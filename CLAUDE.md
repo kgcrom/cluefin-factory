@@ -70,3 +70,12 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
   source of truth for subcommand/param mappings (esp. price-history chunking,
   the 6-call financials bundle, and windowed-financials fallback) — keep the agent
   recipes in sync with them.
+- **Technical analysis goes through `kis chart technical`**, not raw OHLCV: the CLI pages
+  the candles itself and returns indicator readings + rule votes only. Its `signal.trend`
+  and `signal.mean_reversion` families are reported separately on purpose — never collapse
+  them into one score. Use `chart period` (chunked, ~120 days/call) only when the candle
+  rows themselves are the deliverable.
+- Command discovery is `search <자연어> --json` → `schema <path> --json` → `--dry-run`;
+  a bare `list --json` is a 61KB catalog dump. `--fields`/`--limit`/`--compact` keep
+  responses small. Exit codes are a contract: 2 usage, 3 credentials, 4 broker/network
+  (retry only if `error.retryable`), 5 rate limit.

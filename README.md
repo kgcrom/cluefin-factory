@@ -132,11 +132,13 @@ claude          # 저장소 안에서 실행
 4. 최근 뉴스 수집
 5. 환율, 미국/국내 금리, 채권 등 매크로 데이터 수집
 6. `data-sanity-check`로 기준일, 누락, 충돌, 사용 가능 여부 점검
-7. `portfolio-fit`로 기존 포트폴리오 적합성 확인
-8. `bull-analyst` 긍정 의견
-9. `bear-analyst` 부정 의견
-10. `final-decision`으로 buy/hold/sell/watch, 기준선, 손절선, 확인 조건 제시
-11. 필요 시 `investment-journal` 형식으로 기록 제안
+7. `fundamental-analysis` (필수 섹션)
+8. `technical-analysis` (필수 섹션)
+9. `portfolio-fit`로 기존 포트폴리오 적합성 확인
+10. `bull-analyst` → `bear-analyst` → `final-decision` (buy/hold/sell/watch, 기준선, 손절선, 확인 조건)
+11. `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`는 기본 코스를
+    끝낸 뒤 사용자에게 물어보고(Claude Code는 AskUserQuestion), 선택한 것만 수행
+12. 필요 시 `investment-journal` 형식으로 기록 제안
 
 주요 가드레일:
 
