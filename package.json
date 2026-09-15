@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc",
     "start": "npm run chat",
     "chat": "node --env-file=.env ./node_modules/@earendil-works/pi-coding-agent/dist/cli.js",
     "lint": "biome check .",
