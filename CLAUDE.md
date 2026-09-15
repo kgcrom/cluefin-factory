@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-Dure (두레) is an agent configuration for Korean-market investment research.
+Cluefin Factory is an agent configuration for Korean-market investment research —
+a "factory" that keeps turning out company analyses and stock picks.
 There is **no `src/`** — all code and config live under `.pi/` and `.claude/`.
 It runs on **two agent runtimes**, both backed by the external cluefin CLI:
 

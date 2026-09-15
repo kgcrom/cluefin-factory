@@ -1,12 +1,13 @@
-# Dure (두레)
+# Cluefin Factory
 
-![Dure Logo](docs/assets/dure_logo.png)
+![Cluefin Factory Logo](docs/assets/factory_logo.png)
 
-Dure는 한국 시장 투자 리서치 워크벤치입니다.
+Cluefin Factory는 한국 시장 투자 리서치 워크벤치입니다.
+테슬라의 기가팩토리처럼 기업 분석과 종목 추출을 끊임없이 반복해 내놓는 "공장"을 지향합니다.
 별도의 CLI를 만들지 않고, 코딩 에이전트의 project-local resource로 시장 데이터 도구와 분석 워크플로우를 구성합니다.
 시장과 종목을 입력하면 데이터 수집부터 기본적/기술적/뉴스/매크로 분석, 데이터 점검, 포트폴리오 적합성, bull/bear 의견, 최종 판단까지 하나의 진입점에서 실행합니다.
 
-Dure는 **두 가지 에이전트 런타임**을 지원합니다.
+Cluefin Factory는 **두 가지 에이전트 런타임**을 지원합니다.
 
 - **[Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-coding-agent)** — `.pi/` 리소스로 동작 (`npm run chat`)
 - **[Claude Code](https://docs.claude.com/en/docs/claude-code)** — `.claude/` 리소스로 동작
@@ -14,7 +15,7 @@ Dure는 **두 가지 에이전트 런타임**을 지원합니다.
 Pi 런타임은 `.pi/extensions/market-data/`의 도구로 cluefin CLI를 호출하고,
 Claude Code 런타임은 `market-review` 에이전트가 cluefin CLI를 bash로 직접 호출합니다.
 
-## What Dure Does
+## What Cluefin Factory Does
 
 | 구성 | Pi | Claude Code |
 | --- | --- | --- |
@@ -65,10 +66,10 @@ Pi 런타임은 `.pi/extensions/market-data/`의 도구로, Claude Code 런타�
 시장 데이터 도구는 `cluefin` 저장소의 Python CLI(`cluefin-openapi-cli`)를 `uv run`으로 호출하므로, `cluefin`과 [`uv`](https://docs.astral.sh/uv/)가 함께 필요합니다.
 
 ```bash
-git clone https://github.com/kgcrom/cluefin-dure
+git clone https://github.com/kgcrom/cluefin-factory
 git clone https://github.com/kgcrom/cluefin
 
-cd cluefin-dure
+cd cluefin-factory
 npm install
 cp .env.example .env
 ```
@@ -127,7 +128,7 @@ claude          # 저장소 안에서 실행
 
 1. 시장과 종목 식별
 2. 기본적 분석 데이터 수집 (가능하면 최근 5개년 연간, 부족하면 최근 12개 기간)
-3. 기술적 분석 데이터 수집 (가능하면 수정주가 일봉 2년치, 한도 초과 시 구간 분할 후 병합)
+3. 기술적 분석 지표 수집 (`kis chart technical` — CLI가 일봉을 페이징해 지표·신호만 반환, 기본 수정주가)
 4. 최근 뉴스 수집
 5. 환율, 미국/국내 금리, 채권 등 매크로 데이터 수집
 6. `data-sanity-check`로 기준일, 누락, 충돌, 사용 가능 여부 점검
@@ -141,7 +142,9 @@ claude          # 저장소 안에서 실행
 
 - 데이터가 없으면 없다고 명시하며, 투자 조언이 아닌 의사결정 보조 리포트로 작성합니다.
 - `data-sanity-check` 결과가 blocked이면 확정적인 buy/sell 의견을 내지 않습니다.
-- KIS API 요청은 동시에 최대 2개로 제한하고, 토큰/호출 제한 오류 시 확정 판단을 미룹니다.
+- KIS API 요청은 동시에 최대 2개로 제한하고, 토큰/호출 제한 오류(exit 5) 시 확정 판단을 미룹니다.
+- 명령 경로는 `search`, 파라미터는 `schema`로 확인하며 `list` 전체 덤프는 호출하지 않습니다.
+- 기술적 신호는 trend/mean_reversion 두 계열을 따로 읽고 하나의 점수로 합치지 않습니다.
 - 사용자의 명시적 요청 없이 `investments/`의 보유 수량, 평균단가, 현금 잔고를 수정하지 않습니다.
 
 ## Investments Data
