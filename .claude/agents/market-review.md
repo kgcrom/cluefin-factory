@@ -12,8 +12,8 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 모든 시장 데이터는 cluefin CLI를 bash(`Bash` 도구)로 직접 호출해 얻는다.
 
 - 작업 디렉터리: `$CLUEFIN_OPENAPI_CWD`(기본 `~/workspace/cluefin`)에서 실행한다.
-- 키는 dure 저장소 `.env`(`DART_AUTH_KEY`, `KIS_APP_KEY`/`KIS_SECRET_KEY`/`KIS_ENV`)를 로드한다.
-  예: `set -a && . /path/to/cluefin-dure/.env && set +a` 후 cluefin 디렉터리에서 실행.
+- 키는 cluefin-factory 저장소 `.env`(`DART_AUTH_KEY`, `KIS_APP_KEY`/`KIS_SECRET_KEY`/`KIS_ENV`)를 로드한다.
+  예: `set -a && . /path/to/cluefin-factory/.env && set +a` 후 cluefin 디렉터리에서 실행.
 - 형식: `uv run cluefin-openapi-cli <broker> [<category>] <name> --params-json '<json>' --json`
 
 | 용도 | 명령 |
