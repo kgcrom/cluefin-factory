@@ -1,6 +1,7 @@
 ---
 name: macro-analysis
 description: 달러원 환율, 미국 금리, 한국 금리, 미국채, 국고채, 유동성 환경이 종목과 시장에 미치는 영향을 분석한다.
+model: opus
 ---
 
 # Macro Analysis

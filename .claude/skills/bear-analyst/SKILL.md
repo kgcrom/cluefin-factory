@@ -1,6 +1,7 @@
 ---
 name: bear-analyst
 description: 동일한 데이터에서 부정적 투자 논리를 구성한다. 매도, 관망, 리스크 점검이 필요할 때 사용한다.
+model: opus
 ---
 
 # Bear Analyst

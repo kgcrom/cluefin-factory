@@ -1,6 +1,7 @@
 ---
 name: news-analysis
 description: 최근 뉴스, 공시, 실적 발표, 산업 이벤트를 분석해 호재, 악재, 중립 이벤트로 분류한다.
+model: opus
 ---
 
 # News Analysis

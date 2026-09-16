@@ -31,23 +31,23 @@ KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI
 
 ### Analysis skills
 
-`.claude/skills/`에 있습니다.
+`.claude/skills/`에 있습니다. 규칙 적용·산술·기록처럼 기계적인 스킬은 sonnet, 다중 근거를 종합하거나 반론을 구성하는 스킬은 opus로 고정했습니다.
 
-| Skill | 역할 |
-| --- | --- |
-| `fundamental-analysis` | 재무제표, 밸류에이션, 성장성, 수익성, 현금흐름, 부채 구조 |
-| `technical-analysis` | 이동평균, 거래량, RSI, MACD, 지지/저항, 추세 전환 |
-| `news-analysis` | 뉴스, 공시, 실적, 산업 이벤트를 호재/악재/중립으로 분류 |
-| `macro-analysis` | 환율, 미국/한국 금리, 미국채/국고채, 유동성 환경 |
-| `data-sanity-check` | 기준일, 누락, 충돌, 종목 식별, 가격 조정 여부 점검 |
-| `portfolio-fit` | 기존 포트폴리오와 신규/기존 종목의 적합성 |
-| `scenario-planner` | bull / base / bear 시나리오와 조건, 예상 가격 범위 |
-| `risk-position-sizing` | 진입가, 손절가, 목표가, 손익비, 포지션 크기 |
-| `bull-analyst` | 동일 데이터에서 긍정 투자 논리 구성 |
-| `bear-analyst` | 동일 데이터에서 부정 투자 논리 구성 |
-| `final-decision` | buy/hold/sell/watch, 기준선, 무효화 조건, 추적 지표 |
-| `investment-journal` | 투자 판단과 사후 복기를 `investments/journal/`에 기록 |
-| `decision-scorecard` | 과거 판단을 기한·무효화 조건 기준으로 채점하고 적중률·초과수익 집계 |
+| Skill | 모델 | 역할 |
+| --- | --- | --- |
+| `fundamental-analysis` | opus | 재무제표, 밸류에이션, 성장성, 수익성, 현금흐름, 부채 구조 |
+| `technical-analysis` | sonnet | 이동평균, 거래량, RSI, MACD, 지지/저항, 추세 전환 |
+| `news-analysis` | opus | 뉴스, 공시, 실적, 산업 이벤트를 호재/악재/중립으로 분류 |
+| `macro-analysis` | opus | 환율, 미국/한국 금리, 미국채/국고채, 유동성 환경 |
+| `data-sanity-check` | sonnet | 기준일, 누락, 충돌, 종목 식별, 가격 조정 여부 점검 |
+| `portfolio-fit` | opus | 기존 포트폴리오와 신규/기존 종목의 적합성 |
+| `scenario-planner` | opus | bull / base / bear 시나리오와 조건, 예상 가격 범위 |
+| `risk-position-sizing` | sonnet | 진입가, 손절가, 목표가, 손익비, 포지션 크기 |
+| `bull-analyst` | opus | 동일 데이터에서 긍정 투자 논리 구성 |
+| `bear-analyst` | opus | 동일 데이터에서 부정 투자 논리 구성 |
+| `final-decision` | opus | buy/hold/sell/watch, 기준선, 무효화 조건, 추적 지표 |
+| `investment-journal` | sonnet | 투자 판단과 사후 복기를 `investments/journal/`에 기록 |
+| `decision-scorecard` | sonnet | 과거 판단을 기한·무효화 조건 기준으로 채점하고 적중률·초과수익 집계 |
 
 ### Market data
 

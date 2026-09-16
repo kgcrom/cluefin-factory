@@ -1,6 +1,7 @@
 ---
 name: risk-position-sizing
 description: 진입가, 손절가, 목표가, 리스크 대비 보상비, 포지션 크기를 계산한다. 개인 투자자의 리스크 관리에 사용한다.
+model: sonnet
 ---
 
 # Risk Position Sizing

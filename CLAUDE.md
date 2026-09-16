@@ -42,6 +42,11 @@ schemas/                      # final-decision frontmatter JSON Schema + example
 
 Investments data is per-user and git-ignored: `.claude/investments/`.
 
+Each skill pins a model in its frontmatter: `sonnet` for rule-application, arithmetic
+and recording (data-sanity-check, technical-analysis, risk-position-sizing,
+investment-journal, decision-scorecard), `opus` for everything that weighs multiple
+sources or argues a side.
+
 ## Data sources
 
 Market data tools shell out to the external **cluefin** CLI (`uv run
