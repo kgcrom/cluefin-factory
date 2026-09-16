@@ -50,7 +50,7 @@ TS 도구 계층을 유지하는 비용이 얻는 안정성보다 컸다.
 
 ## 남은 정리
 
-- `package.json`에 Pi 런타임 잔재가 남아 있다 — `chat`/`start` 스크립트와
-  `@earendil-works/pi-coding-agent`, `@sinclair/typebox` 의존성. 실행해도 하는 일이 없다.
 - `vitest.config.ts`는 `tests/`를 가리키지만 테스트가 없다. 테스트를 쓸 계획이 없으면
-  vitest 설정과 의존성도 함께 정리한다.
+  vitest 설정과 의존성도 정리한다 — 남아 있는 npm 의존성은 biome과 vitest뿐이다.
+- dependabot이 `vitest`만 올리고 `@vitest/coverage-v8`은 두어 peer 충돌로
+  `npm install`이 깨진 적이 있다(#26). 두 패키지는 버전을 함께 올려야 한다.

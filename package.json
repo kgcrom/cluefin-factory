@@ -4,8 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "npm run chat",
-    "chat": "node --env-file=.env ./node_modules/@earendil-works/pi-coding-agent/dist/cli.js",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
@@ -13,16 +11,9 @@
     "test:coverage": "vitest run --config ./vitest.config.ts --coverage",
     "test:watch": "vitest"
   },
-  "dependencies": {
-    "@earendil-works/pi-coding-agent": "0.85.1",
-    "@sinclair/typebox": "0.34.49"
-  },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
-    "@types/node": "22.19.19",
-    "@vitest/coverage-v8": "4.1.7",
-    "tsx": "4.22.3",
-    "typescript": "6.0.3",
+    "@vitest/coverage-v8": "4.1.11",
     "vitest": "4.1.11"
   }
 }
