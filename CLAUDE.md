@@ -31,11 +31,13 @@ toolchain.
 ```
 .claude/
 ├── agents/market-review.md   # market-review subagent (the orchestrator)
-└── skills/                   # 12 analyst skills: bull/bear-analyst, fundamental-,
+└── skills/                   # 13 analyst skills: bull/bear-analyst, fundamental-,
                               # technical-, macro-, news-analysis, scenario-planner,
                               # final-decision, data-sanity-check, portfolio-fit,
-                              # risk-position-sizing, investment-journal
+                              # risk-position-sizing, investment-journal,
+                              # decision-scorecard
 docs/                         # TODO.md + assets/ (GitHub Pages source)
+schemas/                      # final-decision frontmatter JSON Schema + example
 ```
 
 Investments data is per-user and git-ignored: `.claude/investments/`.

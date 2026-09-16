@@ -38,11 +38,31 @@ TS 도구 계층을 유지하는 비용이 얻는 안정성보다 컸다.
 (`kis chart technical`). 같은 성격의 작업은 이 저장소가 아니라 CLI 쪽에 얹는 것을 먼저
 검토한다.
 
-## Backtest Bot
+## 판단 채점 (decision-scorecard)
 
-`docs/assets/factory_logo.png`의 파이프라인 그림에 "Backtest Bot (coming soon)"으로 자리만
-잡아둔 단계다. `final-decision`이 낸 판단을 과거 구간에 돌려 사후 검증하는 역할이며, 아직
-설계·구현 모두 없다. 무엇을 입력으로 받고 어디에 결과를 남길지부터 정해야 한다.
+`docs/assets/factory_logo.png`에 "Backtest Bot (coming soon)"으로 잡아둔 자리는
+과거 구간 백테스트가 아니라 **forward test 채점**으로 간다. 과거 구간에 에이전트를 다시
+돌리는 방식은 두 가지 이유로 버렸다.
+
+- point-in-time 재무와 상장폐지 종목을 구할 수 없어 look-ahead / survivorship bias를
+  피할 방법이 없다.
+- 모델이 과거 주가 흐름을 이미 알고 있어, 그건 백테스트가 아니라 기억력 테스트가 된다.
+
+대신 `final-decision`이 낸 판단에 타임스탬프와 기한을 박아 저장하고, 기한이 오면
+그때의 실제 값과 대조한다. 판단 시점에 결과를 알 수 없었다는 보증이 이 방식의 근거다.
+
+- 스키마: `schemas/final-decision.schema.json` (+ `final-decision.example.md`)
+- 발행: `final-decision` → `investment-journal`이 frontmatter째 journal에 저장
+- 채점: `decision-scorecard`가 `scoring` 블록만 덮어쓴다
+
+남은 일:
+
+- 판단 표본이 쌓이기 전까지 집계는 의미가 없다. 구간별 10건이 기준선이다.
+- 조기 채점(무효화 조건 daily 확인)을 자동으로 돌릴지, 요청 시에만 돌릴지 미정.
+- 벤치마크를 ETF 대용(`069500`, `229200`)으로 쓰고 있다. 지수 자체를 직접 조회하는
+  명령이 cluefin CLI에 생기면 교체한다.
+- `reference.adjusted`를 CLI 응답에서 자동으로 판별할 방법이 없다. 지금은 확인 안 되면
+  false로 두고 경고만 남긴다.
 
 ## 데이터 공백
 

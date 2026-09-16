@@ -47,6 +47,7 @@ KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI
 | `bear-analyst` | 동일 데이터에서 부정 투자 논리 구성 |
 | `final-decision` | buy/hold/sell/watch, 기준선, 무효화 조건, 추적 지표 |
 | `investment-journal` | 투자 판단과 사후 복기를 `investments/journal/`에 기록 |
+| `decision-scorecard` | 과거 판단을 기한·무효화 조건 기준으로 채점하고 적중률·초과수익 집계 |
 
 ### Market data
 
