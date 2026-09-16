@@ -7,27 +7,26 @@ Cluefin Factory는 한국 시장 투자 리서치 워크벤치입니다.
 별도의 CLI를 만들지 않고, 코딩 에이전트의 project-local resource로 시장 데이터 도구와 분석 워크플로우를 구성합니다.
 시장과 종목을 입력하면 데이터 수집부터 기본적/기술적/뉴스/매크로 분석, 데이터 점검, 포트폴리오 적합성, bull/bear 의견, 최종 판단까지 하나의 진입점에서 실행합니다.
 
-Cluefin Factory는 **두 가지 에이전트 런타임**을 지원합니다.
+런타임은 **[Claude Code](https://docs.claude.com/en/docs/claude-code)** 하나이며,
+`.claude/` 리소스로 동작합니다. `market-review` 에이전트가 cluefin CLI를 bash로 직접
+호출하므로 빌드도, 별도 서버도 없습니다.
 
-- **[Pi coding agent](https://www.npmjs.com/package/@earendil-works/pi-coding-agent)** — `.pi/` 리소스로 동작 (`npm run chat`)
-- **[Claude Code](https://docs.claude.com/en/docs/claude-code)** — `.claude/` 리소스로 동작
-
-Pi 런타임은 `.pi/extensions/market-data/`의 도구로 cluefin CLI를 호출하고,
-Claude Code 런타임은 `market-review` 에이전트가 cluefin CLI를 bash로 직접 호출합니다.
+(Pi coding agent 런타임 `.pi/`는 제거했습니다 — CLI가 바뀔 때마다 두 런타임을 맞추는
+비용이 이득보다 컸습니다.)
 
 ## What Cluefin Factory Does
 
-| 구성 | Pi | Claude Code |
-| --- | --- | --- |
-| 데이터 수집 | Extension `index.ts` (Pi tool) | `market-review` 에이전트가 cluefin CLI를 bash로 직접 호출 |
-| 오케스트레이션 | Prompt `/market-review` | `market-review` 서브에이전트 (`.claude/agents/`) |
-| 분석 역할 | Skills `.pi/skills/*` | Skills `.claude/skills/*` |
+| 구성 | 위치 |
+| --- | --- |
+| 데이터 수집 | `market-review` 에이전트가 cluefin CLI를 bash로 직접 호출 |
+| 오케스트레이션 | `market-review` 서브에이전트 (`.claude/agents/`) |
+| 분석 역할 | Skills `.claude/skills/*` |
 
-공통적으로 KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI(`cluefin-openapi-cli`)를 `uv run`으로 호출합니다.
+KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI(`cluefin-openapi-cli`)를 `uv run`으로 호출합니다.
 
 ### Analysis skills
 
-`.pi/skills/`와 `.claude/skills/`에 동일하게 제공됩니다.
+`.claude/skills/`에 있습니다.
 
 | Skill | 역할 |
 | --- | --- |
@@ -46,12 +45,13 @@ Claude Code 런타임은 `market-review` 에이전트가 cluefin CLI를 bash로 
 
 ### Market data
 
-KIS·DART 데이터는 cluefin CLI(`uv run cluefin-openapi-cli`)로 가져옵니다.
-Pi 런타임은 `.pi/extensions/market-data/`의 도구로, Claude Code 런타임은 `market-review`
-에이전트가 bash로 직접 호출합니다. 주요 조회 항목:
+KIS·DART 데이터는 `market-review` 에이전트가 cluefin CLI(`uv run cluefin-openapi-cli`)를
+bash로 호출해 가져옵니다. 명령 경로는 `search <자연어> --json`, 파라미터는
+`schema <경로> --json`으로 확인합니다. 주요 조회 항목:
 
 - 현재가: `kis stock current-price`
-- 가격 이력(기술적 분석용): `kis chart period` (장기 구간은 분할 후 병합)
+- 기술적 지표: `kis chart technical` (CLI가 일봉을 페이징해 지표·신호만 반환)
+- 가격 이력(캔들 행이 필요할 때만): `kis chart period` (장기 구간은 분할 후 병합)
 - 재무제표/비율 번들: `kis financial {income-statement,balance-sheet,ratio,growth,profitability,stability}`
 - 시장 뉴스/공시 제목: `kis market announcement`
 - DART 기업 고유번호: `dart corp-code-lookup`
@@ -70,11 +70,10 @@ git clone https://github.com/kgcrom/cluefin-factory
 git clone https://github.com/kgcrom/cluefin
 
 cd cluefin-factory
-npm install
 cp .env.example .env
 ```
 
-`market-data` 계층은 기본적으로 `~/workspace/cluefin`을 cluefin CLI 실행 경로로 가정합니다.
+`market-review` 에이전트는 기본적으로 `~/workspace/cluefin`을 cluefin CLI 실행 경로로 가정합니다.
 다른 위치에 clone했다면 `.env`에 `CLUEFIN_OPENAPI_CWD`로 경로를 지정합니다.
 
 ```bash
@@ -91,22 +90,6 @@ CLUEFIN_OPENAPI_CWD=/path/to/cluefin
 - `CLUEFIN_OPENAPI_CWD` (cluefin이 `~/workspace/cluefin`이 아닐 때만)
 
 ### 3. Run
-
-#### Pi coding agent
-
-```bash
-npm run chat
-```
-
-`npm run chat`은 Pi coding agent CLI를 `.env`와 함께 실행합니다.
-대화형 모드에서 `/market-review` 프롬프트로 투자 검토를 시작합니다.
-
-```text
-/market-review KOSPI 005930
-/market-review KOSDAQ 247540
-```
-
-#### Claude Code
 
 저장소 안에서 Claude Code를 실행하면 `.claude/`의 스킬과 `market-review` 서브에이전트가
 자동 등록됩니다. 시장 데이터는 에이전트가 cluefin CLI를 bash로 직접 호출하므로 별도 빌드는
@@ -132,11 +115,13 @@ claude          # 저장소 안에서 실행
 4. 최근 뉴스 수집
 5. 환율, 미국/국내 금리, 채권 등 매크로 데이터 수집
 6. `data-sanity-check`로 기준일, 누락, 충돌, 사용 가능 여부 점검
-7. `portfolio-fit`로 기존 포트폴리오 적합성 확인
-8. `bull-analyst` 긍정 의견
-9. `bear-analyst` 부정 의견
-10. `final-decision`으로 buy/hold/sell/watch, 기준선, 손절선, 확인 조건 제시
-11. 필요 시 `investment-journal` 형식으로 기록 제안
+7. `fundamental-analysis` (필수 섹션)
+8. `technical-analysis` (필수 섹션)
+9. `portfolio-fit`로 기존 포트폴리오 적합성 확인
+10. `bull-analyst` → `bear-analyst` → `final-decision` (buy/hold/sell/watch, 기준선, 손절선, 확인 조건)
+11. `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`는 기본 코스를
+    끝낸 뒤 사용자에게 물어보고(Claude Code는 AskUserQuestion), 선택한 것만 수행
+12. 필요 시 `investment-journal` 형식으로 기록 제안
 
 주요 가드레일:
 
@@ -150,30 +135,20 @@ claude          # 저장소 안에서 실행
 ## Investments Data
 
 `portfolio-fit`과 `investment-journal` 스킬은 사용자별 로컬 데이터를 읽고 씁니다.
-런타임에 따라 `.pi/investments/` 또는 `.claude/investments/`를 사용합니다.
+`.claude/investments/`에 저장합니다.
 
 - `portfolio.yaml`, `watchlist.yaml`, `transactions.csv`: 보유/관심 종목과 거래 기록
 - `journal/`: 투자 판단과 사후 복기 기록
 
-이 데이터는 개인 자료이므로 커밋하지 않습니다 (`.gitignore`에서 `.pi/investments/`, `.claude/investments/` 모두 제외).
+이 데이터는 개인 자료이므로 커밋하지 않습니다 (`.gitignore`에서 `.claude/investments/` 제외).
 
 ## Repository Layout
 
 ```text
-.pi/
-├── extensions/
-│   └── market-data/        # KIS, DART 데이터 도구 — cluefin CLI(uv) 브리지
-│       ├── index.ts        # Pi tool 등록 진입점
-│       ├── cli.ts          # cluefin-openapi-cli 실행
-│       ├── providers/      # kis.ts, dart.ts (런타임 비의존)
-│       └── types.ts
-├── prompts/
-│   └── market-review.md    # /market-review 진입점 프롬프트 (Pi)
-└── skills/                 # 분석 역할 스킬 (Pi)
 .claude/
 ├── agents/
-│   └── market-review.md    # market-review 서브에이전트 (Claude Code 오케스트레이터)
-└── skills/                 # 분석 역할 스킬 (Claude Code, .pi/skills와 동일)
+│   └── market-review.md    # market-review 서브에이전트 (오케스트레이터)
+└── skills/                 # 분석 역할 스킬 12개
 docs/
 ├── TODO.md                 # 남아 있는 작업 메모
 └── assets/                 # 로고 등 정적 리소스
@@ -183,11 +158,12 @@ docs/
 
 작업을 마친 뒤 아래 검증을 실행합니다.
 
+저장소에 소스 코드가 없어 빌드 단계는 없습니다. 남은 npm 스크립트는 형식 검사용입니다.
+
 ```bash
-npm test       # vitest (--passWithNoTests)
 npm run lint   # biome check
 npm run format # biome format --write
-npm run build  # tsc (Pi 확장 dist/ 생성)
+npm test       # vitest (--passWithNoTests, 현재 테스트 없음)
 ```
 
 ## Related Docs
