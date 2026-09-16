@@ -38,6 +38,12 @@ TS 도구 계층을 유지하는 비용이 얻는 안정성보다 컸다.
 (`kis chart technical`). 같은 성격의 작업은 이 저장소가 아니라 CLI 쪽에 얹는 것을 먼저
 검토한다.
 
+## Backtest Bot
+
+`docs/assets/factory_logo.png`의 파이프라인 그림에 "Backtest Bot (coming soon)"으로 자리만
+잡아둔 단계다. `final-decision`이 낸 판단을 과거 구간에 돌려 사후 검증하는 역할이며, 아직
+설계·구현 모두 없다. 무엇을 입력으로 받고 어디에 결과를 남길지부터 정해야 한다.
+
 ## 데이터 공백
 
 - **원/달러 환율 명령이 없다.** `list --query "exchange rate"`가 0건이고 `search`도

@@ -1,11 +1,16 @@
 # Cluefin Factory
 
-![Cluefin Factory Logo](docs/assets/factory_logo.png)
+![market-review 파이프라인 다이어그램 — KIS·DART 데이터 수집부터 data-sanity-check 게이트, 기본적·기술적 분석, 포트폴리오 적합성, bull/bear 토론, 최종 판단, 종목별 투자 검토 리포트까지](docs/assets/factory_logo.png)
 
 Cluefin Factory는 한국 시장 투자 리서치 워크벤치입니다.
 테슬라의 기가팩토리처럼 기업 분석과 종목 추출을 끊임없이 반복해 내놓는 "공장"을 지향합니다.
 별도의 CLI를 만들지 않고, 코딩 에이전트의 project-local resource로 시장 데이터 도구와 분석 워크플로우를 구성합니다.
 시장과 종목을 입력하면 데이터 수집부터 기본적/기술적/뉴스/매크로 분석, 데이터 점검, 포트폴리오 적합성, bull/bear 의견, 최종 판단까지 하나의 진입점에서 실행합니다.
+
+위 그림이 `market-review` 서브에이전트의 실행 순서입니다. `data-sanity-check`가 게이트 역할을
+해서 blocked이면 확정 판단을 내리지 않고, `fundamental-analysis`와 `technical-analysis`는 항상
+수행하며, `macro-analysis`·`news-analysis`·`scenario-planner`·`risk-position-sizing`은 사용자가
+요청할 때만 붙습니다.
 
 런타임은 **[Claude Code](https://docs.claude.com/en/docs/claude-code)** 하나이며,
 `.claude/` 리소스로 동작합니다. `market-review` 에이전트가 cluefin CLI를 bash로 직접
@@ -151,7 +156,7 @@ claude          # 저장소 안에서 실행
 └── skills/                 # 분석 역할 스킬 12개
 docs/
 ├── TODO.md                 # 남아 있는 작업 메모
-└── assets/                 # 로고 등 정적 리소스
+└── assets/                 # 파이프라인 다이어그램 등 정적 리소스
 ```
 
 ## Development
