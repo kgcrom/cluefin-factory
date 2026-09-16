@@ -14,7 +14,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "0.79.8",
+    "@earendil-works/pi-coding-agent": "0.85.1",
     "@sinclair/typebox": "0.34.49"
   },
   "devDependencies": {
