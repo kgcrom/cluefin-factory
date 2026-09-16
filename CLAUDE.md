@@ -9,8 +9,8 @@ the external cluefin CLI (`uv run cluefin-openapi-cli`) via bash — no MCP serv
 build step, no TypeScript.
 
 The Pi runtime (`.pi/`, `@earendil-works/pi-coding-agent`) was removed; keeping two
-runtimes in sync with a moving CLI cost more than it returned. The leftover npm
-toolchain (`chat`/`start` scripts, pi dependency, biome, vitest) is vestigial.
+runtimes in sync with a moving CLI cost more than it returned. What is left of npm is
+biome (formats the JSON/config files) and vitest (no tests yet).
 
 ## Commands
 
@@ -23,8 +23,8 @@ npm run lint:fix      # biome check --write .
 npm run format        # biome format --write .
 ```
 
-There is nothing to build. `npm run chat`/`start` still point at the removed Pi
-runtime and do nothing useful.
+There is nothing to build and no runtime dependency — npm is only the lint/test
+toolchain.
 
 ## Layout
 
