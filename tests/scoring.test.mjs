@@ -9,6 +9,8 @@ import {
   firstTrigger,
   judgeOutcome,
   scoreDecision,
+  tradingDayAfter,
+  tradingDaysBetween,
   weeklyCloses,
 } from '../scripts/lib/scoring.mjs';
 
@@ -106,6 +108,49 @@ describe('채점 대상 선별', () => {
     };
     const result = scoreDecision(fired, { ...series, today: '20260919' });
     expect(result).toMatchObject({ status: 'invalidated', endDate: '20260623' });
+  });
+});
+
+describe('거래일 기준 horizon', () => {
+  const base = readEntry(join(DECISIONS, '2026-06-19-383220-02.md')).data;
+
+  it('경과를 달력일이 아니라 거래일로 센다', () => {
+    // 2026-06-19(금) → 06-23(화): 달력 4일이지만 주말을 빼면 2거래일이다
+    const result = scoreDecision(
+      { ...base, horizon_basis: 'trading', horizon_days: 62 },
+      { ...series, today: TODAY },
+    );
+    expect(result.elapsed_days).toBe(2);
+    expect(result.elapsed_calendar_days).toBe(4);
+    expect(result.horizon_basis).toBe('trading');
+  });
+
+  it('기한 도래를 review_due가 아니라 거래일 수로 판정한다', () => {
+    const noTrigger = { ...base, invalidation: [], horizon_basis: 'trading' };
+    // 20260619에서 5거래일 뒤는 20260626 — review_due(2026-09-17)와 무관하다
+    expect(
+      scoreDecision({ ...noTrigger, horizon_days: 5 }, { ...series, today: TODAY }).endDate,
+    ).toBe(tradingDayAfter(series.prices, '20260619', 5));
+    // 시계열이 닿지 않는 horizon은 아직 기한 미도래다
+    expect(scoreDecision({ ...noTrigger, horizon_days: 500 }, { ...series, today: TODAY })).toEqual(
+      {
+        status: 'pending',
+        manual_conditions: [],
+      },
+    );
+  });
+
+  it('horizon_basis가 없으면 예전처럼 달력일로 센다', () => {
+    expect(score('2026-06-19-383220-02.md')).toMatchObject({
+      horizon_basis: 'calendar',
+      elapsed_days: 4,
+    });
+  });
+
+  it('거래일 계산은 시계열에 있는 날만 센다', () => {
+    expect(tradingDaysBetween(series.prices, '20260619', '20260623')).toBe(2);
+    expect(tradingDayAfter(series.prices, '20260619', 2)).toBe('20260623');
+    expect(tradingDayAfter(series.prices, '20260917', 1)).toBeNull();
   });
 });
 

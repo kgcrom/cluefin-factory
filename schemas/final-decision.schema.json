@@ -183,12 +183,21 @@
     "horizon_days": {
       "type": "integer",
       "minimum": 1,
-      "description": "채점 기한(일). 이게 없으면 채점 불가 — 필수."
+      "description": "채점 기한. 단위는 horizon_basis가 정한다(기본 calendar). 이게 없으면 채점 불가 — 필수."
+    },
+    "horizon_basis": {
+      "type": "string",
+      "enum": [
+        "calendar",
+        "trading"
+      ],
+      "default": "calendar",
+      "description": "horizon_days의 단위. trading이면 거래일 수로 읽고, 기한 도래 판정도 거래일로 센다. 시장이 열린 날만 세야 연휴 배치에 따라 실질 관찰 기간이 흔들리지 않는다. 생략하면 calendar(옛 판단 호환)."
     },
     "review_due": {
       "type": "string",
       "format": "date",
-      "description": "decided_at + horizon_days. 사후 복기 예정일."
+      "description": "사후 복기 예정일. horizon_basis가 trading이면 미래 휴장일을 알 수 없어 근사치이며, 기한 도래 판정은 채점 시점에 실제 거래일을 세어 한다."
     },
     "reference": {
       "type": "object",

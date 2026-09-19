@@ -24,7 +24,10 @@ export function scoringNotes(result, { referenceDate }) {
   } else {
     parts.push(`기한 도래 정상 채점(${result.endDate} 종가 기준).`);
   }
-  parts.push(`경과 ${result.elapsed_days}일 / horizon 대비 ${result.elapsed_ratio}%.`);
+  const unit = result.horizon_basis === 'trading' ? '거래일' : '일';
+  parts.push(
+    `경과 ${result.elapsed_days}${unit}(달력 ${result.elapsed_calendar_days}일) / horizon 대비 ${result.elapsed_ratio}%.`,
+  );
   if (result.early_exit) {
     parts.push('20% 미만이라 horizon별 성과 비교에서 제외한다(적중률 집계에는 포함).');
   }

@@ -47,6 +47,9 @@ node scripts/scorecard.mjs aggregate            # 성적표 집계
   밑돌았으면 `incorrect`다.
 - `sell`과 `watch`는 부등호가 반대다. 포지션을 잡지 않은 판단이므로 "사지 않은 것이
   옳았는가"를 본다. `notes`의 `excess_long`이 부호 반전 전 원값이다.
+- 경과는 `horizon_basis`가 `trading`이면 거래일로 센다. `elapsed_days`가 거래일,
+  `elapsed_calendar_days`가 달력일이다. 기한 도래도 `review_due`가 아니라 실제 거래일
+  수로 판정하므로, 근사치인 `review_due`와 하루 이틀 어긋나는 것은 정상이다.
 - `early_exit`(경과율 20% 미만)인 건은 **horizon별 성과 비교에서 뺀다.** 사흘 만에 끝난
   120일 판단과 완주한 30일 판단을 같은 표에서 비교하면 horizon이 아니라 무효화 조건의
   민감도를 비교하는 셈이다. 적중률 집계에는 그대로 포함한다 — 조기 종료도 결과다.
@@ -78,7 +81,8 @@ forward 표본이 쌓이기를 기다리는 동안, **과거 기준일 데이터
 
 ### 1. as_of 잡기
 
-`as_of + horizon_days <= 오늘`이어야 하므로, horizon을 늘리면 as_of가 과거로 밀린다.
+`as_of`로부터 `horizon_days` 거래일이 오늘 이전에 끝나야 하므로, horizon을 늘리면
+as_of가 과거로 밀린다.
 `leakage_risk`는 horizon이 아니라 **as_of와 학습 컷오프의 간격**으로만 정한다 — 등급
 경계는 `lint`가 판정하므로, 먼저 컷오프를 확인하고 as_of를 역산한 뒤 lint로 맞춘다.
 

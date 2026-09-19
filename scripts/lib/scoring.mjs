@@ -8,6 +8,17 @@
 const DAY_MS = 86_400_000;
 const EARLY_EXIT_RATIO = 0.2;
 
+/** Trading days elapsed: rows in the series after `from`, up to and including `to`. */
+export function tradingDaysBetween(series, from, to) {
+  return series.filter((row) => row.date > from && row.date <= to).length;
+}
+
+/** The date `count` trading days after `from`, or null if the series stops short. */
+export function tradingDayAfter(series, from, count) {
+  const forward = series.filter((row) => row.date > from);
+  return forward.length >= count ? forward[count - 1].date : null;
+}
+
 export function toUtc(yyyymmdd) {
   return Date.UTC(
     Number(yyyymmdd.slice(0, 4)),
@@ -96,18 +107,24 @@ export function judgeOutcome(verdict, excessLong) {
 
 export function scoreDecision(data, { prices, index, today }) {
   const referenceDate = compact(String(data.data_as_of?.price ?? ''));
-  const reviewDue = compact(String(data.review_due ?? ''));
   const horizon = Number(data.horizon_days);
+  const trading = data.horizon_basis === 'trading';
   const { trigger, manual } = firstTrigger(data.invalidation, prices, referenceDate);
 
-  const due = reviewDue <= today;
-  const earlyExit = trigger !== null && (!due || trigger.date < reviewDue);
+  // On a trading basis the completion date is counted off the exchange calendar,
+  // because review_due was only ever an estimate — future holidays are unknown
+  // when the judgment is written.
+  const completionDate = trading
+    ? tradingDayAfter(prices, referenceDate, horizon)
+    : compact(String(data.review_due ?? ''));
+  const due = completionDate !== null && completionDate <= today;
+  const earlyExit = trigger !== null && (!due || trigger.date < completionDate);
   if (!due && !earlyExit) {
     // Not due and nothing fired: only the invalidation check applies, and it
     // came back clean. Scoring an open judgment early would invent a result.
     return { status: 'pending', manual_conditions: manual };
   }
-  const endDate = earlyExit ? trigger.date : reviewDue;
+  const endDate = earlyExit ? trigger.date : completionDate;
   const window = slice(prices, referenceDate, endDate);
   if (window.length === 0) return { status: 'void', notes: '구간에 가격 데이터가 없다' };
   // A capped response comes back short instead of erroring, so a series that
@@ -125,7 +142,9 @@ export function scoreDecision(data, { prices, index, today }) {
 
   const verdict = data.verdict;
   const flip = verdict === 'sell';
-  const elapsed = elapsedDays(referenceDate, endDate);
+  const elapsed = trading
+    ? tradingDaysBetween(prices, referenceDate, endDate)
+    : elapsedDays(referenceDate, endDate);
   const volatility = dailyVolatility(indexWindow);
 
   const stop = data.levels?.stop_loss;
@@ -150,7 +169,9 @@ export function scoreDecision(data, { prices, index, today }) {
     invalidated_by: earlyExit ? trigger.ids : [],
     manual_conditions: manual,
     outcome: judgeOutcome(verdict, excessLong),
+    horizon_basis: trading ? 'trading' : 'calendar',
     elapsed_days: elapsed,
+    elapsed_calendar_days: elapsedDays(referenceDate, endDate),
     elapsed_ratio: round((elapsed / horizon) * 100),
     early_exit: elapsed / horizon < EARLY_EXIT_RATIO,
     index_volatility_pct: volatility === null ? null : round(volatility),

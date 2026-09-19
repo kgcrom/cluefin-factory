@@ -46,10 +46,29 @@ export function minStopWidth(atr, horizonDays) {
   return 1.5 * atr * Math.sqrt(horizonDays / 30);
 }
 
+const TRADING_DAYS_PER_WEEK = 5;
+const CALENDAR_DAYS_PER_WEEK = 7;
+
 export function checkReviewDue(data) {
   const anchor = anchorDate(data);
   const due = parseDate(data.review_due);
   if (anchor === null || due === null) return [];
+  if (data.horizon_basis === 'trading') {
+    // Future holidays are unknown, so review_due is an estimate and the real
+    // completion date is counted at scoring time. Only flag an implausible one.
+    const nominal = (Number(data.horizon_days) * CALENDAR_DAYS_PER_WEEK) / TRADING_DAYS_PER_WEEK;
+    const gap = daysBetween(anchor, due);
+    if (gap < nominal * 0.8 || gap > nominal * 1.4) {
+      return [
+        finding(
+          'review_due',
+          'warn',
+          `review_due가 기준일 + ${gap}일인데, 거래일 ${data.horizon_days}일은 달력으로 ${Math.round(nominal)}일 안팎이다`,
+        ),
+      ];
+    }
+    return [];
+  }
   const expected = anchor + Number(data.horizon_days) * DAY_MS;
   if (due === expected) return [];
   const iso = new Date(expected).toISOString().slice(0, 10);
