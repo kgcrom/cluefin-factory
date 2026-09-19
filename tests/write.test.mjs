@@ -48,10 +48,14 @@ describe('scoring 블록 쓰기', () => {
       status: 'invalidated',
       price_at_review: 73200,
       return_pct: -9.96,
+      // 산문이 아니라 필드로 남아야 집계가 다시 읽을 수 있다
+      excess_long: -0.52,
+      early_exit: true,
+      within_noise: true,
       invalidated_by: ['inv-2'],
       outcome: 'incorrect',
     });
-    expect(data.decision_id).toBe('2026-06-19-000000-01');
+    expect(data.decision_id).toBe('2026-07-24-000000-01');
   });
 
   it('기한 미도래 판단은 pending 그대로 남긴다', () => {

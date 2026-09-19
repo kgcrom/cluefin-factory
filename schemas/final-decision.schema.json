@@ -63,6 +63,10 @@
           "format": "date",
           "description": "시뮬레이션 기준일. 모든 조회를 이 날짜로 고정한다. decided_at(실제 생성 시각)과 혼동하지 않는다."
         },
+        "generator_model": {
+          "type": "string",
+          "description": "이 판단을 생성한 모델 id. 컷오프는 모델에 딸린 값이므로 leakage_risk는 여기서 역산한다. rules.mjs의 MODEL_CUTOFFS에 없는 모델은 lint error다."
+        },
         "bounded_sources": {
           "type": "array",
           "minItems": 1,
