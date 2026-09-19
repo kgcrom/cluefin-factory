@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/kgcrom/cluefin-dure/schemas/final-decision.schema.json",
+  "$id": "https://github.com/kgcrom/cluefin-factory/schemas/final-decision.schema.json",
   "title": "final-decision frontmatter",
   "description": "투자 저널 파일(.claude/investments/journal/YYYY-MM-DD-SYMBOL.md)의 YAML frontmatter. 채점 봇이 이 블록만 읽는다.",
   "type": "object",
@@ -509,6 +509,13 @@
           ],
           "description": "같은 기간 KOSPI/KOSDAQ 수익률. 절대수익이 아니라 초과수익으로 채점한다."
         },
+        "excess_long": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "종목 수익률 − 벤치마크 수익률, 부호 반전 전 원값. 항상 매수 관점으로 계산하고 verdict에 따라 부등호만 뒤집는다(buy/hold는 >0, sell/watch는 <0이 correct). 집계는 return_pct를 다시 빼지 말고 이 값을 읽는다."
+        },
         "max_drawdown_pct": {
           "type": [
             "number",
@@ -548,6 +555,74 @@
             "inconclusive",
             null
           ]
+        },
+        "horizon_basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "trading",
+            "calendar",
+            null
+          ],
+          "description": "경과를 거래일로 셌는지 달력일로 셌는지."
+        },
+        "elapsed_days": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "horizon_basis 기준 경과. trading이면 거래일 수다."
+        },
+        "elapsed_calendar_days": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "달력 기준 경과."
+        },
+        "elapsed_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "elapsed_days / horizon_days, 백분율."
+        },
+        "early_exit": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "경과율 20% 미만. horizon별 성과 비교에서 제외한다(적중률에는 포함)."
+        },
+        "index_volatility_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "구간 지수 일간 수익률의 표준편차."
+        },
+        "within_noise": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "|excess_long| < index_volatility_pct. 초과수익의 크기를 성패로 읽지 않는다."
+        },
+        "coverage_gap": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "조회 구간이 기준일까지 닿지 않았다 — 시계열이 잘렸을 수 있다."
+        },
+        "manual_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "스크립트가 판정을 포기한 조건 id. 사용자에게 물어야 한다."
         },
         "notes": {
           "type": [

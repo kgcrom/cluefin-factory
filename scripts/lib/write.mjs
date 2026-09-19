@@ -51,18 +51,37 @@ export function renderScoring(result, { scoredAt, referenceDate }) {
   if (result.status === 'pending') {
     return 'scoring:\n  status: pending\n';
   }
+  // Everything the scorer computes is written as a field, not only into `notes`:
+  // aggregation reads these back, and prose cannot be read back.
+  const fields = [
+    ['status', result.status],
+    ['scored_at', scoredAt],
+    ['price_at_review', result.price_at_review],
+    ['return_pct', result.return_pct],
+    ['benchmark_return_pct', result.benchmark_return_pct],
+    ['excess_long', result.excess_long],
+    ['max_drawdown_pct', result.max_drawdown_pct],
+    ['stop_hit', result.stop_hit],
+    ['target_hit', result.target_hit],
+    ['invalidated_by', result.invalidated_by ?? []],
+    ['outcome', result.outcome],
+    ['horizon_basis', result.horizon_basis],
+    ['elapsed_days', result.elapsed_days],
+    ['elapsed_calendar_days', result.elapsed_calendar_days],
+    ['elapsed_ratio', result.elapsed_ratio],
+    ['early_exit', result.early_exit],
+    ['index_volatility_pct', result.index_volatility_pct],
+    ['within_noise', result.within_noise],
+    ['coverage_gap', result.coverage_gap],
+    ['manual_conditions', result.manual_conditions],
+  ];
   const lines = [
     'scoring:',
-    `  status: ${result.status}`,
-    `  scored_at: ${scoredAt}`,
-    `  price_at_review: ${scalar(result.price_at_review)}`,
-    `  return_pct: ${scalar(result.return_pct)}`,
-    `  benchmark_return_pct: ${scalar(result.benchmark_return_pct)}`,
-    `  max_drawdown_pct: ${scalar(result.max_drawdown_pct)}`,
-    `  stop_hit: ${scalar(result.stop_hit)}`,
-    `  target_hit: ${scalar(result.target_hit)}`,
-    `  invalidated_by: ${JSON.stringify(result.invalidated_by ?? [])}`,
-    `  outcome: ${scalar(result.outcome)}`,
+    ...fields
+      .filter(([, value]) => value !== undefined)
+      .map(([key, value]) =>
+        Array.isArray(value) ? `  ${key}: ${JSON.stringify(value)}` : `  ${key}: ${scalar(value)}`,
+      ),
     '  notes: >-',
     ...wrap(scoringNotes(result, { referenceDate }), 88).map((line) => `    ${line}`),
   ];

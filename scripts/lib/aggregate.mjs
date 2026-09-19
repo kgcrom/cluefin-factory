@@ -29,6 +29,24 @@ function hitRate(rows) {
   return { n: judged.length, rate: round((correct / judged.length) * 100) };
 }
 
+/**
+ * The excess a long position would have earned — one definition for every verdict.
+ *
+ * Deriving it from `return_pct` is not safe on its own: a `sell` stores that pair
+ * already sign-flipped and a `watch` does not, so subtracting would put two sign
+ * conventions in one column. Entries scored before `excess_long` became a field
+ * fall back to undoing the `sell` flip by hand.
+ */
+function excessLong(data) {
+  const scoring = data.scoring ?? {};
+  if (typeof scoring.excess_long === 'number') return scoring.excess_long;
+  if (typeof scoring.return_pct !== 'number' || typeof scoring.benchmark_return_pct !== 'number') {
+    return null;
+  }
+  const raw = scoring.return_pct - scoring.benchmark_return_pct;
+  return data.verdict === 'sell' ? -raw : raw;
+}
+
 /** One row per scored judgment, flattened from frontmatter. */
 export function toRows(entries) {
   return entries
@@ -41,11 +59,7 @@ export function toRows(entries) {
       confidence: data.confidence,
       horizon_days: data.horizon_days,
       outcome: data.scoring.outcome,
-      excess:
-        typeof data.scoring.return_pct === 'number' &&
-        typeof data.scoring.benchmark_return_pct === 'number'
-          ? data.scoring.return_pct - data.scoring.benchmark_return_pct
-          : null,
+      excess: excessLong(data),
       uncheckable: (data.invalidation ?? []).filter((item) => item.checkable === false).length,
       conditions: (data.invalidation ?? []).length,
     }));

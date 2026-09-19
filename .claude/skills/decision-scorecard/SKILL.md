@@ -44,7 +44,9 @@ node scripts/scorecard.mjs aggregate            # 성적표 집계
 ### 판정의 의미
 
 - `outcome`은 절대수익이 아니라 **초과수익** 기준이다. 절대수익이 플러스여도 지수를
-  밑돌았으면 `incorrect`다.
+  밑돌았으면 `incorrect`다. 기준값은 `excess_long`(종목 − 벤치마크, 부호 반전 전 원값)이며
+  `scoring` 블록에 필드로 남는다. `return_pct`를 다시 빼서 쓰지 않는다 — sell은 이미
+  반전돼 저장돼 있고 watch는 아니라, 빼면 한 열에 부호 규칙이 둘 섞인다.
 - `sell`과 `watch`는 부등호가 반대다. 포지션을 잡지 않은 판단이므로 "사지 않은 것이
   옳았는가"를 본다. `notes`의 `excess_long`이 부호 반전 전 원값이다.
 - 경과는 `horizon_basis`가 `trading`이면 거래일로 센다. `elapsed_days`가 거래일,

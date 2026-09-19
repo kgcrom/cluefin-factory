@@ -72,3 +72,40 @@ describe('지표', () => {
     expect(group.uncheckable_ratio).toBe(50);
   });
 });
+
+describe('초과수익 부호', () => {
+  const scored = (verdict, scoring) =>
+    decision({ verdict, decision_id: verdict, retro_seed: { cohort: verdict }, scoring });
+
+  it('excess_long 필드가 있으면 그대로 읽는다', () => {
+    const [row] = toRows([
+      scored('sell', { status: 'scored', outcome: 'incorrect', excess_long: 8.36 }),
+    ]);
+    expect(row.excess).toBe(8.36);
+  });
+
+  it('필드가 없는 옛 기록은 sell의 부호 반전을 되돌린다', () => {
+    // sell은 return_pct/benchmark가 이미 반전돼 저장돼 있다: 원값은 +8.36
+    const [row] = toRows([
+      scored('sell', {
+        status: 'scored',
+        outcome: 'incorrect',
+        return_pct: -6.16,
+        benchmark_return_pct: 2.19,
+      }),
+    ]);
+    expect(row.excess).toBeCloseTo(8.35, 2);
+  });
+
+  it('watch는 반전 없이 그대로 쓴다', () => {
+    const [row] = toRows([
+      scored('watch', {
+        status: 'invalidated',
+        outcome: 'correct',
+        return_pct: -21.77,
+        benchmark_return_pct: -8.67,
+      }),
+    ]);
+    expect(row.excess).toBeCloseTo(-13.1, 2);
+  });
+});
