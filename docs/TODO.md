@@ -53,19 +53,23 @@ TS 도구 계층을 유지하는 비용이 얻는 안정성보다 컸다.
 
 - 스키마: `schemas/final-decision.schema.json` (+ `final-decision.example.md`)
 - 발행: `final-decision` → `investment-journal`이 frontmatter째 journal에 저장
-- 채점: `decision-scorecard`가 `scoring` 블록만 덮어쓴다
+- 채점: `scripts/scorecard.mjs`가 산술과 쓰기를 맡고, `decision-scorecard` 스킬은
+  실행과 결과 해석만 한다 (`lint` → `score --write` → `aggregate`)
 
 남은 일:
 
 - 판단 표본이 쌓이기 전까지 집계는 의미가 없다. 구간별 10건이 기준선이다.
 - 조기 채점(무효화 조건 daily 확인)을 자동으로 돌릴지, 요청 시에만 돌릴지 미정.
-- 벤치마크는 `kis sector daily`로 지수를 직접 조회한다(ETF 대용에서 교체 완료).
-  `--start-date`가 이름과 달리 **종료일**이고 100행 고정이라, 5개월을 넘는 구간은
-  나눠 호출해 병합한다.
-- 수정된 채점 규칙(verdict별 판정 방향, `excess_long` 부호 반전, 조기 종료 제외,
-  `leakage_risk` 재정의)으로 **처음부터 다시 돌리는 재테스트**가 남았다. 기존 4건
-  재채점은 끝났지만, 무효화 조건을 horizon에 맞추는 규칙이 실제로 조건 설계를
-  바꾸는지는 판단을 새로 생성해야 드러난다.
+- 벤치마크 지수 조회는 `scripts/lib/cluefin.mjs`가 맡는다. `--start-date`가 종료일인
+  함정은 `endingOn` 파라미터로 감쌌지만, **100행을 넘는 구간을 나눠 호출해 병합하는
+  처리는 아직 없다.** 5개월을 넘는 horizon에서 벤치마크가 조용히 잘린다.
+- 가격이 아닌 `checkable: true` 술어(`operating_profit_growth_yoy` 등)를 스크립트가
+  평가하지 못해 `manual_conditions`로 넘긴다. `kis financial` 경로를 붙일지 정해야 한다.
+- 집계에서 아직 안 내는 지표: 무효화 조건 효용(조기 종료 대비 기한까지 갔을 때의 손실
+  차이), `gates.data_sanity`가 warn인 판단의 초과수익 저하 폭, `skills_run` 구성별 성과
+  차이. 표본이 쌓이기 전에는 계산해도 읽을 것이 없어 미뤘다.
+- 손절폭 규칙(`1.5 × ATR14 × √(horizon/30)`)의 검증 표본이 종목 1개·가격경로 1개다.
+  long 3건이 전부 같은 날 발동해 독립 증거가 아니고, 20% 캡은 한 번도 걸리지 않았다.
 - `reference.adjusted`를 CLI 응답에서 자동으로 판별할 방법이 없다. 지금은 확인 안 되면
   false로 두고 경고만 남긴다.
 
