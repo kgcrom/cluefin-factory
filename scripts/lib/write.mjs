@@ -34,6 +34,9 @@ export function scoringNotes(result, { referenceDate }) {
   if (result.within_noise) {
     parts.push(`구간 지수 일간 변동성 ${result.index_volatility_pct}%p를 밑도는 노이즈 범위.`);
   }
+  if (result.coverage_gap) {
+    parts.push('경고: 조회 구간이 기준일까지 닿지 않는다 — 시계열이 잘렸을 수 있다.');
+  }
   if (result.manual_conditions?.length > 0) {
     parts.push(`자동 판정 불가 조건: ${result.manual_conditions.join(', ')} — 사용자 확인 필요.`);
   }

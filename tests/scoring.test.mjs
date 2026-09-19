@@ -109,6 +109,22 @@ describe('채점 대상 선별', () => {
   });
 });
 
+describe('잘린 시계열', () => {
+  it('구간이 기준일까지 닿지 않으면 coverage_gap을 세운다', () => {
+    const truncated = {
+      prices: series.prices.filter((row) => row.date >= '20260701'),
+      index: series.index,
+    };
+    const data = readEntry(join(DECISIONS, '2026-06-19-383220-02.md')).data;
+    const result = scoreDecision(data, { ...truncated, today: TODAY });
+    expect(result.coverage_gap).toBe(true);
+  });
+
+  it('온전한 구간이면 세우지 않는다', () => {
+    expect(score('2026-06-19-383220-02.md').coverage_gap).toBe(false);
+  });
+});
+
 describe('verdict별 판정 방향', () => {
   it('buy·hold는 초과수익이 양수일 때 맞다', () => {
     expect(judgeOutcome('buy', 1.2)).toBe('correct');

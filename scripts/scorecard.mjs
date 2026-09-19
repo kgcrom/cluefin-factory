@@ -15,7 +15,7 @@ import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aggregate } from './lib/aggregate.mjs';
-import { benchmarkFor, dailyCandles, sectorDaily } from './lib/cluefin.mjs';
+import { benchmarkFor, dailyCandles, sectorDailyRange } from './lib/cluefin.mjs';
 import { readEntry } from './lib/journal.mjs';
 import { DEFAULT_CUTOFF, runRules } from './lib/rules.mjs';
 import { compact, scoreDecision } from './lib/scoring.mjs';
@@ -109,7 +109,7 @@ export function score(paths, options = {}) {
     const end =
       compact(String(data.review_due)) <= today ? compact(String(data.review_due)) : today;
     const prices = dailyCandles(data.symbol, referenceDate, end);
-    const index = sectorDaily(benchmarkFor(data.market), end);
+    const index = sectorDailyRange(benchmarkFor(data.market), referenceDate, end);
     const result = scoreDecision(data, { prices, index, today });
     if (options.write && result.status !== 'pending') {
       const block = renderScoring(result, {

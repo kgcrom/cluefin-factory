@@ -110,6 +110,9 @@ export function scoreDecision(data, { prices, index, today }) {
   const endDate = earlyExit ? trigger.date : reviewDue;
   const window = slice(prices, referenceDate, endDate);
   if (window.length === 0) return { status: 'void', notes: '구간에 가격 데이터가 없다' };
+  // A capped response comes back short instead of erroring, so a series that
+  // starts after the reference date means the window was silently truncated.
+  const coverageGap = window[0].date > referenceDate;
 
   const reference = Number(data.reference?.price);
   const last = window.at(-1);
@@ -151,6 +154,7 @@ export function scoreDecision(data, { prices, index, today }) {
     elapsed_ratio: round((elapsed / horizon) * 100),
     early_exit: elapsed / horizon < EARLY_EXIT_RATIO,
     index_volatility_pct: volatility === null ? null : round(volatility),
+    coverage_gap: coverageGap || (indexWindow.length > 0 && indexWindow[0].date > referenceDate),
     within_noise: volatility !== null && excessLong !== null && Math.abs(excessLong) < volatility,
   };
 }
