@@ -34,16 +34,29 @@ frontmatter에 이미 있는 값을 본문에 다시 나열만 하지는 않는�
 - `data_as_of`에 인용한 데이터의 기준일을 전부 남긴다. 재무는 회계기준일
   (`financial`)과 실제 공시일(`financial_disclosed_at`)을 구분한다. 모르면 null로 두고
   추측해서 채우지 않는다.
+- **`financial`은 thesis·key_drivers·본문이 실제로 인용한 가장 최근 재무의 기준일과
+  일치해야 한다.** 반기 실적을 근거로 들었으면 `financial`은 그 반기말이지 직전
+  연말이 아니다. 여기가 어긋나면 사후에 "그때 알 수 있었던 정보인가"를 검증할 수
+  없어져, 판단 전체가 채점 불가가 된다. 작성 후 본문에 등장하는 실적 수치의 기간을
+  훑어 가장 최근 것과 대조한다.
 - `reference.adjusted`는 수정주가 여부다. 확인되지 않으면 `false`로 두고
   `gates.notes`에 남긴다.
 - `invalidation`은 최소 1개. 가능한 항목은 `checkable: true`로 두고
   `metric`/`op`/`value`/`source`/`check_on`을 채워 기계가 검증할 수 있게 쓴다.
   술어로 표현할 수 없는 조건은 `checkable: false`로 솔직히 표시한다 — 억지로
   숫자를 만들어내지 않는다.
-- `verdict`가 buy 또는 sell이면 `levels`(진입 구간, 손절선, 목표가)는 필수다.
+- **무효화 조건의 시간 척도를 `horizon_days`에 맞춘다.** SMA20 하회 같은 일봉 조건만
+  달아두면 90일·120일 판단이 사흘 만에 종료돼 horizon을 정한 의미가 사라진다.
+  `check_on: daily` 가격 조건 하나로 끝내지 말고, horizon에 상응하는 조건
+  (분기 실적, 다중 주 추세, 손절선 이탈 등)을 최소 하나 함께 둔다.
+  horizon이 90일을 넘으면 일봉 단독 조건은 쓰지 않는다.
+- `verdict`가 buy 또는 sell이면 `levels`(진입 구간, 목표가, 손절선)는 필수다.
 - `gates.data_sanity`가 `blocked`이면 `verdict`는 `watch`만 허용한다.
   확정 판단을 내리지 않는다.
-- `skills_run`에는 이번 검토에서 실제로 수행한 스킬만 적는다.
+- `skills_run`에는 이번 검토에서 실제로 수행한 **분석** 스킬만 적는다.
+  `investment-journal`·`decision-scorecard` 같은 기록·채점 스킬은 넣지 않는다 —
+  "어떤 분석을 붙였을 때 성적이 좋은가"를 보는 필드라, 모든 판단에 공통으로
+  붙는 스킬이 섞이면 신호가 희석된다.
 - `scoring`은 `status: pending`만 쓴다. **이 스킬은 자기 판단을 채점하지 않는다.**
   나머지 필드는 나중에 채점 단계가 채운다.
 - 같은 날 같은 종목을 다시 판단하면 `decision_id`의 끝 번호를 올리고,

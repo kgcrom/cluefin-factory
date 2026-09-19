@@ -66,6 +66,10 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
   and `signal.mean_reversion` families are reported separately on purpose — never collapse
   them into one score. Use `chart period` (chunked, ~120 days/call) only when the candle
   rows themselves are the deliverable.
+- **`kis sector daily --start-date` is an END date**, not a start: it returns the 100
+  trading days ending on it (`20260901` → `20260407~20260901`). Use it for index
+  benchmarks (`0001` KOSPI, `1001` KOSDAQ, `2001` KOSPI200) and split longer spans
+  across calls. Prefer it over ETF proxies.
 - Command discovery is `search <자연어> --json` → `schema <path> --json` → `--dry-run`;
   a bare `list --json` is a 61KB catalog dump. `--fields`/`--limit`/`--compact` keep
   responses small. Exit codes are a contract: 2 usage, 3 credentials, 4 broker/network
