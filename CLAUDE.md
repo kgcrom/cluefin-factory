@@ -43,7 +43,7 @@ directly, with `js-yaml` and `ajv` as its only dependencies.
 docs/                         # TODO.md + assets/ (GitHub Pages source)
 schemas/                      # final-decision frontmatter JSON Schema + example
 scripts/                      # deterministic steps lifted out of the skills
-└── scorecard.mjs             # lint (frontmatter + rules), score --dry-run
+└── scorecard.mjs             # lint / score [--write] / aggregate
 tests/                        # vitest specs + fixtures
 ```
 

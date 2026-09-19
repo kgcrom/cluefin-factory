@@ -4,20 +4,23 @@
  *
  * Usage:
  *   node scripts/scorecard.mjs lint  [경로...] [--cutoff YYYY-MM] [--json]
- *   node scripts/scorecard.mjs score [경로...] --dry-run [--today YYYYMMDD] [--json]
+ *   node scripts/scorecard.mjs score [경로...] [--write] [--today YYYYMMDD] [--json]
+ *   node scripts/scorecard.mjs aggregate [경로...] [--json]
  *
- * `lint` is read-only and makes no network calls. `score` calls the cluefin CLI
- * and, for now, only prints — writing the `scoring` block back comes next.
+ * `lint` and `aggregate` are read-only. `score` calls the cluefin CLI and prints;
+ * it rewrites the `scoring` block only with `--write`.
  * Paths default to `.claude/investments/journal/*.md`, git-ignored per-user data.
  */
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { aggregate } from './lib/aggregate.mjs';
 import { benchmarkFor, dailyCandles, sectorDaily } from './lib/cluefin.mjs';
 import { readEntry } from './lib/journal.mjs';
 import { DEFAULT_CUTOFF, runRules } from './lib/rules.mjs';
 import { compact, scoreDecision } from './lib/scoring.mjs';
 import { schemaFindings } from './lib/validate.mjs';
+import { applyScoring, renderScoring } from './lib/write.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const DEFAULT_JOURNAL = join(ROOT, '.claude/investments/journal');
@@ -36,6 +39,8 @@ function parseArgs(argv) {
       options.today = argv[i];
     } else if (arg === '--dry-run') {
       options.dryRun = true;
+    } else if (arg === '--write') {
+      options.write = true;
     } else if (arg === '--json') {
       options.json = true;
     } else if (arg.startsWith('--')) {
@@ -105,11 +110,15 @@ export function score(paths, options = {}) {
       compact(String(data.review_due)) <= today ? compact(String(data.review_due)) : today;
     const prices = dailyCandles(data.symbol, referenceDate, end);
     const index = sectorDaily(benchmarkFor(data.market), end);
-    return {
-      path,
-      decision_id: data.decision_id,
-      result: scoreDecision(data, { prices, index, today }),
-    };
+    const result = scoreDecision(data, { prices, index, today });
+    if (options.write && result.status !== 'pending') {
+      const block = renderScoring(result, {
+        scoredAt: options.scoredAt ?? new Date().toISOString(),
+        referenceDate,
+      });
+      writeFileSync(path, applyScoring(entry.text, block));
+    }
+    return { path, decision_id: data.decision_id, written: Boolean(options.write), result };
   });
 }
 
@@ -148,11 +157,12 @@ function main(argv) {
   const [command, ...rest] = argv;
   const { paths, options } = parseArgs(rest);
   if (command === 'lint') return report(lint(paths, options), options);
+  if (command === 'aggregate') {
+    const groups = aggregate(expandPaths(paths).map((path) => readEntry(path)));
+    process.stdout.write(`${JSON.stringify(groups, null, 2)}\n`);
+    return 0;
+  }
   if (command === 'score') {
-    if (!options.dryRun) {
-      process.stderr.write('score는 아직 --dry-run만 지원한다 (쓰기는 다음 단계)\n');
-      return 2;
-    }
     const results = score(paths, options);
     if (options.json) {
       process.stdout.write(`${JSON.stringify(results, null, 2)}\n`);
@@ -161,7 +171,7 @@ function main(argv) {
     return reportScores(results);
   }
   process.stderr.write(
-    'usage: scorecard.mjs lint|score [경로...] [--cutoff YYYY-MM] [--today YYYYMMDD] [--dry-run] [--json]\n',
+    'usage: scorecard.mjs lint|score|aggregate [경로...] [--cutoff YYYY-MM] [--today YYYYMMDD] [--write] [--json]\n',
   );
   return 2;
 }
