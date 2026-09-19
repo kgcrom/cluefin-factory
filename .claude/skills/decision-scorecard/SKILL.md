@@ -10,128 +10,61 @@ model: sonnet
 과거 구간에 분석을 다시 돌리는 백테스트가 아니다. 이미 발행된 판단을 미래가 채점하는
 forward test이며, 판단 시점에는 결과를 알 수 없었다는 점이 이 방식의 유일한 근거다.
 
-**새로 분석하지 않는다.** 여기서 하는 일은 저장된 숫자와 조회한 숫자를 비교하는 산술이다.
-채점 중에 종목 전망을 새로 내거나 판단을 수정하지 않는다.
+**새로 분석하지 않는다.** 채점 중에 종목 전망을 새로 내거나 판단을 수정하지 않는다.
 
-## 입력
+**산술은 `scripts/scorecard.mjs`가 한다.** 술어 평가, 구간 절단, 수익률·초과수익·변동성
+계산, `scoring` 블록 쓰기, 집계가 전부 거기 있다. 이 문서는 **무엇을 실행하고 결과를
+어떻게 읽을지**만 다룬다 — 규칙을 여기 다시 적으면 코드와 갈라지고, 갈라지면 문서 쪽이
+얼떨결에 이긴다.
 
-- `.claude/investments/journal/*.md`의 YAML frontmatter
-  (스키마: `schemas/final-decision.schema.json`)
-- cluefin CLI로 조회한 현재값
-
-frontmatter가 스키마를 따르지 않는 파일은 건너뛰고, 건너뛴 파일 목록을 보고한다.
-형식을 추측해서 복원하지 않는다.
-
-## 절차
-
-### 1. 대상 선별
-
-`scoring.status`가 `pending`인 판단만 본다. 그중,
-
-- `review_due <= 오늘` → 정기 채점 대상
-- 그 외 → 무효화 조건만 확인 (조기 채점 여부 판단)
-
-같은 종목에 더 최근 판단이 있고 그 판단의 `supersedes`가 이 판단을 가리키면,
-`status: superseded`로 닫고 수익률은 계산하지 않는다.
-
-### 2. 현재값 조회
-
-무효화 조건의 `source` 필드가 호출할 명령을 지정한다. 종목당 필요한 것만 부른다.
+## 실행
 
 ```bash
-# 현재가 (거의 항상 필요)
-uv run cluefin-openapi-cli kis stock current-price --symbol 005930
-
-# check_on: quarterly 조건이 있을 때만
-uv run cluefin-openapi-cli kis financial profitability --symbol 005930
-
-# 구간 최고/최저가가 필요할 때 (target_hit, max_drawdown 계산)
-uv run cluefin-openapi-cli kis chart period --symbol 005930 --start ... --end ...
+node scripts/scorecard.mjs lint                 # 스키마·규칙 위반 점검 (읽기 전용)
+node scripts/scorecard.mjs score --write        # 채점하고 scoring 블록 갱신
+node scripts/scorecard.mjs aggregate            # 성적표 집계
 ```
 
-명령 경로가 확실하지 않으면 `search <자연어> --json` → `schema <경로> --json`으로 확인한다.
-exit code 4는 `error.retryable`일 때만 재시도하고, 5(rate limit)면 남은 종목을 중단한 뒤
-어디까지 채점했는지 보고한다.
+`--json`을 붙이면 기계 판독용으로 나온다. `score`는 `--write` 없이는 출력만 한다.
+`--today YYYYMMDD`로 기준일을 고정할 수 있다.
 
-### 3. 무효화 조건 확인
+순서는 `lint` → `score` → `aggregate`다. lint가 error를 내면 먼저 사용자에게 보고한다 —
+스키마를 벗어난 파일은 채점에서 빠지므로, 모르고 지나가면 성적표에 구멍이 생긴다.
 
-`checkable: true`인 항목만 기계적으로 비교한다.
-`metric`/`op`/`value`를 그대로 적용하고, 해석을 덧붙이지 않는다.
+## 결과 읽기
 
-하나라도 발동하면 그 시점 가격으로 조기 채점한다.
-`status: invalidated`, `invalidated_by`에 발동한 id를 모두 적는다.
+### 자동 판정할 수 없는 조건
 
-**경과 기간이 `horizon_days`의 20% 미만이면 `scoring.notes`에 조기 종료 비율을 적고,
-horizon별 성과 비교에서 제외한다.** 사흘 만에 끝난 120일 판단과 완주한 30일 판단을
-같은 표에서 비교하면 horizon이 아니라 무효화 조건의 민감도를 비교하는 셈이 된다.
-적중률 집계에는 그대로 포함한다 — 조기 종료도 판단의 결과다.
+`score` 결과의 `manual_conditions`에는 스크립트가 판정을 포기한 조건 id가 담긴다.
+`checkable: false`이거나, 가격이 아닌 지표라 아직 평가 경로가 없는 것들이다.
 
-`checkable: false` 항목은 자동 판정하지 않는다. 사용자에게 "확인이 필요한 조건"으로
-따로 보여주고, 사용자가 발동했다고 답한 경우에만 반영한다.
+**이건 사용자에게 물어야 한다.** "확인이 필요한 조건"으로 따로 보여주고, 사용자가
+발동했다고 답한 경우에만 반영한다. 임의로 발동/미발동을 정하지 않는다.
 
-### 4. 성과 계산
+### 판정의 의미
 
-- `return_pct` = (현재가 − `reference.price`) / `reference.price` × 100
-  `verdict`가 `sell`이면 부호를 뒤집는다 (하락을 맞힌 것이므로).
+- `outcome`은 절대수익이 아니라 **초과수익** 기준이다. 절대수익이 플러스여도 지수를
+  밑돌았으면 `incorrect`다.
+- `sell`과 `watch`는 부등호가 반대다. 포지션을 잡지 않은 판단이므로 "사지 않은 것이
+  옳았는가"를 본다. `notes`의 `excess_long`이 부호 반전 전 원값이다.
+- `early_exit`(경과율 20% 미만)인 건은 **horizon별 성과 비교에서 뺀다.** 사흘 만에 끝난
+  120일 판단과 완주한 30일 판단을 같은 표에서 비교하면 horizon이 아니라 무효화 조건의
+  민감도를 비교하는 셈이다. 적중률 집계에는 그대로 포함한다 — 조기 종료도 결과다.
+- `within_noise`인 건은 초과수익의 크기를 성패로 읽지 않는다. 그 구간 지수 변동성보다
+  작은 차이는 어느 날을 걸쳤는가의 결과다. 이 비율이 높으면 horizon이 그 종목의
+  변동성에 비해 짧다는 뜻이다.
+- `reference.adjusted`가 false인 판단은 **수정주가 미반영 경고**를 함께 표시한다.
 
-**verdict별 판정 방향.** watch를 `inconclusive`로 흘려보내면 관망 판단이 전부 집계에서
-빠져 성적표가 절반만 남는다. 관망도 "샀어야 했는가"라는 반대 명제로 채점할 수 있다.
+### 집계
 
-| verdict | 포지션 | 판정 방향 |
-| --- | --- | --- |
-| `buy` | 진입 | 초과수익 > 0 → correct |
-| `hold` | 보유 중 가정 | buy와 동일 |
-| `sell` | 청산·회피 | 부호 반전 후 초과수익 > 0 → correct |
-| `watch` | 없음 | **초과수익 < 0 → correct** (사지 않은 것이 옳았다) |
+`aggregate`는 retro seed와 forward를 분리해서 내고, 같은 `cohort`는 표본 1개로 접는다.
+한 종목을 30/60/90일로 돌린 3건은 겹치는 구간을 보는 것이라 3개로 세면 표본이 부풀려진다.
 
-`watch`는 보류가 옳았는지를 보므로 부등호가 반대다. 종목이 벤치마크를 밑돌았으면
-관망이 맞은 것이고, 웃돌았으면 기회를 놓친 것이므로 `incorrect`다.
+`underpowered: true`(10건 미만)면 **수치를 해석하지 않는다.** 건수만 밝히고 "아직 판단할
+수 없다"고 쓴다.
 
-**`sell`과 `watch`는 벤치마크도 함께 뒤집는다.** 포지션을 잡지 않은 판단을 롱 벤치마크와
-그대로 비교하면 시장이 빠진 구간에서 회피 판단이 전부 실패로 잡힌다. 두 verdict는
-"종목을 들고 있었을 때의 초과수익"을 구한 뒤 부호를 반전한 값으로 판정한다.
-
-```
-excess_long = 종목수익률 − 벤치마크수익률          # 부호 반전 전 원값으로 계산
-buy, hold  : excess_long > 0  → correct
-sell, watch: excess_long < 0  → correct
-```
-
-`return_pct`에는 sell의 반전된 값을 그대로 저장하되, 판정은 위 식으로 한다.
-`scoring.notes`에 `excess_long` 값을 함께 남겨 사후에 재현할 수 있게 한다.
-**벤치마크.** `benchmark_return_pct`는 같은 기간 **지수** 수익률이며,
-ETF 대용이 아니라 지수를 직접 조회한다.
-
-```bash
-uv run cluefin-openapi-cli kis sector daily --sector-code 2001 --start-date 20260917
-```
-
-`sector_code`는 `0001` KOSPI, `1001` KOSDAQ, `2001` KOSPI200이다. KOSPI 종목은 2001,
-KOSDAQ 종목은 1001을 쓴다.
-
-**`--start-date`는 이름과 달리 종료일로 동작한다** — 그 날짜까지의 최근 100거래일을
-반환한다(`20260901` → `20260407~20260901`). 시작일로 착각하면 조용히 엉뚱한 구간을
-집계하므로, 채점 종료일을 넣고 반환된 구간에 판단 기준일이 들어 있는지 확인한다.
-100행으로 고정이라 약 5개월을 넘는 구간은 나눠 호출해 병합한다.
-이 동작 덕분에 retro seed에서도 지수를 as-of로 조회할 수 있다.
-
-구간은 판단의 `reference` 기준일부터 채점 종료일까지이며, **조기 종료된 건은 종료일까지만
-자른다.** 기한 말까지 늘려 잡으면 초과수익이 통째로 달라진다.
-
-- `outcome` 판정은 **초과수익 기준**이다.
-  - `return_pct − benchmark_return_pct > 0` → `correct`
-  - `< 0` → `incorrect` (절대수익이 플러스여도 마찬가지다)
-  - 지수 데이터를 못 구했거나 `reference.adjusted: false`인데 그 사이 액면분할·유상증자가
-    있었으면 → `inconclusive`. 억지로 보정하지 않는다.
-  - 상장폐지·거래정지로 조회 불가 → `status: void`
-
-`reference.adjusted`가 false인 판단은 결과에 **수정주가 미반영 경고**를 함께 표시한다.
-
-### 5. 기록
-
-각 journal 파일의 **`scoring` 블록만** 덮어쓴다.
-frontmatter의 다른 필드와 본문은 건드리지 않는다. 과거 판단을 사후에 고치면 성적표가
-무의미해진다.
+생존 편향은 retro seed에서 구조적으로 남는다. 오늘 시점에서 종목을 고르는 이상
+상장폐지·거래정지 종목이 애초에 후보에 없다. `universe_note`와 함께 이 한계를 표시한다.
 
 ## Retro seed 프로토콜 (표본 부트스트랩)
 
@@ -139,120 +72,62 @@ forward 표본이 쌓이기를 기다리는 동안, **과거 기준일 데이터
 채점해** 표본을 앞당길 수 있다. 성립하는 이유는 하나뿐이다 — 모델의 학습 컷오프 이후
 구간이면 그 기간의 주가 흐름을 모델이 모른다.
 
-이 방식으로 만든 판단은 `provenance: retro_seed`로 표시하고, `retro_seed` 블록에
-누수 통제 내역을 남긴다. **forward 표본과 합산하지 않는다.**
-retro seed가 검증하는 것은 "판단 로직이 작동하는가"이지 "이 에이전트를 믿어도 되는가"가
-아니다. 후자는 forward 표본만 답할 수 있다.
+이 방식으로 만든 판단은 `provenance: retro_seed`로 표시하고 `retro_seed` 블록에 누수 통제
+내역을 남긴다. **forward 표본과 합산하지 않는다.** retro seed가 검증하는 것은 "판단 로직이
+작동하는가"이지 "이 에이전트를 믿어도 되는가"가 아니다. 후자는 forward 표본만 답한다.
 
-### 1. as_of와 horizon 잡기
+### 1. as_of 잡기
 
 `as_of + horizon_days <= 오늘`이어야 하므로, horizon을 늘리면 as_of가 과거로 밀린다.
-as_of가 모델 학습 컷오프에 가까울수록 누수 위험이 커진다.
+`leakage_risk`는 horizon이 아니라 **as_of와 학습 컷오프의 간격**으로만 정한다 — 등급
+경계는 `lint`가 판정하므로, 먼저 컷오프를 확인하고 as_of를 역산한 뒤 lint로 맞춘다.
 
-`leakage_risk`는 horizon이 아니라 **as_of와 학습 컷오프의 간격**으로만 정한다.
-horizon은 그 간격을 바꾸는 수단일 뿐이다.
-
-| as_of − 컷오프 | leakage_risk |
-| --- | --- |
-| 컷오프 이전이거나 같음 | high (실험으로 쓰지 않는다) |
-| 30일 이내 | high |
-| 31~90일 | medium |
-| 90일 초과 | low |
-
-먼저 컷오프를 확인하고 as_of를 역산한다. 컷오프가 2026-05이고 오늘이 2026-09-17이면
-horizon 120일(as_of 2026-05-20)은 컷오프와 겹쳐 high, 90일(2026-06-19)은 30일 이내라
-high, 60일(2026-07-19)은 medium 구간이다 — **긴 horizon일수록 누수 위험이 커지는
-방향으로 단조 증가**한다.
-
-컷오프는 무른 경계이므로 "겹치지 않으니 안전하다"고 단정하지 않는다.
-`high`는 집계에서 별도 표로 뺀다.
+컷오프는 무른 경계이므로 "겹치지 않으니 안전하다"고 단정하지 않는다. `high`는 실험으로
+쓰지 않는다.
 
 ### 2. 조회를 as_of로 고정
 
-as-of 지정이 되는 명령만 쓴다. 확인된 현황:
+as-of 지정이 되는 명령만 쓴다.
 
 | 명령 | as-of | 비고 |
 | --- | --- | --- |
-| `kis chart technical` | `--end-date YYYYMMDD` | "Analyze as of this date". 지표·시그널 재현 가능 |
-| `kis chart period` | `--start-date` / `--end-date` | `--adj-price 0`(수정주가) 함께 지정 |
+| `kis chart technical` | `--end-date YYYYMMDD` | 지표·시그널 재현 가능 |
+| `kis chart period` | `--start-date` / `--end-date` | `--adj-price 0` 함께 지정 |
 | `kis financial *` | **없음** | 최신 정정본만 반환 — 쓰면 look-ahead |
 | 웹 검색 기반 뉴스 | 없음 | 오늘 기사가 딸려온다 |
 
-따라서 retro seed 판단은 **기술적 분석 기반으로만** 만든다.
-`fundamental-analysis`, `news-analysis`, `macro-analysis`는 `excluded_skills`에 적고
-실제로 호출하지 않는다. 재무 수치를 기억으로 채워 넣지 않는다 — 그 순간 실험이 무효다.
+따라서 retro seed 판단은 **기술적 분석 기반으로만** 만든다. `fundamental-analysis`,
+`news-analysis`, `macro-analysis`는 `excluded_skills`에 적고 실제로 호출하지 않는다.
+재무 수치를 기억으로 채워 넣지 않는다 — 그 순간 실험이 무효다.
 
-호출한 명령은 `--end-date`까지 포함해 전문을 `bounded_sources`에 그대로 남긴다.
-나중에 누수를 의심할 때 이 기록만이 검증 수단이다.
+호출한 명령은 `--end-date`까지 포함해 전문을 `bounded_sources`에 남긴다. 나중에 누수를
+의심할 때 이 기록만이 검증 수단이다.
 
 ### 3. 판단 생성
 
 `as_of` 시점 데이터만 놓고 `final-decision` 스키마대로 판단을 낸다.
 
 - `decided_at`은 **실제 생성 시각(오늘)** 을 적는다. as_of로 위조하지 않는다.
-- `decision_id`의 날짜 부분은 `as_of`를 쓴다 (정렬·조회 편의).
-- `review_due` = `as_of` + `horizon_days`.
-- `scoring.status`는 `pending`으로 둔다. 생성과 채점을 한 단계에서 하지 않는다 —
+- `decision_id`의 날짜 부분은 `as_of`를 쓴다.
+- `scoring.status`는 `pending`으로 둔다. **생성과 채점을 한 실행에서 하지 않는다** —
   판단을 내리면서 결과를 보면 그 자체가 누수다.
+- 같은 종목을 여러 horizon으로 돌릴 때는 각각 별도 판단으로 만들고 같은 `cohort`를 준다.
 
-같은 종목을 여러 horizon으로 돌릴 때는 각각 별도 판단으로 만들고, 같은 `cohort` 값을
-부여한다.
-
-### 4. 채점
-
-이후는 일반 채점과 동일하다. `review_due`가 이미 지났으므로 생성 직후 채점 대상이 된다.
-채점은 **판단 생성과 분리된 실행**에서 한다.
-
-### 5. 집계 시 주의
-
-- retro seed와 forward를 같은 표에 넣지 않는다.
-- **같은 `cohort`는 독립 표본이 아니다.** 한 종목을 30/60/90일로 돌린 3건은 시작점만
-  다를 뿐 겹치는 구간을 보는 것이라 상관관계가 크다. 적중률을 셀 때는 cohort 단위로
-  묶어 세거나, horizon별로 표를 나눈다. 3건을 표본 3개로 세지 않는다.
-- horizon별 성과 차이는 보고할 가치가 있다 — 이 판단 로직이 단기에 강한지 중기에
-  강한지가 드러난다.
-- 생존 편향은 retro seed에서 구조적으로 남는다. 오늘 시점에서 종목을 고르는 이상
-  상장폐지·거래정지 종목이 애초에 후보에 없다. `universe_note`에 어떻게 골랐는지 적고,
-  결과에 이 한계를 함께 표시한다.
-
-## 집계
-
-채점이 끝나면 전체 이력으로 다음을 낸다. 표본이 10건 미만인 구간은 건수를 함께 표시하고
-결론을 내리지 않는다.
-
-| 지표 | 계산 |
-| --- | --- |
-| verdict별 적중률 | buy/sell/hold/watch 각각의 `outcome: correct` 비율 |
-| verdict별 평균 초과수익 | `return_pct − benchmark_return_pct`의 평균 |
-| 확신도 캘리브레이션 | `confidence` high/medium/low별 적중률. high가 더 낮으면 경고 |
-| bull/bear 신뢰도 | `debate.winner`별 실제 성과. bear가 이겼는데 buy를 낸 건의 결과 |
-| 무효화 조건 효용 | `invalidated` 비율과, 조기 종료 시점 대비 기한까지 갔을 때의 손실 차이 |
-| 조건 품질 | 전체 `invalidation` 중 `checkable: false` 비율 (낮을수록 좋다) |
-| 데이터 품질 영향 | `gates.data_sanity`가 `warn`인 판단의 초과수익 저하 폭 |
-| 스킬 기여도 | `skills_run`에 macro-analysis / news-analysis 포함 여부별 성과 차이 |
-
-## 변동성 대비 초과수익
-
-초과수익의 크기는 그 구간 시장 변동성에 견줘 읽는다. 지수가 하루 ±10%씩 움직인
-구간에서 30일 초과수익 −1.2%p는 판단의 성패가 아니라 어느 날을 걸쳤는가의 결과다.
-
-채점 구간의 지수 일간 변동성(표준편차)을 함께 구해, **|초과수익|이 구간 변동성보다
-작으면 `scoring.notes`에 "노이즈 범위"로 표시한다.** `outcome`은 그대로 매기되,
-집계에서 이 건들의 비율을 함께 보고한다. 비율이 높으면 horizon이 그 종목의
-변동성에 비해 짧다는 뜻이다.
+생성 직후 `lint`를 돌려 규칙 위반을 먼저 잡는다. 채점은 별도 실행에서 한다.
 
 ## 보고
 
-성적표는 듣기 좋게 쓰지 않는다. 적중률이 낮으면 낮다고 쓰고, 표본이 부족하면
-"아직 판단할 수 없다"고 쓴다. 우연한 수익을 실력으로 해석하지 않는다.
+성적표는 듣기 좋게 쓰지 않는다. 적중률이 낮으면 낮다고 쓰고, 표본이 부족하면 "아직 판단할
+수 없다"고 쓴다. 우연한 수익을 실력으로 해석하지 않는다.
 
-개선 제안은 집계에서 실제로 드러난 패턴에 한해 낸다.
-예를 들어 확신도 캘리브레이션이 역전돼 있으면 그 사실만 지적하고, 원인 추정은
-사용자에게 맡긴다.
+개선 제안은 집계에서 실제로 드러난 패턴에 한해 낸다. 확신도 캘리브레이션이 역전돼 있으면
+그 사실만 지적하고 원인 추정은 사용자에게 맡긴다.
 
 ## 주의
 
 - 개인 투자 기록은 민감 정보다. journal 내용을 외부로 전송하지 않는다.
 - 이 스킬은 매수/매도를 권하지 않는다. 과거 판단의 채점만 한다.
-- `transactions.csv`의 실제 체결 기록과 journal의 판단은 별개다.
-  실제 수익률을 묻는 경우 두 파일이 다를 수 있음을 먼저 밝힌다.
+- `transactions.csv`의 실제 체결 기록과 journal의 판단은 별개다. 실제 수익률을 묻는 경우
+  두 파일이 다를 수 있음을 먼저 밝힌다.
+- 각 journal 파일의 **`scoring` 블록만** 바뀐다. 과거 판단을 사후에 고치면 성적표가
+  무의미해진다.
