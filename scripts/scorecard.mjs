@@ -3,16 +3,20 @@
  * Deterministic half of the decision-scorecard pipeline.
  *
  * Usage:
- *   node scripts/scorecard.mjs lint [경로...] [--cutoff YYYY-MM] [--json]
+ *   node scripts/scorecard.mjs lint  [경로...] [--cutoff YYYY-MM] [--json]
+ *   node scripts/scorecard.mjs score [경로...] --dry-run [--today YYYYMMDD] [--json]
  *
- * `lint` is read-only and makes no network calls. Paths default to
- * `.claude/investments/journal/*.md`, which is git-ignored per-user data.
+ * `lint` is read-only and makes no network calls. `score` calls the cluefin CLI
+ * and, for now, only prints — writing the `scoring` block back comes next.
+ * Paths default to `.claude/investments/journal/*.md`, git-ignored per-user data.
  */
 import { readdirSync, statSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { benchmarkFor, dailyCandles, sectorDaily } from './lib/cluefin.mjs';
 import { readEntry } from './lib/journal.mjs';
 import { DEFAULT_CUTOFF, runRules } from './lib/rules.mjs';
+import { compact, scoreDecision } from './lib/scoring.mjs';
 import { schemaFindings } from './lib/validate.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -27,6 +31,11 @@ function parseArgs(argv) {
     if (arg === '--cutoff') {
       i += 1;
       options.cutoff = argv[i];
+    } else if (arg === '--today') {
+      i += 1;
+      options.today = argv[i];
+    } else if (arg === '--dry-run') {
+      options.dryRun = true;
     } else if (arg === '--json') {
       options.json = true;
     } else if (arg.startsWith('--')) {
@@ -68,6 +77,42 @@ export function lint(paths, options = {}) {
   }));
 }
 
+const todayCompact = () => new Date().toISOString().slice(0, 10).replaceAll('-', '');
+
+/** Decisions still open, plus the ids that a newer decision has superseded. */
+export function selectPending(entries) {
+  const superseded = new Set(
+    entries.map((entry) => entry.data?.supersedes).filter((id) => typeof id === 'string'),
+  );
+  return entries
+    .filter((entry) => entry.data?.scoring?.status === 'pending')
+    .map((entry) => ({
+      entry,
+      superseded: superseded.has(entry.data.decision_id),
+    }));
+}
+
+export function score(paths, options = {}) {
+  const today = options.today ?? todayCompact();
+  const entries = expandPaths(paths).map((path) => readEntry(path));
+  return selectPending(entries).map(({ entry, superseded }) => {
+    const { data, path } = entry;
+    if (superseded) {
+      return { path, decision_id: data.decision_id, result: { status: 'superseded' } };
+    }
+    const referenceDate = compact(String(data.data_as_of.price));
+    const end =
+      compact(String(data.review_due)) <= today ? compact(String(data.review_due)) : today;
+    const prices = dailyCandles(data.symbol, referenceDate, end);
+    const index = sectorDaily(benchmarkFor(data.market), end);
+    return {
+      path,
+      decision_id: data.decision_id,
+      result: scoreDecision(data, { prices, index, today }),
+    };
+  });
+}
+
 const SEVERITY_MARK = { error: '✗', warn: '!', info: '·' };
 
 function report(results, options) {
@@ -89,14 +134,36 @@ function report(results, options) {
   return results.some(({ findings }) => findings.some((f) => f.severity === 'error')) ? 1 : 0;
 }
 
+function reportScores(results) {
+  for (const { decision_id, result } of results) {
+    process.stdout.write(`  ${decision_id}\n`);
+    for (const [key, value] of Object.entries(result)) {
+      process.stdout.write(`    ${key}: ${JSON.stringify(value)}\n`);
+    }
+  }
+  return 0;
+}
+
 function main(argv) {
   const [command, ...rest] = argv;
-  if (command !== 'lint') {
-    process.stderr.write('usage: scorecard.mjs lint [경로...] [--cutoff YYYY-MM] [--json]\n');
-    return 2;
-  }
   const { paths, options } = parseArgs(rest);
-  return report(lint(paths, options), options);
+  if (command === 'lint') return report(lint(paths, options), options);
+  if (command === 'score') {
+    if (!options.dryRun) {
+      process.stderr.write('score는 아직 --dry-run만 지원한다 (쓰기는 다음 단계)\n');
+      return 2;
+    }
+    const results = score(paths, options);
+    if (options.json) {
+      process.stdout.write(`${JSON.stringify(results, null, 2)}\n`);
+      return 0;
+    }
+    return reportScores(results);
+  }
+  process.stderr.write(
+    'usage: scorecard.mjs lint|score [경로...] [--cutoff YYYY-MM] [--today YYYYMMDD] [--dry-run] [--json]\n',
+  );
+  return 2;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
