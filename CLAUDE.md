@@ -88,9 +88,14 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
 - **cluefin path:** the agent runs the CLI from `$CLUEFIN_OPENAPI_CWD`, default
   `~/workspace/cluefin`; credentials come from that directory's `.env`.
 - `.claude/agents/market-review.md` holds the bash recipes for the cluefin CLI
-  (price-history chunking, the 6-call financials bundle, the windowed-financials
-  fallback). With `.pi/providers/*` gone, the CLI's own `schema <path> --json` is the
-  source of truth for parameter names — check it there before editing a recipe.
+  (price-history chunking, the DART-first financials split). With `.pi/providers/*` gone,
+  the CLI's own `schema <path> --json` is the source of truth for parameter names — check
+  it there before editing a recipe.
+- **Latest reported earnings come from `dart financial-major-accounts`, not KIS.**
+  `kis financial --div-cls-code 1` returns quarterly rows only for the stocks KIS covers
+  in depth; a small cap gets annual rows that can lag a year behind the filed report. KIS
+  still owns the ratios and growth rates DART does not publish. In KIS income statements
+  `bsop_prti` is 영업이익 and `op_prfi` is 경상이익 — the name reads the other way.
 - **Technical analysis goes through `kis chart technical`**, not raw OHLCV: the CLI pages
   the candles itself and returns indicator readings + rule votes only. Its `signal.trend`
   and `signal.mean_reversion` families are reported separately on purpose — never collapse
