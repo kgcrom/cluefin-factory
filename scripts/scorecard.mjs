@@ -3,11 +3,13 @@
  * Deterministic half of the decision-scorecard pipeline.
  *
  * Usage:
- *   node scripts/scorecard.mjs lint  [경로...] [--cutoff YYYY-MM] [--json]
+ *   node scripts/scorecard.mjs lint  [경로...] [--cutoff YYYY-MM] [--atr] [--json]
  *   node scripts/scorecard.mjs score [경로...] [--write] [--today YYYYMMDD] [--json]
  *   node scripts/scorecard.mjs aggregate [경로...] [--json]
  *
- * `lint` and `aggregate` are read-only. `score` calls the cluefin CLI and prints;
+ * `lint` and `aggregate` are read-only, and offline unless `lint --atr` is given —
+ * the minimum-stop-width rule needs the ATR of the judgment's own price date, which
+ * only the candles have. `score` calls the cluefin CLI and prints;
  * it rewrites the `scoring` block only with `--write`.
  * Paths default to `.claude/investments/journal/*.md`, git-ignored per-user data.
  */
@@ -15,6 +17,7 @@ import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aggregate } from './lib/aggregate.mjs';
+import { ATR_PERIOD, atr14, lookbackStart } from './lib/atr.mjs';
 import { benchmarkFor, dailyCandles, sectorDailyRange } from './lib/cluefin.mjs';
 import { readEntry } from './lib/journal.mjs';
 import { DEFAULT_CUTOFF, runRules } from './lib/rules.mjs';
@@ -39,6 +42,8 @@ function parseArgs(argv) {
       options.today = argv[i];
     } else if (arg === '--dry-run') {
       options.dryRun = true;
+    } else if (arg === '--atr') {
+      options.withAtr = true;
     } else if (arg === '--write') {
       options.write = true;
     } else if (arg === '--json') {
@@ -75,11 +80,47 @@ export function lintEntry(entry, options = {}) {
   ];
 }
 
-export function lint(paths, options = {}) {
-  return expandPaths(paths).map((path) => ({
+/**
+ * Calendar days of candles to pull for one ATR reading: ATR_PERIOD trading days
+ * plus slack for weekends and holidays, so the window is never short by a day.
+ */
+const ATR_LOOKBACK_DAYS = Math.ceil(ATR_PERIOD * 2) + 21;
+
+/** ATR14 as of `data_as_of.price`. Hits the network — only `lint --atr` calls it. */
+export function atrFor(data, options = {}) {
+  const end = compact(String(data?.data_as_of?.price ?? ''));
+  if (!/^\d{8}$/.test(end) || typeof data.symbol !== 'string') return null;
+  const fetchCandles = options.fetchCandles ?? dailyCandles;
+  return atr14(fetchCandles(data.symbol, lookbackStart(end, ATR_LOOKBACK_DAYS), end));
+}
+
+/** The stop-width minimum is unchecked without an ATR, so say so rather than pass silently. */
+const atrMissing = (message) => ({ rule: 'atr', severity: 'warn', message });
+
+function lintOne(path, options) {
+  const entry = readEntry(path);
+  if (!options.withAtr || entry.error) return { path, findings: lintEntry(entry, options) };
+  let atr = null;
+  try {
+    atr = atrFor(entry.data, options);
+  } catch (cause) {
+    return {
+      path,
+      findings: [...lintEntry(entry, options), atrMissing(`ATR 조회 실패 — ${cause.message}`)],
+    };
+  }
+  const findings = lintEntry(entry, { ...options, atr });
+  return {
     path,
-    findings: lintEntry(readEntry(path), options),
-  }));
+    findings:
+      atr === null
+        ? [...findings, atrMissing('ATR14을 구하지 못했다 — 최소 손절폭 검사를 건너뛴다')]
+        : findings,
+  };
+}
+
+export function lint(paths, options = {}) {
+  return expandPaths(paths).map((path) => lintOne(path, options));
 }
 
 const todayCompact = () => new Date().toISOString().slice(0, 10).replaceAll('-', '');
@@ -171,7 +212,7 @@ function main(argv) {
     return reportScores(results);
   }
   process.stderr.write(
-    'usage: scorecard.mjs lint|score|aggregate [경로...] [--cutoff YYYY-MM] [--today YYYYMMDD] [--write] [--json]\n',
+    'usage: scorecard.mjs lint|score|aggregate [경로...] [--cutoff YYYY-MM] [--today YYYYMMDD] [--atr] [--write] [--json]\n',
   );
   return 2;
 }

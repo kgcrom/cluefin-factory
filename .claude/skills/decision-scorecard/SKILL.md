@@ -20,13 +20,20 @@ forward test이며, 판단 시점에는 결과를 알 수 없었다는 점이 �
 ## 실행
 
 ```bash
-node scripts/scorecard.mjs lint                 # 스키마·규칙 위반 점검 (읽기 전용)
+node scripts/scorecard.mjs lint                 # 스키마·규칙 위반 점검 (읽기 전용, 오프라인)
+node scripts/scorecard.mjs lint --atr           # + 최소 손절폭 검사 (일봉을 조회한다)
 node scripts/scorecard.mjs score --write        # 채점하고 scoring 블록 갱신
 node scripts/scorecard.mjs aggregate            # 성적표 집계
 ```
 
 `--json`을 붙이면 기계 판독용으로 나온다. `score`는 `--write` 없이는 출력만 한다.
 `--today YYYYMMDD`로 기준일을 고정할 수 있다.
+
+`--atr` 없이 돌린 lint는 최소 손절폭(`final-decision`의 √horizon 규칙)을 **검사하지
+않는다** — 그 규칙에는 판단의 `data_as_of.price` 시점 ATR14이 필요하고, ATR은
+frontmatter에 없어 일봉을 조회해야 나온다. 네트워크를 쓰는 만큼 기본값은 오프라인이고,
+손절폭까지 보려면 `--atr`을 붙인다. ATR을 못 구하면 `[atr]` warn으로 "검사를 건너뛰었다"고
+남으므로, 그 줄이 없으면 실제로 검사된 것이다.
 
 순서는 `lint` → `score` → `aggregate`다. lint가 error를 내면 먼저 사용자에게 보고한다 —
 스키마를 벗어난 파일은 채점에서 빠지므로, 모르고 지나가면 성적표에 구멍이 생긴다.
