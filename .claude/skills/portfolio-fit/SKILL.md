@@ -1,6 +1,7 @@
 ---
 name: portfolio-fit
 description: .claude/investments/portfolio.yaml, watchlist.yaml, transactions.csv, journal 기록을 읽고 새 종목이나 기존 종목이 포트폴리오에 적합한지 분석한다.
+model: opus
 ---
 
 # Portfolio Fit

@@ -1,6 +1,7 @@
 ---
 name: fundamental-analysis
 description: 기업의 재무제표, 밸류에이션, 성장성, 수익성, 현금흐름, 부채 구조를 분석한다. 기본적 분석이 필요할 때 사용한다.
+model: opus
 ---
 
 # Fundamental Analysis

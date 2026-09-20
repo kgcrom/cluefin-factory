@@ -1,6 +1,7 @@
 ---
 name: data-sanity-check
 description: 투자 분석 전에 수집 데이터의 기준일, 누락, 충돌, 종목 식별 오류, 가격 조정 여부를 점검한다. 데이터 출처 신뢰도 평가보다 분석 가능성 확인에 사용한다.
+model: sonnet
 ---
 
 # Data Sanity Check

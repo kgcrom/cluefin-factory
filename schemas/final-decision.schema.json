@@ -1,0 +1,705 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kgcrom/cluefin-factory/schemas/final-decision.schema.json",
+  "title": "final-decision frontmatter",
+  "description": "투자 저널 파일(.claude/investments/journal/YYYY-MM-DD-SYMBOL.md)의 YAML frontmatter. 채점 봇이 이 블록만 읽는다.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "decision_id",
+    "decided_at",
+    "provenance",
+    "data_as_of",
+    "market",
+    "symbol",
+    "name",
+    "verdict",
+    "confidence",
+    "horizon_days",
+    "review_due",
+    "reference",
+    "thesis",
+    "biggest_risk",
+    "gates",
+    "skills_run",
+    "scoring"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "decision_id": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}-[A-Za-z0-9.]+-\\d{2}$",
+      "description": "YYYY-MM-DD-SYMBOL-NN. 같은 날 같은 종목을 다시 판단하면 NN을 올린다."
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "판단 발행 시각(KST, 오프셋 필수). 채점 기준점."
+    },
+    "provenance": {
+      "type": "string",
+      "enum": [
+        "forward",
+        "retro_seed"
+      ],
+      "description": "forward: 발행 시점에 미래를 알 수 없었던 정상 판단. retro_seed: 과거 기준일 데이터로 사후에 생성한 표본 부트스트랩. 두 표본은 집계에서 절대 합산하지 않는다."
+    },
+    "retro_seed": {
+      "type": "object",
+      "description": "provenance가 retro_seed일 때만 존재한다. 누수 통제 내역을 남긴다.",
+      "required": [
+        "as_of",
+        "bounded_sources",
+        "excluded_skills",
+        "leakage_risk"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "type": "string",
+          "format": "date",
+          "description": "시뮬레이션 기준일. 모든 조회를 이 날짜로 고정한다. decided_at(실제 생성 시각)과 혼동하지 않는다."
+        },
+        "generator_model": {
+          "type": "string",
+          "description": "이 판단을 생성한 모델 id. 컷오프는 모델에 딸린 값이므로 leakage_risk는 여기서 역산한다. rules.mjs의 MODEL_CUTOFFS에 없는 모델은 lint error다."
+        },
+        "bounded_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "end_date를 실제로 먹인 명령 전문. 예: 'kis chart technical --stock-code 005930 --end-date 20260619'"
+        },
+        "excluded_skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "as-of 고정이 불가능해 제외한 스킬. fundamental-analysis는 재무에 날짜 파라미터가 없어 항상 여기 들어간다."
+        },
+        "leakage_risk": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "description": "as_of가 모델 학습 컷오프에 가까울수록 높다. 컷오프와 겹치거나 30일 이내면 high."
+        },
+        "cohort": {
+          "type": "string",
+          "description": "같은 종목을 여러 horizon으로 돌린 묶음의 id. 집계 시 독립 표본으로 세지 않기 위해 필요하다."
+        },
+        "universe_note": {
+          "type": "string",
+          "description": "종목을 어떻게 골랐는지. 생존 편향이 남아 있으면 그 사실을 적는다."
+        }
+      }
+    },
+    "supersedes": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "이 판단이 뒤집는 이전 decision_id."
+    },
+    "data_as_of": {
+      "type": "object",
+      "description": "각 데이터의 기준일. look-ahead 탐지와 기준일 불일치 경고에 쓴다.",
+      "required": [
+        "price"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "price": {
+          "type": "string",
+          "format": "date"
+        },
+        "financial": {
+          "type": "string",
+          "format": "date",
+          "description": "인용한 재무의 회계 기준일(예: 2026-06-30)."
+        },
+        "financial_disclosed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date",
+          "description": "그 재무가 실제 공시된 날. 없으면 null."
+        },
+        "news_scanned_through": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "macro": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
+      }
+    },
+    "market": {
+      "type": "string",
+      "enum": [
+        "KRX",
+        "KOSPI",
+        "KOSDAQ",
+        "NASDAQ",
+        "NYSE"
+      ]
+    },
+    "symbol": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "buy",
+        "hold",
+        "sell",
+        "watch"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "horizon_days": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "채점 기한. 단위는 horizon_basis가 정한다(기본 calendar). 이게 없으면 채점 불가 — 필수."
+    },
+    "horizon_basis": {
+      "type": "string",
+      "enum": [
+        "calendar",
+        "trading"
+      ],
+      "default": "calendar",
+      "description": "horizon_days의 단위. trading이면 거래일 수로 읽고, 기한 도래 판정도 거래일로 센다. 시장이 열린 날만 세야 연휴 배치에 따라 실질 관찰 기간이 흔들리지 않는다. 생략하면 calendar(옛 판단 호환)."
+    },
+    "review_due": {
+      "type": "string",
+      "format": "date",
+      "description": "사후 복기 예정일. horizon_basis가 trading이면 미래 휴장일을 알 수 없어 근사치이며, 기한 도래 판정은 채점 시점에 실제 거래일을 세어 한다."
+    },
+    "reference": {
+      "type": "object",
+      "required": [
+        "price",
+        "currency",
+        "price_type",
+        "adjusted"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "price": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "KRW",
+            "USD"
+          ]
+        },
+        "price_type": {
+          "type": "string",
+          "enum": [
+            "close",
+            "current",
+            "vwap"
+          ]
+        },
+        "adjusted": {
+          "type": "boolean",
+          "description": "수정주가 반영 여부. false면 채점 시 액면분할·유증 보정 필요."
+        }
+      }
+    },
+    "levels": {
+      "type": "object",
+      "description": "verdict가 buy/sell이면 필수. watch/hold는 생략 가능.",
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "type": "object",
+          "required": [
+            "min",
+            "max"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          }
+        },
+        "stop_loss": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "price"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "price": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "분할 익절 비중. 합이 1이어야 한다."
+              }
+            }
+          }
+        },
+        "risk_reward": {
+          "type": "number",
+          "description": "risk-position-sizing 산출값. 없으면 생략."
+        }
+      }
+    },
+    "thesis": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "한 문장. 이게 틀리면 판단 전체가 틀린다는 명제."
+    },
+    "key_drivers": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "string",
+        "maxLength": 200
+      }
+    },
+    "biggest_risk": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "debate": {
+      "type": "object",
+      "description": "bull/bear 스킬 결과. 'bear가 이겼을 때 실제 성과' 같은 집계에 쓴다.",
+      "required": [
+        "bull_score",
+        "bear_score",
+        "winner"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "bull_score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "bear_score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "winner": {
+          "type": "string",
+          "enum": [
+            "bull",
+            "bear",
+            "tie"
+          ]
+        },
+        "decisive_factor": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "invalidation": {
+      "type": "array",
+      "minItems": 1,
+      "description": "무효화 조건. 자연어 statement와 기계 판독용 predicate를 함께 쓴다. predicate를 못 쓰면 checkable:false로 명시하고 넘어가되, 그 비율 자체가 품질 지표가 된다.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "statement",
+          "checkable"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^inv-\\d+$"
+          },
+          "statement": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "checkable": {
+            "type": "boolean"
+          },
+          "metric": {
+            "type": "string",
+            "description": "예: price, operating_margin, foreign_net_buy_20d, debt_to_equity"
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "<",
+              "<=",
+              ">",
+              ">=",
+              "crosses_below",
+              "crosses_above"
+            ]
+          },
+          "value": {
+            "type": "number"
+          },
+          "source": {
+            "type": "string",
+            "description": "확인할 cluefin CLI 명령 경로. 예: kis financial profitability"
+          },
+          "check_on": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "quarterly",
+              "event"
+            ]
+          }
+        }
+      }
+    },
+    "tracking": {
+      "type": "array",
+      "description": "무효화까지는 아니지만 추적할 지표.",
+      "items": {
+        "type": "object",
+        "required": [
+          "metric",
+          "source"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "metric": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "expected": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down",
+              "flat"
+            ]
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "required": [
+        "data_sanity"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "data_sanity": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "warn",
+            "blocked"
+          ],
+          "description": "blocked면 verdict는 watch만 허용한다."
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "skills_run": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "실제 수행한 스킬. 선택 스킬 유무와 성과의 상관을 보기 위해 기록한다."
+    },
+    "skills_skipped": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "description": "발행 시점에는 status: pending만 둔다. 채점 봇이 나중에 나머지를 채운다. final-decision 스킬은 이 블록을 pending 외의 값으로 쓰지 않는다.",
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "scored",
+            "invalidated",
+            "superseded",
+            "void"
+          ]
+        },
+        "scored_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "price_at_review": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "return_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "reference.price 대비 수익률. verdict가 sell이면 부호를 뒤집어 '판단 기준 성과'로 본다."
+        },
+        "benchmark_return_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "같은 기간 KOSPI/KOSDAQ 수익률. 절대수익이 아니라 초과수익으로 채점한다."
+        },
+        "excess_long": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "종목 수익률 − 벤치마크 수익률, 부호 반전 전 원값. 항상 매수 관점으로 계산하고 verdict에 따라 부등호만 뒤집는다(buy/hold는 >0, sell/watch는 <0이 correct). 집계는 return_pct를 다시 빼지 말고 이 값을 읽는다."
+        },
+        "max_drawdown_pct": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "stop_hit": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "target_hit": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "invalidated_by": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "발동한 invalidation id 목록."
+        },
+        "outcome": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "correct",
+            "incorrect",
+            "inconclusive",
+            null
+          ]
+        },
+        "horizon_basis": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "trading",
+            "calendar",
+            null
+          ],
+          "description": "경과를 거래일로 셌는지 달력일로 셌는지."
+        },
+        "elapsed_days": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "horizon_basis 기준 경과. trading이면 거래일 수다."
+        },
+        "elapsed_calendar_days": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "달력 기준 경과."
+        },
+        "elapsed_ratio": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "elapsed_days / horizon_days, 백분율."
+        },
+        "early_exit": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "경과율 20% 미만. horizon별 성과 비교에서 제외한다(적중률에는 포함)."
+        },
+        "index_volatility_pct": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "description": "구간 지수 일간 수익률의 표준편차."
+        },
+        "within_noise": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "|excess_long| < index_volatility_pct. 초과수익의 크기를 성패로 읽지 않는다."
+        },
+        "coverage_gap": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "조회 구간이 기준일까지 닿지 않았다 — 시계열이 잘렸을 수 있다."
+        },
+        "manual_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "스크립트가 판정을 포기한 조건 id. 사용자에게 물어야 한다."
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "enum": [
+              "buy",
+              "sell"
+            ]
+          }
+        },
+        "required": [
+          "verdict"
+        ]
+      },
+      "then": {
+        "required": [
+          "levels"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gates": {
+            "properties": {
+              "data_sanity": {
+                "const": "blocked"
+              }
+            },
+            "required": [
+              "data_sanity"
+            ]
+          }
+        },
+        "required": [
+          "gates"
+        ]
+      },
+      "then": {
+        "properties": {
+          "verdict": {
+            "const": "watch"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "provenance": {
+            "const": "retro_seed"
+          }
+        },
+        "required": [
+          "provenance"
+        ]
+      },
+      "then": {
+        "required": [
+          "retro_seed"
+        ]
+      }
+    }
+  ]
+}

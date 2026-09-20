@@ -1,6 +1,7 @@
 ---
 name: scenario-planner
 description: 투자 판단 전에 bull, base, bear 시나리오와 각 시나리오의 조건, 예상 가격 범위를 정리한다.
+model: opus
 ---
 
 # Scenario Planner

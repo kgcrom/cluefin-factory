@@ -1,6 +1,7 @@
 ---
 name: technical-analysis
 description: 주가 흐름, 이동평균, 거래량, RSI, MACD, 지지선, 저항선, 추세 전환 가능성을 분석한다.
+model: sonnet
 ---
 
 # Technical Analysis
