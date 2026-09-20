@@ -29,7 +29,8 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const DEFAULT_JOURNAL = join(ROOT, '.claude/investments/journal');
 const SCHEMA = join(ROOT, 'schemas/final-decision.schema.json');
 
-function parseArgs(argv) {
+/** Split argv into paths and options. Exported for tests. */
+export function parseArgs(argv) {
   const paths = [];
   const options = { cutoff: DEFAULT_CUTOFF, json: false };
   for (let i = 0; i < argv.length; i += 1) {
@@ -149,8 +150,10 @@ export function score(paths, options = {}) {
     const referenceDate = compact(String(data.data_as_of.price));
     const end =
       compact(String(data.review_due)) <= today ? compact(String(data.review_due)) : today;
-    const prices = dailyCandles(data.symbol, referenceDate, end);
-    const index = sectorDailyRange(benchmarkFor(data.market), referenceDate, end);
+    const fetchPrices = options.fetchPrices ?? dailyCandles;
+    const fetchIndex = options.fetchIndex ?? sectorDailyRange;
+    const prices = fetchPrices(data.symbol, referenceDate, end);
+    const index = fetchIndex(benchmarkFor(data.market), referenceDate, end);
     const result = scoreDecision(data, { prices, index, today });
     if (options.write && result.status !== 'pending') {
       const block = renderScoring(result, {
