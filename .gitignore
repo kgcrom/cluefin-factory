@@ -4,3 +4,4 @@ node_modules/
 dist/
 .pi/investments/
 .claude/investments/
+.claude/plans/

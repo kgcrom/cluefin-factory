@@ -1,7 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "Bash(uv run cluefin-openapi-cli:*)"
+      "Bash(uv run cluefin-openapi-cli:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:fix)",
+      "Bash(npm run format)",
+      "Bash(npm test)",
+      "Bash(npm run test:coverage)",
+      "Bash(node scripts/scorecard.mjs:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npm run lint:fix --silent && npm test --silent",
+            "statusMessage": "biome check + vitest 실행 중..."
+          }
+        ]
+      }
     ]
   }
 }
