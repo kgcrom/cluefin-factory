@@ -97,10 +97,10 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
   still owns the ratios and growth rates DART does not publish. In KIS income statements
   `bsop_prti` is 영업이익 and `op_prfi` is 경상이익 — the name reads the other way.
 - **Technical analysis goes through `kis chart technical`**, not raw OHLCV: the CLI pages
-  the candles itself and returns indicator readings + rule votes only. Its `signal.trend`
-  and `signal.mean_reversion` families are reported separately on purpose — never collapse
-  them into one score. Use `chart period` (chunked, ~120 days/call) only when the candle
-  rows themselves are the deliverable.
+  the candles itself and returns indicator readings + rule votes only. Use `chart period`
+  (chunked, ~120 days/call) only when the candle rows themselves are the deliverable. How
+  to read the two signal families lives in `.claude/skills/technical-analysis/SKILL.md` —
+  the skill that applies the rule owns it.
 - **`kis sector daily --start-date` is an END date**, not a start: it returns the 100
   trading days ending on it (`20260901` → `20260407~20260901`). Use it for index
   benchmarks (`0001` KOSPI, `1001` KOSDAQ, `2001` KOSPI200) and split longer spans
