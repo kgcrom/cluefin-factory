@@ -40,8 +40,9 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 | 현재가 | `uv run cluefin-openapi-cli kis stock current-price --stock-code 005930 --json` |
 | **기술적 지표** | `uv run cluefin-openapi-cli kis chart technical --stock-code 005930 --count 250 --json` |
 | 가격이력(원시 행) | `uv run cluefin-openapi-cli kis chart period --stock-code 005930 --start-date ... --end-date ... --json` (>120일은 구간 분할 후 병합) |
-| 재무(번들) | `uv run cluefin-openapi-cli kis financial {income-statement,balance-sheet,ratio,growth,profitability,stability}` 6종을 각각 호출해 합친다 |
-| windowed 재무 | 연간(`--div-cls-code 0`) 우선 조회 → 5개년 부족 시 분기/반기(`--div-cls-code 1`) 최근 12기간으로 보완 |
+| **최신 실적** | `uv run cluefin-openapi-cli dart financial-major-accounts --corp-code <8자리> --bsns-year 2026 --reprt-code 11012 --json` (11011 사업/11012 반기/11013 1Q/11014 3Q) |
+| 재무 비율·성장률 | `uv run cluefin-openapi-cli kis financial {ratio,growth,profitability,stability}` — DART에 없는 지표만 |
+| 과거 5개년 실적 | `uv run cluefin-openapi-cli kis financial {income-statement,balance-sheet} --div-cls-code 0` |
 | 시장 공시 | `uv run cluefin-openapi-cli kis market announcement --stock-code 005930 --json` |
 | DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --json` |
 | DART 개요 | `uv run cluefin-openapi-cli dart company-overview --corp-code <8자리> --json` |
@@ -72,7 +73,7 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 5. 환율, 미국/국내 금리, 채권 데이터를 수집한다.
 6. `data-sanity-check` 관점으로 데이터의 기준일, 누락, 충돌, 사용 가능 여부를 점검한다.
 7. **`fundamental-analysis` 관점으로 재무·밸류에이션·성장성·수익성·현금흐름·부채 구조를 분석한다.
-   이 섹션은 필수이며, 사용한 재무 기준(annual-5y 또는 period-12)과 기간 목록을 함께 적는다.**
+   이 섹션은 필수이며, 사용한 재무 출처(dart-<보고서코드> 또는 kis-annual)와 기간 목록을 함께 적는다.**
 8. **`technical-analysis` 관점으로 추세, 이동평균 배열, 지표, 지지/저항, 무효화 가격을 분석한다.
    이 섹션은 필수이며, `kis chart technical`의 trend·mean_reversion 두 계열을 따로 적는다.**
 9. `portfolio-fit` 관점으로 기존 포트폴리오와의 적합성을 확인한다.
@@ -95,12 +96,23 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
   CLI가 일봉을 직접 페이징해 지표와 룰 투표만 돌려주므로 캔들 행이 컨텍스트에 들어오지 않는다.
 - **캔들 행 자체가 필요할 때만** `kis chart period`로 내려받는다. KIS 일봉 응답 한도(약 120일)로
   장기 구간이 한 번에 오지 않으면 **날짜 구간을 분할 조회한 뒤 병합**하고, 중복/누락 날짜를 점검한다.
-- `kis chart technical`의 신호는 **trend(macd, ma_stack)** 와 **mean_reversion(rsi, bbands, stoch)**
-  두 계열로 나뉜다. 강한 추세에서는 서로 반대로 나오는 것이 정상이므로 **하나의 점수로 합치지 않고**
-  두 계열과 `rules[].reason`을 함께 읽는다.
-- 기본적 분석은 가능하면 **최근 5개년 연간 데이터(YYYY12, 사업보고서 대응)** 를 우선 사용한다.
-- 연간 데이터가 5개년보다 부족하면 **반기/분기/사업 기준 최근 12개 기간**으로 보완한다.
-- 가능하면 연간(`divClsCode=0`) 우선의 windowed 방식을 사용하고, 최종 리포트에 **재무 데이터 기준(annual-5y 또는 period-12)** 과 **사용 기간 목록**을 명시한다.
+- `kis chart technical`의 두 신호 계열을 읽는 법은 `technical-analysis` 스킬에 있다.
+  여기에 다시 적지 않는다 — 두 벌이 되면 갈라진다.
+- **최신 실적은 DART에서 읽는다.** `kis financial`의 분기 옵션(`--div-cls-code 1`)은
+  종목에 따라 연간 행만 돌려주고, 그 연간마저 한 해 뒤처질 수 있다(125020은 2026-09 시점에
+  최신이 FY2024였다). 대형주로 확인하고 KIS를 기본 경로로 삼으면 소형주 분석이 1년 묵은
+  수치 위에서 돈다. 반기·분기는 종목 불문 `dart financial-major-accounts`가 준다.
+- **DART 응답의 누적 필드를 쓴다.** 분기·반기 보고서의 손익 행은 `thstrm_amount`에 그 분기만,
+  `thstrm_add_amount`에 연초 누적이 들어온다(1Q는 같다). 반기 실적을 전년과 비교할 때는
+  누적 쪽이다. `fs_div`는 CFS(연결)/OFS(별도)이므로 어느 쪽인지 리포트에 밝힌다.
+- **KIS `op_prfi`는 영업이익이 아니라 경상이익(법인세차감전)이다.** 영업이익은 `bsop_prti`,
+  당기순이익은 `thtr_ntin`. 값이 없는 필드는 `99.99`로 오며 이것은 실값이 아니다.
+- 비율·성장률(ROE, 부채비율, 성장률)은 DART에 없으므로 `kis financial ratio/growth/...`를 쓴다.
+  **이 비율들도 같은 커버리지 한계를 그대로 받는다** — 125020은 비율 응답의 `stac_yymm`이
+  202412였다. ROE·성장률을 인용할 때 그 기준 기간을 함께 적어, 최신 실적과 한 기간인 것처럼
+  읽히지 않게 한다.
+- 최종 리포트에 **재무 데이터 출처(dart-<보고서코드> 또는 kis-annual)** 와 **사용 기간 목록**을
+  명시한다. 출처가 섞이면 어느 수치가 원문이고 어느 쪽이 파생인지 알 수 없다.
 
 ## 주의
 
@@ -112,7 +124,7 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 - KIS API 요청은 동시에 최대 2개까지만 실행한다.
 - KIS 데이터 수집이 여러 단계에 필요하면 동시 실행 수를 2개 이하로 제한한다.
 - KIS 토큰이 없거나 갱신 가능성이 있으면 먼저 1건으로 토큰 확보를 시도한 뒤, 이후 최대 2개까지 병렬 실행할 수 있다.
-- KIS 재무 데이터에서는 연간(YYYY12)과 분기/반기(YYYY03/06/09/12)가 섞이지 않도록 먼저 기준을 정하고, 보완 사용 시 혼합 여부를 명시한다.
+- 재무 데이터는 DART 최신 실적과 KIS 과거 연간이 섞이지 않도록 기준을 먼저 정하고, 함께 쓰면 어느 수치가 어느 출처인지 표에 적는다.
 - DART, 로컬 파일 조회, 기타 비-KIS 작업은 필요 시 병렬 실행할 수 있다.
 - KIS에서 토큰/호출 제한 오류(exit 5, EGW00133 등)가 발생하면 확정적 판단을 미루고, 실패한 데이터는 없다고 명시한다.
 - `kis chart technical` 수치는 `cluefin-desk` 화면값과 일치하지 않는다(ta-lib 방식 EMA 워밍업 차이). 이 CLI 값이 기준이다.

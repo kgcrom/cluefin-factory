@@ -19,7 +19,7 @@ model: sonnet
 - 손절 기준 후보
 
 데이터 기준:
-- 지표는 cluefin CLI의 `kis chart technical`(Pi: `kis_technical_indicators`)에서 받는다.
+- 지표는 cluefin CLI의 `kis chart technical`에서 받는다.
   CLI가 일봉을 직접 페이징해 계산하므로 캔들 행을 따로 받아 직접 계산하지 않는다.
 - 기본은 수정주가이며, `count`는 최소 60(SMA(60) 워밍업), 기본 120, 최대 600이다.
   1년치 기준이면 250을 쓴다. `missing_candles`와 `as_of`를 먼저 확인한다.
