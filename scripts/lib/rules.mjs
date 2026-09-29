@@ -19,6 +19,8 @@ const STOP_CAP_PCT = 20;
  */
 export const MODEL_CUTOFFS = {
   'claude-opus-5': '2026-05',
+  // Confirmed by the user on 2026-09-29; matches the Claude Code system prompt.
+  'claude-opus-5-5': '2026-06',
 };
 
 export const DEFAULT_CUTOFF = '2026-05';
@@ -340,6 +342,34 @@ export const ALL_CHECKS = [
   checkHorizonLadder,
 ];
 
+/**
+ * The day each rule started to bind, compared with the judgment's `decided_at`.
+ *
+ * A judgment decided earlier was written under the old rules, so its violation is
+ * a generational gap, not a defect — and it is never edited to pass. Without this
+ * the lint could not exit 0 again, so the finding stays visible as a warn instead.
+ * A rule absent from the map binds every judgment.
+ */
+export const RULE_EFFECTIVE_FROM = {
+  stop_width: '2026-09-20',
+  invalidation_scale: '2026-09-20',
+  leakage_risk: '2026-09-20',
+  retro_seed_budget: '2026-09-20',
+};
+
+export function grandfather(findings, data) {
+  const decided = parseDate(data.decided_at);
+  if (decided === null) return findings;
+  return findings.map((f) => {
+    const since = RULE_EFFECTIVE_FROM[f.rule];
+    if (f.severity !== 'error' || since === undefined || decided >= parseDate(since)) return f;
+    return { ...f, severity: 'warn', message: `${f.message} (규칙 도입 ${since} 이전 판단)` };
+  });
+}
+
 export function runRules(data, options = {}) {
-  return ALL_CHECKS.flatMap((check) => check(data, options));
+  return grandfather(
+    ALL_CHECKS.flatMap((check) => check(data, options)),
+    data,
+  );
 }
