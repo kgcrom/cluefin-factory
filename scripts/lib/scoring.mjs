@@ -5,6 +5,8 @@
  * Series shape: [{ date: 'YYYYMMDD', close, high, low }], ascending by date.
  */
 
+import { fundamentalTrigger, isFundamental } from './fundamentals.mjs';
+
 const DAY_MS = 86_400_000;
 const EARLY_EXIT_RATIO = 0.2;
 
@@ -55,27 +57,41 @@ const COMPARATORS = {
 
 /**
  * First date an invalidation condition fires, scanning strictly after `afterDate`.
- * Only `checkable: true` price predicates are evaluated; anything else is returned
- * as `manual` for the skill to raise with the user.
+ * Price predicates are checked against the candles. Fundamental ones
+ * (`FUNDAMENTAL_METRICS`) are checked against `reports` — periodic reports filed
+ * in the window, with values attached — and stay manual when `reports` is not
+ * given. Anything else is returned as `manual` for the skill to raise with the user.
  */
-export function firstTrigger(invalidation, series, afterDate) {
+export function firstTrigger(invalidation, series, afterDate, reports = null) {
   const manual = [];
   let earliest = null;
+  const record = (date, id) => {
+    if (!earliest || date < earliest.date) earliest = { date, ids: [id] };
+    else if (date === earliest.date) earliest.ids.push(id);
+  };
   for (const item of invalidation ?? []) {
-    if (item.checkable !== true) {
+    const compare = COMPARATORS[item.op];
+    if (item.checkable !== true || !compare || typeof item.value !== 'number') {
       manual.push(item.id);
       continue;
     }
-    const compare = COMPARATORS[item.op];
-    if (!compare || item.metric !== 'price' || typeof item.value !== 'number') {
+    if (isFundamental(item)) {
+      if (reports === null) {
+        manual.push(item.id);
+        continue;
+      }
+      const { hit, manual: unchecked } = fundamentalTrigger(item, compare, reports, series);
+      if (unchecked) manual.push(item.id);
+      else if (hit) record(hit.date, item.id);
+      continue;
+    }
+    if (item.metric !== 'price') {
       manual.push(item.id);
       continue;
     }
     const rows = item.check_on === 'weekly' ? weeklyCloses(series) : series;
     const hit = rows.find((row) => row.date > afterDate && compare(row.close, item.value));
-    if (!hit) continue;
-    if (!earliest || hit.date < earliest.date) earliest = { date: hit.date, ids: [item.id] };
-    else if (hit.date === earliest.date) earliest.ids.push(item.id);
+    if (hit) record(hit.date, item.id);
   }
   return { trigger: earliest, manual };
 }
@@ -105,11 +121,11 @@ export function judgeOutcome(verdict, excessLong) {
   return LONG_VERDICTS.has(verdict) === excessLong > 0 ? 'correct' : 'incorrect';
 }
 
-export function scoreDecision(data, { prices, index, today }) {
+export function scoreDecision(data, { prices, index, today, reports = null }) {
   const referenceDate = compact(String(data.data_as_of?.price ?? ''));
   const horizon = Number(data.horizon_days);
   const trading = data.horizon_basis === 'trading';
-  const { trigger, manual } = firstTrigger(data.invalidation, prices, referenceDate);
+  const { trigger, manual } = firstTrigger(data.invalidation, prices, referenceDate, reports);
 
   // On a trading basis the completion date is counted off the exchange calendar,
   // because review_due was only ever an estimate — future holidays are unknown

@@ -83,12 +83,12 @@ invalidation:
     source: kis stock current-price
     check_on: daily
   - id: inv-2
-    statement: 분기 영업이익률이 8% 아래로 하락
+    statement: 분기 보고서에서 영업이익이 전년 동기 대비 역성장
     checkable: true
-    metric: operating_margin
+    metric: operating_profit_growth_yoy
     op: "<"
-    value: 0.08
-    source: kis financial profitability
+    value: 0
+    source: dart financial-major-indicators
     check_on: quarterly
   - id: inv-3
     statement: 주요 고객사가 HBM 공급처를 이원화한다는 공시 또는 확인된 보도
