@@ -23,56 +23,62 @@ const score = (file) =>
   scoreDecision(readEntry(join(DECISIONS, file)).data, { ...series, today: TODAY });
 
 /**
- * Golden values: the three retro-seed judgments scored by hand on 2026-09-19,
- * before this module existed. If the arithmetic here drifts, these fail.
- *
- * The journal itself is git-ignored per-user data, so the three entries are
- * copied into fixtures — machine-generated retro seeds on a public ticker, with
- * no holdings or transactions in them.
+ * Golden values: synthetic judgments over the 383220 series, each built so the
+ * expected numbers can be read straight off the candles — the closes and index
+ * levels used are in the comments. The script's output was checked against them,
+ * not copied into them.
  */
-describe('2026-09-19 세션 채점 결과 재현', () => {
-  it('90일 buy — 손절선에 걸려 4일 만에 조기 종료', () => {
-    expect(score('2026-06-19-383220-02.md')).toMatchObject({
+describe('합성 판단 채점', () => {
+  it('90일 buy — 일봉 손절선에 걸려 조기 종료되지만 지수보다 덜 빠졌다', () => {
+    // 종가 77,600(07-10) → 74,400(07-20, 첫 75,000 하회), 지수 1196.69 → 1032.52
+    expect(score('2026-07-10-383220-01.md')).toMatchObject({
       status: 'invalidated',
-      endDate: '20260623',
-      price_at_review: 73200,
-      return_pct: -9.96,
-      benchmark_return_pct: -9.44,
-      excess_long: -0.52,
+      endDate: '20260720',
+      price_at_review: 74400,
+      return_pct: -4.12,
+      benchmark_return_pct: -13.72,
+      excess_long: 9.59,
       invalidated_by: ['inv-2'],
-      outcome: 'incorrect',
-      elapsed_days: 4,
-      early_exit: true,
-      within_noise: true,
-    });
-  });
-
-  it('60일 watch — 볼린저 하단 이탈, 관망이 옳았다', () => {
-    expect(score('2026-07-19-383220-02.md')).toMatchObject({
-      status: 'invalidated',
-      endDate: '20260803',
-      price_at_review: 61800,
-      return_pct: -21.77,
-      benchmark_return_pct: -8.67,
-      excess_long: -13.1,
-      invalidated_by: ['inv-3'],
       outcome: 'correct',
-      early_exit: false,
-      within_noise: false,
+      horizon_basis: 'calendar',
+      elapsed_days: 10,
+      early_exit: true,
+      stop_hit: true,
     });
   });
 
-  it('30일 sell — 기한 완주, 방향이 틀렸다', () => {
-    expect(score('2026-08-18-383220-02.md')).toMatchObject({
+  it('40거래일 watch — 일봉이 아니라 주간 종가에서 발동, 관망이 옳았다', () => {
+    // 08-03 종가 61,800이 먼저 70,000을 깨지만 주 마지막 거래일(08-07) 67,000에서만 본다.
+    // 76,100 → 67,000, 지수 1055.58 → 974.73
+    expect(score('2026-07-24-383220-01.md')).toMatchObject({
+      status: 'invalidated',
+      endDate: '20260807',
+      price_at_review: 67000,
+      return_pct: -11.96,
+      benchmark_return_pct: -7.66,
+      excess_long: -4.3,
+      invalidated_by: ['inv-1'],
+      outcome: 'correct',
+      elapsed_days: 10,
+      elapsed_calendar_days: 14,
+      early_exit: false,
+    });
+  });
+
+  it('20거래일 sell — 기한 완주, 방향이 틀렸다', () => {
+    // 20거래일 뒤는 09-15. 64,900 → 67,300, 지수 1082.00 → 1042.46. sell은 부호가 반전된다.
+    expect(score('2026-08-18-383220-01.md')).toMatchObject({
       status: 'scored',
-      endDate: '20260917',
-      price_at_review: 68900,
-      return_pct: -6.16,
-      benchmark_return_pct: 2.19,
-      excess_long: 8.36,
+      endDate: '20260915',
+      price_at_review: 67300,
+      return_pct: -3.7,
+      benchmark_return_pct: 3.65,
+      excess_long: 7.35,
       invalidated_by: [],
+      manual_conditions: ['inv-2'],
       outcome: 'incorrect',
       elapsed_ratio: 100,
+      // 09-01 고가 69,000이 손절선에 닿았지만 무효화는 주간 종가 조건이라 발동하지 않는다
       stop_hit: true,
     });
   });
@@ -112,25 +118,25 @@ describe('채점 대상 선별', () => {
 });
 
 describe('거래일 기준 horizon', () => {
-  const base = readEntry(join(DECISIONS, '2026-06-19-383220-02.md')).data;
+  const base = readEntry(join(DECISIONS, '2026-07-10-383220-01.md')).data;
 
   it('경과를 달력일이 아니라 거래일로 센다', () => {
-    // 2026-06-19(금) → 06-23(화): 달력 4일이지만 주말을 빼면 2거래일이다
+    // 2026-07-10(금) → 07-20(월): 달력 10일이지만 주말·07-17 휴장을 빼면 5거래일이다
     const result = scoreDecision(
       { ...base, horizon_basis: 'trading', horizon_days: 62 },
       { ...series, today: TODAY },
     );
-    expect(result.elapsed_days).toBe(2);
-    expect(result.elapsed_calendar_days).toBe(4);
+    expect(result.elapsed_days).toBe(5);
+    expect(result.elapsed_calendar_days).toBe(10);
     expect(result.horizon_basis).toBe('trading');
   });
 
   it('기한 도래를 review_due가 아니라 거래일 수로 판정한다', () => {
     const noTrigger = { ...base, invalidation: [], horizon_basis: 'trading' };
-    // 20260619에서 5거래일 뒤는 20260626 — review_due(2026-09-17)와 무관하다
+    // 20260710에서 3거래일 뒤는 20260715 — review_due(2026-10-08)와 무관하다
     expect(
-      scoreDecision({ ...noTrigger, horizon_days: 5 }, { ...series, today: TODAY }).endDate,
-    ).toBe(tradingDayAfter(series.prices, '20260619', 5));
+      scoreDecision({ ...noTrigger, horizon_days: 3 }, { ...series, today: TODAY }).endDate,
+    ).toBe('20260715');
     // 시계열이 닿지 않는 horizon은 아직 기한 미도래다
     expect(scoreDecision({ ...noTrigger, horizon_days: 500 }, { ...series, today: TODAY })).toEqual(
       {
@@ -141,9 +147,9 @@ describe('거래일 기준 horizon', () => {
   });
 
   it('horizon_basis가 없으면 예전처럼 달력일로 센다', () => {
-    expect(score('2026-06-19-383220-02.md')).toMatchObject({
+    expect(score('2026-07-10-383220-01.md')).toMatchObject({
       horizon_basis: 'calendar',
-      elapsed_days: 4,
+      elapsed_days: 10,
     });
   });
 
@@ -157,16 +163,16 @@ describe('거래일 기준 horizon', () => {
 describe('잘린 시계열', () => {
   it('구간이 기준일까지 닿지 않으면 coverage_gap을 세운다', () => {
     const truncated = {
-      prices: series.prices.filter((row) => row.date >= '20260701'),
+      prices: series.prices.filter((row) => row.date >= '20260713'),
       index: series.index,
     };
-    const data = readEntry(join(DECISIONS, '2026-06-19-383220-02.md')).data;
+    const data = readEntry(join(DECISIONS, '2026-07-10-383220-01.md')).data;
     const result = scoreDecision(data, { ...truncated, today: TODAY });
     expect(result.coverage_gap).toBe(true);
   });
 
   it('온전한 구간이면 세우지 않는다', () => {
-    expect(score('2026-06-19-383220-02.md').coverage_gap).toBe(false);
+    expect(score('2026-07-10-383220-01.md').coverage_gap).toBe(false);
   });
 });
 

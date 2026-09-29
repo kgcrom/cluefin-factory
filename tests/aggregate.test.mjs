@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { aggregate, collapseCohorts, toRows } from '../scripts/lib/aggregate.mjs';
+import { aggregate, toRows } from '../scripts/lib/aggregate.mjs';
 
 const decision = (overrides) => ({
   data: {
     decision_id: 'id',
-    provenance: 'retro_seed',
     verdict: 'buy',
     confidence: 'medium',
     horizon_days: 30,
-    retro_seed: { cohort: 'c1' },
     invalidation: [{ id: 'inv-1', checkable: true }],
     scoring: { status: 'scored', outcome: 'correct', return_pct: 5, benchmark_return_pct: 2 },
     ...overrides,
@@ -25,60 +23,8 @@ describe('집계 대상', () => {
     expect(rows).toHaveLength(2);
   });
 
-  it('retro seed와 forward를 같은 표에 넣지 않는다', () => {
-    const groups = aggregate([
-      decision({}),
-      decision({ provenance: undefined, retro_seed: undefined }),
-    ]);
-    expect(groups.map((g) => g.label).sort()).toEqual(['forward', 'retro_seed']);
-  });
-});
-
-describe('누수 위험 high 표본', () => {
-  const seed = (asOf, extra = {}) =>
-    decision({ retro_seed: { cohort: 'c1', as_of: asOf, ...extra } });
-  const labels = (groups) => groups.map((g) => `${g.label}:${g.n}`).sort();
-
-  it('high는 retro_seed에서 빠져 별도 그룹으로 나온다', () => {
-    // 기본 컷오프 2026-05: 06-19는 19일(high), 08-18은 79일(medium)
-    const groups = aggregate([seed('2026-06-19'), seed('2026-08-18')]);
-    expect(labels(groups)).toEqual(['retro_seed:1', 'retro_seed_high_leakage:1']);
-  });
-
-  it('라벨이 아니라 as_of와 생성 모델의 컷오프로 분류한다', () => {
-    // 옛 판단의 실제 모양: low로 적혔지만 Opus 5.5 컷오프(2026-06)에서 07-19는 19일
-    const groups = aggregate([
-      seed('2026-07-19', { leakage_risk: 'low', generator_model: 'claude-opus-5-5' }),
-    ]);
-    expect(labels(groups)).toEqual(['retro_seed_high_leakage:1']);
-  });
-
-  it('forward는 as_of가 없어 영향받지 않는다', () => {
-    const groups = aggregate([decision({ provenance: 'forward', retro_seed: undefined })]);
-    expect(labels(groups)).toEqual(['forward:1']);
-  });
-
-  it('cohort는 그룹을 나눈 뒤에 접는다', () => {
-    // 같은 cohort라도 high와 medium이 한 표본으로 합쳐지면 안 된다
-    const groups = aggregate([seed('2026-06-19'), seed('2026-08-18'), seed('2026-08-18')]);
-    const retro = groups.find((g) => g.label === 'retro_seed');
-    const high = groups.find((g) => g.label === 'retro_seed_high_leakage');
-    expect([retro.n, retro.cohorts, high.n, high.cohorts]).toEqual([2, 1, 1, 1]);
-  });
-});
-
-describe('cohort', () => {
-  it('같은 cohort 3건은 표본 1개로 접힌다', () => {
-    const rows = toRows([decision({}), decision({}), decision({})]);
-    expect(collapseCohorts(rows)).toHaveLength(1);
-  });
-
-  it('접힌 표본의 판정은 다수결이고 동수면 inconclusive다', () => {
-    const rows = toRows([
-      decision({}),
-      decision({ scoring: { status: 'scored', outcome: 'incorrect' } }),
-    ]);
-    expect(collapseCohorts(rows)[0].outcome).toBe('inconclusive');
+  it('채점된 건이 없으면 그룹을 내지 않는다', () => {
+    expect(aggregate([decision({ scoring: { status: 'pending' } })])).toEqual([]);
   });
 });
 
@@ -107,8 +53,7 @@ describe('지표', () => {
 });
 
 describe('초과수익 부호', () => {
-  const scored = (verdict, scoring) =>
-    decision({ verdict, decision_id: verdict, retro_seed: { cohort: verdict }, scoring });
+  const scored = (verdict, scoring) => decision({ verdict, decision_id: verdict, scoring });
 
   it('excess_long 필드가 있으면 그대로 읽는다', () => {
     const [row] = toRows([

@@ -58,35 +58,6 @@ TS 도구 계층을 유지하는 비용이 얻는 안정성보다 컸다.
 - 채점: `scripts/scorecard.mjs`가 산술과 쓰기를 맡고, `decision-scorecard` 스킬은
   실행과 결과 해석만 한다 (`lint` → `score --write` → `aggregate`)
 
-## retro seed 제거 (다음 작업)
-
-retro seed(과거 as_of로 판단을 만들어 바로 채점하는 backward 표본)는 쓰지 않기로 했다
-(2026-09-29). 위 "과거 구간 백테스트를 버린 이유"가 그대로 적용된다. 표본을 기다리지 않고
-당기는 것이 유일한 이득인데, 비용이 더 컸다.
-
-- 모델이 결과를 알 수 있어 컷오프 이후 거래일 42일 안에서만 만들 수 있고, 모델을 바꾸면
-  더 준다.
-- 재무·뉴스·매크로 스킬을 빼야 성립해, 실제로 쓰는 에이전트와 다른 것을 검증한다.
-- 채점 코드 복잡도의 대부분이 여기서 나왔다. 만든 표본 7건(종목 1개)은 journal과 함께
-  이미 삭제했다.
-
-지울 것 (lint·test를 통과하는 단위로 나눠 커밋한다):
-
-- `scripts/lib/rules.mjs`: `MODEL_CUTOFFS`·`DEFAULT_CUTOFF`, `checkGeneratorModel`·
-  `checkLeakageRisk`·`checkRetroSeedBudget`·`checkHorizonLadder`, `RULE_EFFECTIVE_FROM`·
-  `grandfather`(옛 판단용 완충 — 대상 journal이 없어졌다), `leakageFor`
-- `scripts/lib/aggregate.mjs`: retro seed / forward / high 누수 그룹 분리, `cohort` 접기
-- `scripts/scorecard.mjs`: `--cutoff` 옵션
-- 스키마: `provenance`, `retro_seed` 블록. `schema_version`을 올릴지 정한다
-- `decision-scorecard` SKILL.md의 retro seed 프로토콜 절, `final-decision`의 관련 언급
-- 테스트와 fixture: `valid-/broken-retro-seed.md`, `tests/fixtures/decisions/*`를 forward
-  판단으로 바꾸거나 지운다
-- 로컬 계획 문서(`.claude/plans/`): 블라인드 backward 테스트, PIT 데이터스토어(목표가
-  retro seed에서 뺀 스킬을 되돌리는 것이었다), journal lint backlog
-
-남길 것: `horizon_basis`(forward에도 쓸 수 있다), 최소 손절폭·손절 캡·`levels`·
-`invalidation` 규칙, `score`·`aggregate`의 적중률·초과수익·확신도 캘리브레이션.
-
 ## 매매일지·채점 추가 개발
 
 forward 판단을 매매일지로 남기고 기한에 채점하는 흐름에 집중한다. journal은 0건에서 다시

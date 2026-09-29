@@ -38,11 +38,6 @@ frontmatter에 없어 일봉을 조회해야 나온다. 네트워크를 쓰는 �
 순서는 `lint` → `score` → `aggregate`다. lint가 error를 내면 먼저 사용자에게 보고한다 —
 스키마를 벗어난 파일은 채점에서 빠지므로, 모르고 지나가면 성적표에 구멍이 생긴다.
 
-메시지 끝이 `(규칙 도입 YYYY-MM-DD 이전 판단)`인 warn은 **그 규칙이 생기기 전에 만든
-판단**이다(`decided_at` 기준, 규칙별 도입일은 `rules.mjs`의 `RULE_EFFECTIVE_FROM`).
-세대 차이라 판단을 고치지 않는다 — 고치면 "무엇을 판단했는가"의 기록이 사라진다.
-새로 만드는 판단은 이 완충을 받지 않으므로 error 0건으로 통과해야 한다.
-
 ## 결과 읽기
 
 ### 자동 판정할 수 없는 조건
@@ -74,87 +69,11 @@ frontmatter에 없어 일봉을 조회해야 나온다. 네트워크를 쓰는 �
 
 ### 집계
 
-`aggregate`는 retro seed와 forward를 분리해서 내고, 같은 `cohort`는 표본 1개로 접는다.
-한 종목을 30/60/90일로 돌린 3건은 겹치는 구간을 보는 것이라 3개로 세면 표본이 부풀려진다.
+`aggregate`는 채점이 끝난(`scored`·`invalidated`) 판단을 한 표로 내고, verdict·확신도별로
+나눈다.
 
 `underpowered: true`(10건 미만)면 **수치를 해석하지 않는다.** 건수만 밝히고 "아직 판단할
 수 없다"고 쓴다.
-
-`retro_seed_high_leakage` 그룹은 as_of가 생성 모델 컷오프에서 30일 이내인 retro seed다 —
-모델이 그 구간 주가를 이미 알았을 수 있다. **해석하지 않고 건수만 보고한다.** 분류는
-기록된 `leakage_risk` 라벨이 아니라 `aggregate`가 as_of와 `generator_model`로 계산한 값을
-따른다.
-
-생존 편향은 retro seed에서 구조적으로 남는다. 오늘 시점에서 종목을 고르는 이상
-상장폐지·거래정지 종목이 애초에 후보에 없다. `universe_note`와 함께 이 한계를 표시한다.
-
-## Retro seed 프로토콜 (표본 부트스트랩)
-
-forward 표본이 쌓이기를 기다리는 동안, **과거 기준일 데이터로 판단을 만들고 오늘 값으로
-채점해** 표본을 앞당길 수 있다. 성립하는 이유는 하나뿐이다 — 모델의 학습 컷오프 이후
-구간이면 그 기간의 주가 흐름을 모델이 모른다.
-
-이 방식으로 만든 판단은 `provenance: retro_seed`로 표시하고 `retro_seed` 블록에 누수 통제
-내역을 남긴다. **forward 표본과 합산하지 않는다.** retro seed가 검증하는 것은 "판단 로직이
-작동하는가"이지 "이 에이전트를 믿어도 되는가"가 아니다. 후자는 forward 표본만 답한다.
-
-### 1. horizon과 as_of 잡기
-
-**사다리는 거래일 20 / 40 / 60이다.** 그보다 긴 horizon(200 등)은 retro seed로 만들지
-않고 forward로 발행한다 — 컷오프 예산 안에 들어가지 않는다.
-
-`as_of`는 두 벽 사이에 있어야 한다. 컷오프에서 충분히 멀어야 하고(누수), 거기서부터
-horizon이 오늘 이전에 끝나야 한다(채점). **둘이 같은 폭을 나눠 쓰므로 긴 horizon과 낮은
-leakage_risk는 동시에 가질 수 없다.**
-
-```
-컷오프 ├──── gap ────┤ as_of ├──── horizon ────┤ 오늘
-```
-
-경계 판정은 전부 `lint`가 한다. 여기 숫자를 다시 적지 않는다:
-
-- `leakage_risk`는 **as_of와 학습 컷오프의 간격**으로만 정해지고, `checkLeakageRisk`가
-  역산해 파일에 적힌 값과 대조한다.
-- `high` 구간 as_of와 오늘 안에 끝나지 않는 horizon은 `checkRetroSeedBudget`이 **error로
-  막는다.** 막히면 as_of를 뒤로 밀거나 horizon을 줄이고, 둘 다 안 되면 forward로 발행한다.
-  error 메시지가 현재 예산을 거래일 수로 알려준다.
-
-컷오프는 무른 경계다. "겹치지 않으니 안전하다"고 단정하지 않는다.
-
-**컷오프는 모델에 딸린 값이므로 `retro_seed.generator_model`에 생성 모델을 적는다.**
-`rules.mjs`의 `MODEL_CUTOFFS`에 없는 모델은 error다 — 컷오프를 추측해서 채우지 않는다.
-모델을 바꾸면 기존 표본의 `leakage_risk`를 다시 매겨야 한다.
-
-### 2. 조회를 as_of로 고정
-
-as-of 지정이 되는 명령만 쓴다.
-
-| 명령 | as-of | 비고 |
-| --- | --- | --- |
-| `kis chart technical` | `--end-date YYYYMMDD` | 지표·시그널 재현 가능 |
-| `kis chart period` | `--start-date` / `--end-date` | `--adj-price 0` 함께 지정 |
-| `kis financial *` | **없음** | 최신 정정본만 반환 — 쓰면 look-ahead |
-| 웹 검색 기반 뉴스 | 없음 | 오늘 기사가 딸려온다 |
-
-따라서 retro seed 판단은 **기술적 분석 기반으로만** 만든다. `fundamental-analysis`,
-`news-analysis`, `macro-analysis`는 `excluded_skills`에 적고 실제로 호출하지 않는다.
-재무 수치를 기억으로 채워 넣지 않는다 — 그 순간 실험이 무효다.
-
-호출한 명령은 `--end-date`까지 포함해 전문을 `bounded_sources`에 남긴다. 나중에 누수를
-의심할 때 이 기록만이 검증 수단이다.
-
-### 3. 판단 생성
-
-`as_of` 시점 데이터만 놓고 `final-decision` 스키마대로 판단을 낸다.
-
-- `decided_at`은 **실제 생성 시각(오늘)** 을 적는다. as_of로 위조하지 않는다.
-- `decision_id`의 날짜 부분은 `as_of`를 쓴다.
-- `scoring.status`는 `pending`으로 둔다. **생성과 채점을 한 실행에서 하지 않는다** —
-  판단을 내리면서 결과를 보면 그 자체가 누수다.
-- 같은 종목을 여러 horizon으로 돌릴 때는 각각 별도 판단으로 만들고 같은 `cohort`를 준다.
-- `horizon_basis: trading`을 지정한다. 사다리는 거래일 기준이다.
-
-생성 직후 `lint`를 돌려 규칙 위반을 먼저 잡는다. 채점은 별도 실행에서 한다.
 
 ## 보고
 
