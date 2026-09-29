@@ -242,6 +242,17 @@ export function checkGeneratorModel(data) {
   return [];
 }
 
+/**
+ * The leakage band a retro seed actually sits in, computed from `as_of` and its
+ * model's cutoff — never the recorded label, which older judgments got wrong.
+ */
+export function leakageFor(data, cutoff = DEFAULT_CUTOFF) {
+  if (data.provenance !== 'retro_seed') return null;
+  const asOf = parseDate(data.retro_seed?.as_of);
+  if (asOf === null) return null;
+  return expectedLeakageRisk(asOf, cutoffForModel(data.retro_seed?.generator_model, cutoff));
+}
+
 export function checkLeakageRisk(data, { cutoff = DEFAULT_CUTOFF } = {}) {
   if (data.provenance !== 'retro_seed') return [];
   const asOf = parseDate(data.retro_seed?.as_of);

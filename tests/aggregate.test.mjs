@@ -34,6 +34,39 @@ describe('집계 대상', () => {
   });
 });
 
+describe('누수 위험 high 표본', () => {
+  const seed = (asOf, extra = {}) =>
+    decision({ retro_seed: { cohort: 'c1', as_of: asOf, ...extra } });
+  const labels = (groups) => groups.map((g) => `${g.label}:${g.n}`).sort();
+
+  it('high는 retro_seed에서 빠져 별도 그룹으로 나온다', () => {
+    // 기본 컷오프 2026-05: 06-19는 19일(high), 08-18은 79일(medium)
+    const groups = aggregate([seed('2026-06-19'), seed('2026-08-18')]);
+    expect(labels(groups)).toEqual(['retro_seed:1', 'retro_seed_high_leakage:1']);
+  });
+
+  it('라벨이 아니라 as_of와 생성 모델의 컷오프로 분류한다', () => {
+    // 옛 판단의 실제 모양: low로 적혔지만 Opus 5.5 컷오프(2026-06)에서 07-19는 19일
+    const groups = aggregate([
+      seed('2026-07-19', { leakage_risk: 'low', generator_model: 'claude-opus-5-5' }),
+    ]);
+    expect(labels(groups)).toEqual(['retro_seed_high_leakage:1']);
+  });
+
+  it('forward는 as_of가 없어 영향받지 않는다', () => {
+    const groups = aggregate([decision({ provenance: 'forward', retro_seed: undefined })]);
+    expect(labels(groups)).toEqual(['forward:1']);
+  });
+
+  it('cohort는 그룹을 나눈 뒤에 접는다', () => {
+    // 같은 cohort라도 high와 medium이 한 표본으로 합쳐지면 안 된다
+    const groups = aggregate([seed('2026-06-19'), seed('2026-08-18'), seed('2026-08-18')]);
+    const retro = groups.find((g) => g.label === 'retro_seed');
+    const high = groups.find((g) => g.label === 'retro_seed_high_leakage');
+    expect([retro.n, retro.cohorts, high.n, high.cohorts]).toEqual([2, 1, 1, 1]);
+  });
+});
+
 describe('cohort', () => {
   it('같은 cohort 3건은 표본 1개로 접힌다', () => {
     const rows = toRows([decision({}), decision({}), decision({})]);

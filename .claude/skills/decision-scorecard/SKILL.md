@@ -80,6 +80,11 @@ frontmatter에 없어 일봉을 조회해야 나온다. 네트워크를 쓰는 �
 `underpowered: true`(10건 미만)면 **수치를 해석하지 않는다.** 건수만 밝히고 "아직 판단할
 수 없다"고 쓴다.
 
+`retro_seed_high_leakage` 그룹은 as_of가 생성 모델 컷오프에서 30일 이내인 retro seed다 —
+모델이 그 구간 주가를 이미 알았을 수 있다. **해석하지 않고 건수만 보고한다.** 분류는
+기록된 `leakage_risk` 라벨이 아니라 `aggregate`가 as_of와 `generator_model`로 계산한 값을
+따른다.
+
 생존 편향은 retro seed에서 구조적으로 남는다. 오늘 시점에서 종목을 고르는 이상
 상장폐지·거래정지 종목이 애초에 후보에 없다. `universe_note`와 함께 이 한계를 표시한다.
 

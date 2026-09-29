@@ -4,7 +4,12 @@
  * Retro seed and forward samples are never mixed, and a `cohort` is one sample,
  * not three: the same stock at 30/60/90 days overlaps, so counting each run
  * separately inflates the sample.
+ *
+ * A retro seed whose `as_of` sits in the `high` leakage band was written by a model
+ * that may already know the outcome, so it is reported in its own group rather
+ * than counted toward the retro seed hit rate.
  */
+import { leakageFor } from './rules.mjs';
 
 const MIN_SAMPLE = 10;
 
@@ -54,6 +59,7 @@ export function toRows(entries) {
     .map(({ data }) => ({
       decision_id: data.decision_id,
       provenance: data.provenance ?? 'forward',
+      leakage: leakageFor(data),
       cohort: data.retro_seed?.cohort ?? data.decision_id,
       verdict: data.verdict,
       confidence: data.confidence,
@@ -115,7 +121,15 @@ export function aggregate(entries) {
   const rows = toRows(entries);
   const retro = rows.filter((row) => row.provenance === 'retro_seed');
   const forward = rows.filter((row) => row.provenance !== 'retro_seed');
-  return [summarise(forward, 'forward'), summarise(retro, 'retro_seed')].filter(
-    (group) => group.n > 0,
-  );
+  return [
+    summarise(forward, 'forward'),
+    summarise(
+      retro.filter((row) => row.leakage !== 'high'),
+      'retro_seed',
+    ),
+    summarise(
+      retro.filter((row) => row.leakage === 'high'),
+      'retro_seed_high_leakage',
+    ),
+  ].filter((group) => group.n > 0);
 }
