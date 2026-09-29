@@ -1,5 +1,7 @@
 # TODO
 
+최신화: 2026-09-29
+
 ## 워크플로우를 코드로 고정할지 검토
 
 현재 투자 리서치 흐름은 `.claude/agents/market-review.md`가 전체 진행 순서를 지시하고,
@@ -56,36 +58,89 @@ TS 도구 계층을 유지하는 비용이 얻는 안정성보다 컸다.
 - 채점: `scripts/scorecard.mjs`가 산술과 쓰기를 맡고, `decision-scorecard` 스킬은
   실행과 결과 해석만 한다 (`lint` → `score --write` → `aggregate`)
 
-남은 일:
+## retro seed 제거 (다음 작업)
 
-- 판단 표본이 쌓이기 전까지 집계는 의미가 없다. 구간별 10건이 기준선이다.
-- 조기 채점(무효화 조건 daily 확인)을 자동으로 돌릴지, 요청 시에만 돌릴지 미정.
-- 벤치마크 지수 조회는 `scripts/lib/cluefin.mjs`가 맡는다. `--start-date`가 종료일인
-  함정은 `endingOn`으로 감쌌고, 100행 상한은 `pageBackwards`가 나눠 호출해 병합한다
-  (지수·가격 양쪽 모두). 구간이 기준일까지 닿지 않으면 `coverage_gap`으로 표시된다.
-- 가격이 아닌 `checkable: true` 술어(`operating_profit_growth_yoy` 등)를 스크립트가
-  평가하지 못해 `manual_conditions`로 넘긴다. `kis financial` 경로를 붙일지 정해야 한다.
-- 집계에서 아직 안 내는 지표: 무효화 조건 효용(조기 종료 대비 기한까지 갔을 때의 손실
-  차이), `gates.data_sanity`가 warn인 판단의 초과수익 저하 폭, `skills_run` 구성별 성과
-  차이. 표본이 쌓이기 전에는 계산해도 읽을 것이 없어 미뤘다.
-- 손절폭 규칙(`1.5 × ATR14 × √(horizon/30)`)의 검증 표본이 종목 1개·가격경로 1개다.
-  long 3건이 전부 같은 날 발동해 독립 증거가 아니고, 20% 캡은 한 번도 걸리지 않았다.
-- `reference.adjusted`를 CLI 응답에서 자동으로 판별할 방법이 없다. 지금은 확인 안 되면
-  false로 두고 경고만 남긴다.
+retro seed(과거 as_of로 판단을 만들어 바로 채점하는 backward 표본)는 쓰지 않기로 했다
+(2026-09-29). 위 "과거 구간 백테스트를 버린 이유"가 그대로 적용된다. 표본을 기다리지 않고
+당기는 것이 유일한 이득인데, 비용이 더 컸다.
+
+- 모델이 결과를 알 수 있어 컷오프 이후 거래일 42일 안에서만 만들 수 있고, 모델을 바꾸면
+  더 준다.
+- 재무·뉴스·매크로 스킬을 빼야 성립해, 실제로 쓰는 에이전트와 다른 것을 검증한다.
+- 채점 코드 복잡도의 대부분이 여기서 나왔다. 만든 표본 7건(종목 1개)은 journal과 함께
+  이미 삭제했다.
+
+지울 것 (lint·test를 통과하는 단위로 나눠 커밋한다):
+
+- `scripts/lib/rules.mjs`: `MODEL_CUTOFFS`·`DEFAULT_CUTOFF`, `checkGeneratorModel`·
+  `checkLeakageRisk`·`checkRetroSeedBudget`·`checkHorizonLadder`, `RULE_EFFECTIVE_FROM`·
+  `grandfather`(옛 판단용 완충 — 대상 journal이 없어졌다), `leakageFor`
+- `scripts/lib/aggregate.mjs`: retro seed / forward / high 누수 그룹 분리, `cohort` 접기
+- `scripts/scorecard.mjs`: `--cutoff` 옵션
+- 스키마: `provenance`, `retro_seed` 블록. `schema_version`을 올릴지 정한다
+- `decision-scorecard` SKILL.md의 retro seed 프로토콜 절, `final-decision`의 관련 언급
+- 테스트와 fixture: `valid-/broken-retro-seed.md`, `tests/fixtures/decisions/*`를 forward
+  판단으로 바꾸거나 지운다
+- 로컬 계획 문서(`.claude/plans/`): 블라인드 backward 테스트, PIT 데이터스토어(목표가
+  retro seed에서 뺀 스킬을 되돌리는 것이었다), journal lint backlog
+
+남길 것: `horizon_basis`(forward에도 쓸 수 있다), 최소 손절폭·손절 캡·`levels`·
+`invalidation` 규칙, `score`·`aggregate`의 적중률·초과수익·확신도 캘리브레이션.
+
+## 매매일지·채점 추가 개발
+
+forward 판단을 매매일지로 남기고 기한에 채점하는 흐름에 집중한다. journal은 0건에서 다시
+시작한다.
+
+- **forward 판단 발행 재개.** 거래일 20일이면 첫 채점까지 약 한 달, 구간별 10건(집계를
+  해석하는 기준선)까지는 몇 달이 걸린다. 표본 수가 아래 모든 항목의 전제다.
+- **판단과 실제 매매 연결.** `transactions.csv`(`date,symbol,side,quantity,price,fee,note`)에
+  `decision_id`가 없어, 판단을 따라 샀는지·어겼는지·판단 없이 샀는지를 볼 수 없다. 연결
+  열을 추가하고 "판단 성과"와 "실행 성과"를 나눠 집계한다.
+- **복기 흐름.** `review_due`가 오면 `score` 결과와 함께 journal 본문의 사후 복기 항목을
+  채우도록 `investment-journal`·`decision-scorecard`를 잇는다. 감정 기록은 지금처럼
+  채점 대상 밖에 둔다.
+- **조기 채점.** 무효화 조건의 daily 확인을 자동으로 돌릴지, 요청 시에만 돌릴지 미정.
+- **가격 외 술어 평가.** `operating_profit_growth_yoy` 같은 `checkable: true` 술어를
+  스크립트가 평가하지 못해 `manual_conditions`로 넘긴다. 최신 실적은 이제
+  `dart financial-major-accounts`가 원천이므로 그 경로로 붙인다.
+- **평가지표.** 판단 단위 누적수익(CR)·초과수익 IR·최악 역행폭을 기존 `scoring` 필드로
+  먼저 내고, 일봉 사이드카를 남겨 고점→저점 MDD·연환산 Sharpe로 넓힌다. 그 밖에 무효화
+  조건 효용(조기 종료 대비 기한까지 갔을 때의 손실 차이), `gates.data_sanity` warn 판단의
+  초과수익 저하 폭, `skills_run` 구성별 성과 차이. 표본이 쌓이기 전에는 읽을 것이 없다.
+- **채점 결과 되먹임.** `aggregate --brief` 요약을 bull/bear/final-decision이 읽고 확신도
+  조정에만 쓴다. 표본 10건 미만이면 "해석 불가" 한 줄만 낸다.
+- **손절폭 규칙 검증.** `1.5 × ATR14 × √(horizon/30)`은 검증 표본이 없다. 근거였던
+  retro seed 3건(종목 1개, 같은 날 발동)은 삭제했고, 20% 캡은 한 번도 걸리지 않았다.
+- **`reference.adjusted`** 를 CLI 응답에서 자동으로 판별할 방법이 없다. 지금은 확인 안
+  되면 false로 두고 경고만 남긴다.
+
+## 그 밖의 남은 작업
+
+- **분석 파이프라인 개선** (TradingAgents 논문에서 고른 것): bull/bear 재반박 라운드,
+  중간 산출물을 run 디렉터리에 파일로 저장, `risk-position-sizing`의 공격·중립·보수 세
+  관점. 두 번째는 `market-review` 안에서 서브에이전트를 또 띄울 수 있는지 먼저 확인한다.
+- **`market-review.md` 레시피 갱신.**
+  - 비율·성장률을 "DART에 없으니" `kis financial`로 읽는다고 적지만(44·122행),
+    `dart financial-major-indicators`가 있다. 소스를 하나로 정리한다.
+  - `dart corp-code-lookup`에 `--stock-code` 필터가 생겼는데 레시피(47행)는 필터 없이
+    부른다. 필터 없으면 100행에서 잘린다.
+- **`AGENTS.md` 전환 마무리.** `CLAUDE.md` → `AGENTS.md`로 이름을 바꿨지만 첫 줄 제목이
+  여전히 `# CLAUDE.md`다.
+- **원격 브랜치 정리.** main 외 11개가 남아 있다. squash 머지된 PR 9개(#13·#23·#24·#27·
+  #29·#30·#31·#34·#35)의 브랜치, main에 들어간 `chore/lint-hook-and-plans-dir`, 닫힌 #17의
+  `feat/use-agent-browser`(Pi 리소스라 더 쓰지 않는다).
 
 ## 데이터 공백
 
-- **원/달러 환율 명령이 없다.** `list --query "exchange rate"`가 0건이고 `search`도
-  금리 명령만 돌려준다. 외국인 수급 해석에 매크로 배경이 빠지므로, cluefin CLI에 FX 명령을
-  추가하거나 별도 소스를 정한다.
-- **DART 기업코드 조회가 전체 상장사 덤프다.** `dart corp-code-lookup`에 종목 단위 필터가
-  없어 한 종목을 보려고 전체 목록을 내려받게 된다. 종목코드 → corp_code 매핑 경로가 필요하다.
+- **원/달러 환율 명령이 없다.** 2026-09-29 `search "환율"`은 0건, `search "exchange rate"`는
+  금리·ETF 수익률 명령만 돌려준다. 외국인 수급 해석에 매크로 배경이 빠지므로, cluefin CLI에
+  FX 명령을 추가하거나 별도 소스를 정한다.
 - 금리 데이터는 국내와 미국 지표의 기준일이 며칠 어긋날 수 있다. 매크로 해석 시 기준일을
   먼저 맞춘다.
 
 ## 남은 정리
 
-- `vitest.config.ts`는 `tests/`를 가리키지만 테스트가 없다. 테스트를 쓸 계획이 없으면
-  vitest 설정과 의존성도 정리한다 — 남아 있는 npm 의존성은 biome과 vitest뿐이다.
 - dependabot이 `vitest`만 올리고 `@vitest/coverage-v8`은 두어 peer 충돌로
-  `npm install`이 깨진 적이 있다(#26). 두 패키지는 버전을 함께 올려야 한다.
+  `npm install`이 깨진 적이 있다(#26). 두 패키지는 버전을 함께 올려야 한다(지금은 둘 다
+  4.1.11).
