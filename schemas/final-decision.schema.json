@@ -306,7 +306,7 @@
           },
           "metric": {
             "type": "string",
-            "description": "예: price, operating_margin, foreign_net_buy_20d, debt_to_equity"
+            "description": "price는 종가, 재무 지표는 scripts/lib/fundamentals.mjs의 FUNDAMENTAL_METRICS(DART 주요지표, % 단위)로 자동 판정한다. 그 밖의 이름은 manual로 넘어간다. 예: price, operating_profit_growth_yoy, debt_to_equity, foreign_net_buy_20d"
           },
           "op": {
             "type": "string",

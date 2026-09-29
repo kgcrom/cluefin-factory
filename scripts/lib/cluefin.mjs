@@ -129,3 +129,54 @@ export function sectorDailyRange(sectorCode, from, to, options = {}) {
 export function benchmarkFor(market) {
   return market === 'KOSDAQ' ? SECTOR.KOSDAQ : SECTOR.KOSPI200;
 }
+
+/** DART's 8-digit corp code for a listed 6-digit stock code, or null. */
+export function corpCodeFor(symbol, options) {
+  const payload = run(['dart', 'corp-code-lookup', '--stock-code', symbol], options);
+  return payload.data?.[0]?.corp_code ?? null;
+}
+
+/**
+ * Periodic reports (`pblntf_ty A`) filed in [from, to]. DART answers a window
+ * with no filings with status 013 and a null list, not an error.
+ */
+export function periodicDisclosures(corpCode, from, to, options) {
+  const payload = run(
+    [
+      'dart',
+      'disclosure-search',
+      '--corp-code',
+      corpCode,
+      '--bgn-de',
+      from,
+      '--end-de',
+      to,
+      '--pblntf-ty',
+      'A',
+      '--page-count',
+      '100',
+    ],
+    options,
+  );
+  return payload.result?.list ?? [];
+}
+
+/** One indicator class of one report (`result.list` rows), [] when DART has none. */
+export function majorIndicators(corpCode, { bsnsYear, reprtCode }, idxClCode, options) {
+  const payload = run(
+    [
+      'dart',
+      'financial-major-indicators',
+      '--corp-code',
+      corpCode,
+      '--bsns-year',
+      bsnsYear,
+      '--reprt-code',
+      reprtCode,
+      '--idx-cl-code',
+      idxClCode,
+    ],
+    options,
+  );
+  return payload.result?.list ?? [];
+}

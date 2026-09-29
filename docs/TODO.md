@@ -93,9 +93,8 @@ forward 판단을 매매일지로 남기고 기한에 채점하는 흐름에 집
   채우도록 `investment-journal`·`decision-scorecard`를 잇는다. 감정 기록은 지금처럼
   채점 대상 밖에 둔다.
 - **조기 채점.** 무효화 조건의 daily 확인을 자동으로 돌릴지, 요청 시에만 돌릴지 미정.
-- **가격 외 술어 평가.** `operating_profit_growth_yoy` 같은 `checkable: true` 술어를
-  스크립트가 평가하지 못해 `manual_conditions`로 넘긴다. 최신 실적은 이제
-  `dart financial-major-accounts`가 원천이므로 그 경로로 붙인다.
+- **수급 술어 평가.** 재무 조건은 DART 주요지표로 자동 판정한다(`FUNDAMENTAL_METRICS`).
+  `foreign_net_buy_20d` 같은 수급 조건은 아직 `manual_conditions`로 넘어간다.
 - **평가지표.** 판단 단위 누적수익(CR)·초과수익 IR·최악 역행폭을 기존 `scoring` 필드로
   먼저 내고, 일봉 사이드카를 남겨 고점→저점 MDD·연환산 Sharpe로 넓힌다. 그 밖에 무효화
   조건 효용(조기 종료 대비 기한까지 갔을 때의 손실 차이), `gates.data_sanity` warn 판단의
