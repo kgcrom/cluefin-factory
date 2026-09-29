@@ -1,7 +1,7 @@
 ---
 schema_version: 1
 decision_id: 2026-06-19-000000-01
-decided_at: 2026-09-19T11:20:00+09:00
+decided_at: 2026-09-21T11:20:00+09:00
 provenance: retro_seed
 supersedes: null
 

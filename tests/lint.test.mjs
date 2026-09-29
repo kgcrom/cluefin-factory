@@ -10,6 +10,7 @@ import {
   cutoffForModel,
   daysBetween,
   expectedLeakageRisk,
+  grandfather,
   minStopWidth,
   retroSeedBudget,
   runRules,
@@ -120,6 +121,7 @@ describe('손절폭', () => {
 describe('컷오프는 모델에 딸린 값이다', () => {
   it('generator_model이 컷오프를 정하고, 없으면 기본값으로 떨어진다', () => {
     expect(cutoffForModel('claude-opus-5')).toBe('2026-05');
+    expect(cutoffForModel('claude-opus-5-5')).toBe('2026-06');
     expect(cutoffForModel(undefined)).toBe('2026-05');
     expect(cutoffForModel('claude-opus-5', '2025-01')).toBe('2026-05');
   });
@@ -210,6 +212,66 @@ describe('retro seed 예산', () => {
     expect(runRules(data, { today: TODAY }).filter((f) => f.rule === 'retro_seed_budget')).toEqual(
       [],
     );
+  });
+});
+
+describe('규칙 도입 전 판단', () => {
+  // 2026-06-19 buy 90일: 네 규칙이 전부 생기기 전(2026-09-17)에 만든 실제 판단의 모양
+  const legacy = (decidedAt) => ({
+    decision_id: '2026-06-19-000000-01',
+    decided_at: decidedAt,
+    provenance: 'retro_seed',
+    verdict: 'buy',
+    horizon_days: 90,
+    review_due: '2026-09-17',
+    reference: { price: 81300 },
+    levels: { stop_loss: 73535, entry: {}, targets: [] },
+    invalidation: [{ id: 'inv-1', statement: 'x', checkable: true, check_on: 'daily' }],
+    retro_seed: { as_of: '2026-06-19', generator_model: 'claude-opus-5', leakage_risk: 'low' },
+  });
+  const GRANDFATHERED = ['invalidation_scale', 'leakage_risk', 'retro_seed_budget', 'stop_width'];
+  const bySeverity = (findings, severity) =>
+    [...new Set(findings.filter((f) => f.severity === severity).map((f) => f.rule))].sort();
+
+  it('도입일 전에 결정한 판단은 같은 위반을 warn으로 낮춰 남긴다', () => {
+    const findings = runRules(legacy('2026-09-17T15:44:00+09:00'), { atr: 5176.8, today: TODAY });
+    expect(errors(findings)).toEqual([]);
+    expect(bySeverity(findings, 'warn')).toEqual(expect.arrayContaining(GRANDFATHERED));
+    const downgraded = findings.filter((f) => GRANDFATHERED.includes(f.rule));
+    expect(downgraded.every((f) => f.message.endsWith('(규칙 도입 2026-09-20 이전 판단)'))).toBe(
+      true,
+    );
+  });
+
+  it('도입일 당일부터는 error 그대로다', () => {
+    for (const decidedAt of ['2026-09-20T09:00:00+09:00', '2026-09-29T10:00:00+09:00']) {
+      const findings = runRules(legacy(decidedAt), { atr: 5176.8, today: TODAY });
+      expect(bySeverity(findings, 'error')).toEqual(GRANDFATHERED);
+    }
+  });
+
+  it('맵에 없는 규칙은 도입 전 판단에도 error다', () => {
+    const data = {
+      ...legacy('2026-09-17T15:44:00+09:00'),
+      levels: undefined,
+      review_due: '2026-09-18',
+    };
+    const findings = runRules(data, { today: TODAY });
+    expect(bySeverity(findings, 'error')).toEqual(['levels', 'review_due']);
+  });
+
+  it('decided_at을 읽지 못하면 낮추지 않는다', () => {
+    const finding = { rule: 'stop_width', severity: 'error', message: 'x' };
+    expect(grandfather([finding], {})).toEqual([finding]);
+    expect(grandfather([finding], { decided_at: 'unknown' })).toEqual([finding]);
+  });
+
+  it('스키마 error는 낮추지 않는다', () => {
+    const entry = readEntry(fixture('broken-retro-seed.md'));
+    entry.data.decided_at = '2026-09-17T15:44:00+09:00';
+    const schema = lintEntry(entry, { today: TODAY }).filter((f) => f.rule === 'schema');
+    expect(schema.length).toBeGreaterThan(0);
+    expect(schema.every((f) => f.severity === 'error')).toBe(true);
   });
 });
 
