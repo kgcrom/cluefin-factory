@@ -91,13 +91,6 @@ forward 판단을 매매일지로 남기고 기한에 채점하는 흐름에 집
 - **분석 파이프라인 개선** (TradingAgents 논문에서 고른 것): bull/bear 재반박 라운드,
   중간 산출물을 run 디렉터리에 파일로 저장, `risk-position-sizing`의 공격·중립·보수 세
   관점. 두 번째는 `market-review` 안에서 서브에이전트를 또 띄울 수 있는지 먼저 확인한다.
-- **`market-review.md` 레시피 갱신.**
-  - 비율·성장률을 "DART에 없으니" `kis financial`로 읽는다고 적지만(44·122행),
-    `dart financial-major-indicators`가 있다. 소스를 하나로 정리한다.
-  - `dart corp-code-lookup`에 `--stock-code` 필터가 생겼는데 레시피(47행)는 필터 없이
-    부른다. 필터 없으면 100행에서 잘린다.
-- **`AGENTS.md` 전환 마무리.** `CLAUDE.md` → `AGENTS.md`로 이름을 바꿨지만 첫 줄 제목이
-  여전히 `# CLAUDE.md`다.
 - **원격 브랜치 정리.** main 외 11개가 남아 있다. squash 머지된 PR 9개(#13·#23·#24·#27·
   #29·#30·#31·#34·#35)의 브랜치, main에 들어간 `chore/lint-hook-and-plans-dir`, 닫힌 #17의
   `feat/use-agent-browser`(Pi 리소스라 더 쓰지 않는다).

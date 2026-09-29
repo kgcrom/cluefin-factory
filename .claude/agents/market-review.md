@@ -41,10 +41,11 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 | **기술적 지표** | `uv run cluefin-openapi-cli kis chart technical --stock-code 005930 --count 250 --json` |
 | 가격이력(원시 행) | `uv run cluefin-openapi-cli kis chart period --stock-code 005930 --start-date ... --end-date ... --json` (>120일은 구간 분할 후 병합) |
 | **최신 실적** | `uv run cluefin-openapi-cli dart financial-major-accounts --corp-code <8자리> --bsns-year 2026 --reprt-code 11012 --json` (11011 사업/11012 반기/11013 1Q/11014 3Q) |
-| 재무 비율·성장률 | `uv run cluefin-openapi-cli kis financial {ratio,growth,profitability,stability}` — DART에 없는 지표만 |
+| **재무 비율·성장률** | `uv run cluefin-openapi-cli dart financial-major-indicators --corp-code <8자리> --bsns-year 2026 --reprt-code 11012 --idx-cl-code M210000 --json` (M210000 수익성/M220000 안정성/M230000 성장성/M240000 활동성) |
+| 주당지표 등 보조 비율 | `uv run cluefin-openapi-cli kis financial {ratio,stability}` — DART 주요지표에 없는 EPS·BPS·SPS·당좌비율·차입금의존도만 |
 | 과거 5개년 실적 | `uv run cluefin-openapi-cli kis financial {income-statement,balance-sheet} --div-cls-code 0` |
 | 시장 공시 | `uv run cluefin-openapi-cli kis market announcement --stock-code 005930 --json` |
-| DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --json` |
+| DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --stock-code 005930 --json` (필터 없이 부르면 약 12만 건 중 100행에서 잘린다) |
 | DART 개요 | `uv run cluefin-openapi-cli dart company-overview --corp-code <8자리> --json` |
 | DART 공시검색 | `uv run cluefin-openapi-cli dart disclosure-search --corp-code <8자리> --bgn-de ... --end-de ... --json` |
 
@@ -119,10 +120,19 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
   없다. 현금흐름이나 계정 세부(예: 유동부채가 왜 늘었는지)가 필요하면 같은 키에
   `--fs-div`를 붙여 `dart financial-full-statements`로 내려간다. 응답이 크므로 찾는 계정이
   분명할 때만 쓰고, 그냥 "데이터 없음"으로 적기 전에 이 경로를 먼저 본다.
-- 비율·성장률(ROE, 부채비율, 성장률)은 DART에 없으므로 `kis financial ratio/growth/...`를 쓴다.
-  **이 비율들도 같은 커버리지 한계를 그대로 받는다** — 125020은 비율 응답의 `stac_yymm`이
-  202412였다. ROE·성장률을 인용할 때 그 기준 기간을 함께 적어, 최신 실적과 한 기간인 것처럼
-  읽히지 않게 한다.
+- **비율·성장률(ROE, 부채비율, 유동비율, 매출·영업이익 증가율)은 `dart
+  financial-major-indicators`로 읽는다.** 최신 실적과 같은 보고서에서 나오므로 기간이
+  어긋나지 않는다. KIS `ratio/growth`는 최신 실적과 같은 커버리지 한계를 받는다 — 2026-09-29
+  기준 125020은 DART가 2026-06-30 값을 주는데 KIS 비율의 `stac_yymm`은 202412였다.
+  응답은 `result.list`의 `idx_nm`/`idx_val` 행이고, 분류(`--idx-cl-code`)마다 한 번씩 부른다.
+  - `idx_val`이 `null`이거나 `#########`(자릿수 초과)인 항목은 값이 없는 것이다. 당좌비율·
+    이자보상배율은 두 종목 모두 null이었다 — 필요하면 KIS `stability`로 보충하고 기간을 적는다.
+  - 반기·분기 보고서의 ROE·증가율이 연환산인지, 누적 기준인지 아직 확인하지 못했다. 연간
+    값과 나란히 놓고 비교하지 않고, 보고서 코드를 함께 적는다.
+  - 전기와 당기의 부호가 다른 증가율(예: 125020 순이익증가율 −639%)은 크기도 부호도 의미를
+    잃는다. 인용하지 말고 원 계정 금액으로 설명한다.
+  - EPS·BPS·SPS는 DART 주요지표에 없다. 이것만 `kis financial ratio`로 읽고 그 기준 기간을
+    함께 적는다.
 - 최종 리포트에 **재무 데이터 출처(dart-<보고서코드> 또는 kis-annual)** 와 **사용 기간 목록**을
   명시한다. 출처가 섞이면 어느 수치가 원문이고 어느 쪽이 파생인지 알 수 없다.
 

@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Cluefin Factory is an agent configuration for Korean-market investment research —
 a "factory" that keeps turning out company analyses and stock picks.
@@ -93,8 +93,10 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
   it there before editing a recipe.
 - **Latest reported earnings come from `dart financial-major-accounts`, not KIS.**
   `kis financial --div-cls-code 1` returns quarterly rows only for the stocks KIS covers
-  in depth; a small cap gets annual rows that can lag a year behind the filed report. KIS
-  still owns the ratios and growth rates DART does not publish. In KIS income statements
+  in depth; a small cap gets annual rows that can lag a year behind the filed report. The
+  same goes for ratios: ROE, 부채비율 and growth rates come from `dart
+  financial-major-indicators`; KIS keeps only EPS/BPS/SPS and the ratios DART leaves null.
+  In KIS income statements
   `bsop_prti` is 영업이익 and `op_prfi` is 경상이익 — the name reads the other way.
 - **Technical analysis goes through `kis chart technical`**, not raw OHLCV: the CLI pages
   the candles itself and returns indicator readings + rule votes only. Use `chart period`
