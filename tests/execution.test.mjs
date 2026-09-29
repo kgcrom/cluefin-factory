@@ -66,6 +66,11 @@ describe('CSV 읽기', () => {
     expect(classify(rows[0], undefined)).toBe('unlinked');
   });
 
+  it('Excel이 붙인 BOM이 있어도 헤더를 읽는다', () => {
+    const rows = parseTransactions(`\uFEFF${HEADER}\r\n2026-07-13,383220,buy,10,78000,0,,\r\n`);
+    expect(rows[0]).toMatchObject({ date: '20260713', decision_id: null });
+  });
+
   it('헤더뿐이면 빈 목록이다', () => {
     expect(parseTransactions(`${HEADER}\n`)).toEqual([]);
   });

@@ -35,7 +35,11 @@ function splitLine(line) {
  * such column, and every row reads as unlinked rather than failing.
  */
 export function parseTransactions(text) {
-  const lines = text.split(/\r?\n/).filter((line) => line.trim() !== '');
+  // Excel and Numbers prefix a UTF-8 BOM, which would otherwise glue itself to `date`.
+  const lines = text
+    .replace(/^\uFEFF/, '')
+    .split(/\r?\n/)
+    .filter((line) => line.trim() !== '');
   if (lines.length === 0) return [];
   const header = splitLine(lines[0]).map((name) => name.trim());
   return lines.slice(1).map((line, i) => {
