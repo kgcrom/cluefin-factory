@@ -14,12 +14,12 @@ const errors = (findings) => findings.filter((f) => f.severity === 'error');
 
 describe('lintEntry', () => {
   it('통과하는 판단에는 error를 내지 않는다', () => {
-    const findings = lintEntry(readEntry(fixture('valid-retro-seed.md')));
+    const findings = lintEntry(readEntry(fixture('valid-decision.md')));
     expect(errors(findings)).toEqual([]);
   });
 
   it('2026-09-19 세션에서 실제로 낸 스키마 위반 2건을 잡는다', () => {
-    const findings = lintEntry(readEntry(fixture('broken-retro-seed.md')));
+    const findings = lintEntry(readEntry(fixture('broken-decision.md')));
     const messages = findings.filter((f) => f.rule === 'schema').map((f) => f.message);
     // data_as_of.financial: null — 스키마는 null을 허용하지 않는다
     expect(messages.some((m) => m.includes('/data_as_of/financial'))).toBe(true);
@@ -28,7 +28,7 @@ describe('lintEntry', () => {
   });
 
   it('review_due·일봉 단독 조건을 각각 잡는다', () => {
-    const findings = lintEntry(readEntry(fixture('broken-retro-seed.md')));
+    const findings = lintEntry(readEntry(fixture('broken-decision.md')));
     expect(rules(errors(findings))).toEqual(
       expect.arrayContaining(['invalidation_scale', 'review_due']),
     );
@@ -114,7 +114,7 @@ describe('ATR 배선', () => {
   });
 
   it('--atr이 있어야 최소 손절폭을 검사한다', () => {
-    const path = fixture('valid-retro-seed.md');
+    const path = fixture('valid-decision.md');
     // 손절폭 7765원, horizon 40일 → 최소 1.73 ATR. ATR 5000원이면 미달이다.
     const fetchCandles = vi.fn(() => flatCandles(30, 5000));
 
@@ -128,7 +128,7 @@ describe('ATR 배선', () => {
   });
 
   it('ATR을 못 구하면 검사를 건너뛴 사실을 warn으로 남긴다', () => {
-    const short = lint([fixture('valid-retro-seed.md')], {
+    const short = lint([fixture('valid-decision.md')], {
       withAtr: true,
       fetchCandles: () => [],
     });
@@ -138,7 +138,7 @@ describe('ATR 배선', () => {
   });
 
   it('CLI가 실패해도 나머지 린트 결과는 살린다', () => {
-    const failed = lint([fixture('valid-retro-seed.md')], {
+    const failed = lint([fixture('valid-decision.md')], {
       withAtr: true,
       fetchCandles: () => {
         throw new CluefinError(5, 'rate limit');

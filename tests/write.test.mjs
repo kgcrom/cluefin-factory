@@ -6,7 +6,7 @@ import { parseFrontmatter, splitEntry } from '../scripts/lib/journal.mjs';
 import { applyScoring, renderScoring, scoringNotes } from '../scripts/lib/write.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const original = readFileSync(join(ROOT, 'tests/fixtures/valid-retro-seed.md'), 'utf8');
+const original = readFileSync(join(ROOT, 'tests/fixtures/valid-decision.md'), 'utf8');
 
 const result = {
   status: 'invalidated',

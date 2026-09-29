@@ -2,18 +2,7 @@
 schema_version: 1
 decision_id: 2026-07-24-000000-01
 decided_at: 2026-09-21T11:20:00+09:00
-provenance: retro_seed
 supersedes: null
-
-retro_seed:
-  as_of: 2026-07-24
-  generator_model: claude-opus-5
-  bounded_sources:
-    - "kis chart technical --stock-code 000000 --end-date 20260724 --count 120"
-  excluded_skills:
-    - fundamental-analysis
-  leakage_risk: medium
-  cohort: fixture-cohort
 
 data_as_of:
   price: 2026-07-24
