@@ -1,16 +1,7 @@
 /**
- * Aggregation over scored judgments.
- *
- * Retro seed and forward samples are never mixed, and a `cohort` is one sample,
- * not three: the same stock at 30/60/90 days overlaps, so counting each run
- * separately inflates the sample.
- *
- * A retro seed whose `as_of` sits in the `high` leakage band was written by a model
- * that may already know the outcome, so it is reported in its own group rather
- * than counted toward the retro seed hit rate.
+ * Aggregation over scored judgments: hit rate, excess return and confidence
+ * calibration, broken down by verdict and confidence.
  */
-import { leakageFor } from './rules.mjs';
-
 const MIN_SAMPLE = 10;
 
 const mean = (values) =>
@@ -58,9 +49,6 @@ export function toRows(entries) {
     .filter((entry) => ['scored', 'invalidated'].includes(entry.data?.scoring?.status))
     .map(({ data }) => ({
       decision_id: data.decision_id,
-      provenance: data.provenance ?? 'forward',
-      leakage: leakageFor(data),
-      cohort: data.retro_seed?.cohort ?? data.decision_id,
       verdict: data.verdict,
       confidence: data.confidence,
       horizon_days: data.horizon_days,
@@ -69,24 +57,6 @@ export function toRows(entries) {
       uncheckable: (data.invalidation ?? []).filter((item) => item.checkable === false).length,
       conditions: (data.invalidation ?? []).length,
     }));
-}
-
-/** Collapse each cohort to one entry so overlapping runs are not counted thrice. */
-export function collapseCohorts(rows) {
-  return [...groupBy(rows, (row) => row.cohort).values()].map((group) => {
-    const correct = group.filter((row) => row.outcome === 'correct').length;
-    return {
-      ...group[0],
-      members: group.length,
-      outcome:
-        correct * 2 === group.length
-          ? 'inconclusive'
-          : correct * 2 > group.length
-            ? 'correct'
-            : 'incorrect',
-      excess: mean(group.map((row) => row.excess).filter((value) => value !== null)),
-    };
-  });
 }
 
 export function summarise(rows, label) {
@@ -108,7 +78,6 @@ export function summarise(rows, label) {
   return {
     label,
     n: rows.length,
-    cohorts: collapseCohorts(rows).length,
     underpowered: rows.length < MIN_SAMPLE,
     overall: hitRate(rows),
     by_verdict: byVerdict,
@@ -119,17 +88,5 @@ export function summarise(rows, label) {
 
 export function aggregate(entries) {
   const rows = toRows(entries);
-  const retro = rows.filter((row) => row.provenance === 'retro_seed');
-  const forward = rows.filter((row) => row.provenance !== 'retro_seed');
-  return [
-    summarise(forward, 'forward'),
-    summarise(
-      retro.filter((row) => row.leakage !== 'high'),
-      'retro_seed',
-    ),
-    summarise(
-      retro.filter((row) => row.leakage === 'high'),
-      'retro_seed_high_leakage',
-    ),
-  ].filter((group) => group.n > 0);
+  return rows.length === 0 ? [] : [summarise(rows, 'forward')];
 }

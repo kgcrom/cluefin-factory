@@ -4,7 +4,6 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
-import { DEFAULT_CUTOFF } from '../scripts/lib/rules.mjs';
 import { parseArgs, score, selectPending } from '../scripts/scorecard.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -38,7 +37,7 @@ describe('parseArgs', () => {
     const { paths, options } = parseArgs([]);
 
     expect(paths).toEqual([]);
-    expect(options).toEqual({ cutoff: DEFAULT_CUTOFF, json: false });
+    expect(options).toEqual({ json: false });
     // 없는 것이 기본값이라는 사실 자체가 계약이다 — 조용히 켜지면 안 된다.
     expect(options.write).toBeUndefined();
     expect(options.withAtr).toBeUndefined();
@@ -51,8 +50,6 @@ describe('parseArgs', () => {
       '20260101',
       '--atr',
       '--write',
-      '--cutoff',
-      '2026-03',
       'b.md',
       '--json',
     ]);
@@ -62,7 +59,6 @@ describe('parseArgs', () => {
       today: '20260101',
       withAtr: true,
       write: true,
-      cutoff: '2026-03',
       json: true,
     });
   });
@@ -70,6 +66,8 @@ describe('parseArgs', () => {
   it('모르는 옵션은 조용히 무시하지 않고 던진다', () => {
     // 오타가 무시되면 --wirte 하나로 쓰기가 사라진 것을 아무도 모른다.
     expect(() => parseArgs(['--wirte'])).toThrow('--wirte');
+    // 걷어낸 옵션도 마찬가지다.
+    expect(() => parseArgs(['--cutoff', '2026-05'])).toThrow('--cutoff');
   });
 });
 

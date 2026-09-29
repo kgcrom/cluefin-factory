@@ -3,7 +3,7 @@
  * Deterministic half of the decision-scorecard pipeline.
  *
  * Usage:
- *   node scripts/scorecard.mjs lint  [경로...] [--cutoff YYYY-MM] [--atr] [--json]
+ *   node scripts/scorecard.mjs lint  [경로...] [--atr] [--json]
  *   node scripts/scorecard.mjs score [경로...] [--write] [--today YYYYMMDD] [--json]
  *   node scripts/scorecard.mjs aggregate [경로...] [--json]
  *
@@ -20,7 +20,7 @@ import { aggregate } from './lib/aggregate.mjs';
 import { ATR_PERIOD, atr14, lookbackStart } from './lib/atr.mjs';
 import { benchmarkFor, dailyCandles, sectorDailyRange } from './lib/cluefin.mjs';
 import { readEntry } from './lib/journal.mjs';
-import { DEFAULT_CUTOFF, runRules } from './lib/rules.mjs';
+import { runRules } from './lib/rules.mjs';
 import { compact, scoreDecision } from './lib/scoring.mjs';
 import { schemaFindings } from './lib/validate.mjs';
 import { applyScoring, renderScoring } from './lib/write.mjs';
@@ -32,13 +32,10 @@ const SCHEMA = join(ROOT, 'schemas/final-decision.schema.json');
 /** Split argv into paths and options. Exported for tests. */
 export function parseArgs(argv) {
   const paths = [];
-  const options = { cutoff: DEFAULT_CUTOFF, json: false };
+  const options = { json: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--cutoff') {
-      i += 1;
-      options.cutoff = argv[i];
-    } else if (arg === '--today') {
+    if (arg === '--today') {
       i += 1;
       options.today = argv[i];
     } else if (arg === '--dry-run') {
@@ -215,7 +212,7 @@ function main(argv) {
     return reportScores(results);
   }
   process.stderr.write(
-    'usage: scorecard.mjs lint|score|aggregate [경로...] [--cutoff YYYY-MM] [--today YYYYMMDD] [--atr] [--write] [--json]\n',
+    'usage: scorecard.mjs lint|score|aggregate [경로...] [--today YYYYMMDD] [--atr] [--write] [--json]\n',
   );
   return 2;
 }
