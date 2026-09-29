@@ -144,6 +144,7 @@ claude          # 저장소 안에서 실행
 `.claude/investments/`에 저장합니다.
 
 - `portfolio.yaml`, `watchlist.yaml`, `transactions.csv`: 보유/관심 종목과 거래 기록
+  (`transactions.csv`의 `decision_id`로 매매를 판단에 연결한다 — `scorecard.mjs execution`)
 - `journal/`: 투자 판단과 사후 복기 기록
 
 이 데이터는 개인 자료이므로 커밋하지 않습니다 (`.gitignore`에서 `.claude/investments/` 제외).

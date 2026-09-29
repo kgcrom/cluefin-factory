@@ -43,7 +43,11 @@ frontmatter는 `schemas/final-decision.schema.json`을 따른다.
 
 ## 주의
 
-- 실제 매수/매도 실행 기록은 `transactions.csv`에 남긴다.
+- 실제 매수/매도 실행 기록은 `transactions.csv`에 남긴다. 헤더는
+  `date,symbol,side,quantity,price,fee,note,decision_id`다. **그 매매가 따른 판단의
+  `decision_id`를 적는다.** 판단 없이 한 매매면 비워 둔다 — 비운 것 자체가 기록이다.
+  어느 판단인지 불분명하면 추측해서 채우지 말고 사용자에게 묻는다.
+  `decision_id` 열이 없는 옛 파일도 읽히지만, 새로 쓰기 전에 헤더에 열을 추가한다.
 - 보유 수량, 평균단가, 현금 잔고는 사용자의 명시적 요청 없이 수정하지 않는다.
 - 개인 투자 기록은 민감 정보로 취급한다. 이 디렉터리는 git-ignore 상태를 유지한다.
 - 기존 journal 파일의 `scoring` 블록은 덮어쓰지 않는다. 채점 결과가 이미 들어 있을 수 있다.

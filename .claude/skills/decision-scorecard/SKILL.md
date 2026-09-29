@@ -88,6 +88,13 @@ frontmatter에 없어 일봉을 조회해야 나온다. 네트워크를 쓰는 �
 - 개인 투자 기록은 민감 정보다. journal 내용을 외부로 전송하지 않는다.
 - 이 스킬은 매수/매도를 권하지 않는다. 과거 판단의 채점만 한다.
 - `transactions.csv`의 실제 체결 기록과 journal의 판단은 별개다. 실제 수익률을 묻는 경우
-  두 파일이 다를 수 있음을 먼저 밝힌다.
+  두 파일이 다를 수 있음을 먼저 밝히고, `node scripts/scorecard.mjs execution`을 돌린다.
+  - `counts`: 매매마다 판단을 따랐는지(`followed`), 어겼는지(`against`), 판단이 말하지
+    않은 매매인지(`neutral`), 판단 없이 했는지(`unlinked`).
+  - `performance`: 따른 매매만 놓고 **판단 수익률**(`scoring.return_pct`)과 **실행
+    수익률**(체결가 → `price_at_review`)을 나란히 낸다. 둘의 차이가 실행에서 새어 나간
+    몫이고, `fill_gap_pct`(기준가 대비 체결가, 양수가 불리)가 그 한 원인이다.
+  - `problems`에 줄이 있으면 먼저 보고한다 — 없는 판단, 다른 종목, 판단 전 매매는 입력
+    실수일 가능성이 크다.
 - 각 journal 파일의 **`scoring` 블록만** 바뀐다. 과거 판단을 사후에 고치면 성적표가
   무의미해진다.
