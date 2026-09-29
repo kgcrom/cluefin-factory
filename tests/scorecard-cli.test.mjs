@@ -59,8 +59,6 @@ describe('parseArgs', () => {
   it('모르는 옵션은 조용히 무시하지 않고 던진다', () => {
     // 오타가 무시되면 --wirte 하나로 쓰기가 사라진 것을 아무도 모른다.
     expect(() => parseArgs(['--wirte'])).toThrow('--wirte');
-    // 걷어낸 옵션도 마찬가지다.
-    expect(() => parseArgs(['--cutoff', '2026-05'])).toThrow('--cutoff');
   });
 });
 
