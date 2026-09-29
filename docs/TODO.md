@@ -86,9 +86,6 @@ forward 판단을 매매일지로 남기고 기한에 채점하는 흐름에 집
 
 - **forward 판단 발행 재개.** 거래일 20일이면 첫 채점까지 약 한 달, 구간별 10건(집계를
   해석하는 기준선)까지는 몇 달이 걸린다. 표본 수가 아래 모든 항목의 전제다.
-- **판단과 실제 매매 연결.** `transactions.csv`(`date,symbol,side,quantity,price,fee,note`)에
-  `decision_id`가 없어, 판단을 따라 샀는지·어겼는지·판단 없이 샀는지를 볼 수 없다. 연결
-  열을 추가하고 "판단 성과"와 "실행 성과"를 나눠 집계한다.
 - **복기 흐름.** `review_due`가 오면 `score` 결과와 함께 journal 본문의 사후 복기 항목을
   채우도록 `investment-journal`·`decision-scorecard`를 잇는다. 감정 기록은 지금처럼
   채점 대상 밖에 둔다.

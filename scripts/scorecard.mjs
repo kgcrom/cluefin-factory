@@ -6,6 +6,7 @@
  *   node scripts/scorecard.mjs lint  [경로...] [--atr] [--json]
  *   node scripts/scorecard.mjs score [경로...] [--write] [--today YYYYMMDD] [--json]
  *   node scripts/scorecard.mjs aggregate [경로...] [--json]
+ *   node scripts/scorecard.mjs execution [경로...] [--transactions CSV]
  *
  * `lint` and `aggregate` are read-only, and offline unless `lint --atr` is given —
  * the minimum-stop-width rule needs the ATR of the judgment's own price date, which
@@ -13,7 +14,7 @@
  * it rewrites the `scoring` block only with `--write`.
  * Paths default to `.claude/investments/journal/*.md`, git-ignored per-user data.
  */
-import { readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aggregate } from './lib/aggregate.mjs';
@@ -26,6 +27,7 @@ import {
   periodicDisclosures,
   sectorDailyRange,
 } from './lib/cluefin.mjs';
+import { linkTrades, parseTransactions } from './lib/execution.mjs';
 import { isFundamental, periodicReports, withValues } from './lib/fundamentals.mjs';
 import { readEntry } from './lib/journal.mjs';
 import { runRules } from './lib/rules.mjs';
@@ -35,6 +37,7 @@ import { applyScoring, renderScoring } from './lib/write.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const DEFAULT_JOURNAL = join(ROOT, '.claude/investments/journal');
+const DEFAULT_TRANSACTIONS = join(ROOT, '.claude/investments/transactions.csv');
 const SCHEMA = join(ROOT, 'schemas/final-decision.schema.json');
 
 /** Split argv into paths and options. Exported for tests. */
@@ -43,7 +46,10 @@ export function parseArgs(argv) {
   const options = { json: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--today') {
+    if (arg === '--transactions') {
+      i += 1;
+      options.transactions = argv[i];
+    } else if (arg === '--today') {
       i += 1;
       options.today = argv[i];
     } else if (arg === '--dry-run') {
@@ -193,6 +199,16 @@ export function score(paths, options = {}) {
   });
 }
 
+/** Trades linked to the judgments they name. Read-only and offline. */
+export function execution(paths, options = {}) {
+  const csv = options.transactions ?? DEFAULT_TRANSACTIONS;
+  const trades = existsSync(csv) ? parseTransactions(readFileSync(csv, 'utf8')) : [];
+  return linkTrades(
+    trades,
+    expandPaths(paths).map((path) => readEntry(path)),
+  );
+}
+
 const SEVERITY_MARK = { error: '✗', warn: '!', info: '·' };
 
 function report(results, options) {
@@ -233,6 +249,10 @@ function main(argv) {
     process.stdout.write(`${JSON.stringify(groups, null, 2)}\n`);
     return 0;
   }
+  if (command === 'execution') {
+    process.stdout.write(`${JSON.stringify(execution(paths, options), null, 2)}\n`);
+    return 0;
+  }
   if (command === 'score') {
     const results = score(paths, options);
     if (options.json) {
@@ -242,7 +262,7 @@ function main(argv) {
     return reportScores(results);
   }
   process.stderr.write(
-    'usage: scorecard.mjs lint|score|aggregate [경로...] [--today YYYYMMDD] [--atr] [--write] [--json]\n',
+    'usage: scorecard.mjs lint|score|aggregate|execution [경로...] [--today YYYYMMDD] [--atr] [--write] [--transactions CSV] [--json]\n',
   );
   return 2;
 }
