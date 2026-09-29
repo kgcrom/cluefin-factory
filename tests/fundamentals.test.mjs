@@ -133,6 +133,11 @@ describe('재무 조건 발동', () => {
     expect(manual).toEqual(['inv-1']);
   });
 
+  it('맵에 없는 이름은 객체 기본 속성과 겹쳐도 manual이다', () => {
+    const odd = { ...condition, metric: 'toString' };
+    expect(firstTrigger([odd], series.prices, '20260701', []).manual).toEqual(['inv-1']);
+  });
+
   it('보고서를 조회하지 않았으면(null) 예전처럼 manual이다', () => {
     expect(firstTrigger([condition], series.prices, '20260701').manual).toEqual(['inv-1']);
   });

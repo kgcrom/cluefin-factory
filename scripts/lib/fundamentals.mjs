@@ -71,7 +71,7 @@ export function indicatorValue(rows, idxNm) {
 
 /** Whether a checkable condition is one this module evaluates. */
 export function isFundamental(item) {
-  return item.checkable === true && item.metric in FUNDAMENTAL_METRICS;
+  return item.checkable === true && Object.hasOwn(FUNDAMENTAL_METRICS, String(item.metric));
 }
 
 /**
