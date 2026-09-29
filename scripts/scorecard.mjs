@@ -19,8 +19,16 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aggregate } from './lib/aggregate.mjs';
 import { ATR_PERIOD, atr14, lookbackStart } from './lib/atr.mjs';
-import { benchmarkFor, dailyCandles, sectorDailyRange } from './lib/cluefin.mjs';
+import {
+  benchmarkFor,
+  corpCodeFor,
+  dailyCandles,
+  majorIndicators,
+  periodicDisclosures,
+  sectorDailyRange,
+} from './lib/cluefin.mjs';
 import { linkTrades, parseTransactions } from './lib/execution.mjs';
+import { isFundamental, periodicReports, withValues } from './lib/fundamentals.mjs';
 import { readEntry } from './lib/journal.mjs';
 import { runRules } from './lib/rules.mjs';
 import { compact, scoreDecision } from './lib/scoring.mjs';
@@ -142,6 +150,27 @@ export function selectPending(entries) {
     }));
 }
 
+/**
+ * Periodic reports filed in the window, with the values the judgment's
+ * fundamental conditions need. Null when it has none, so no DART call is made
+ * for a price-only judgment.
+ */
+export function reportsFor(data, from, to, options = {}) {
+  const metrics = [
+    ...new Set((data.invalidation ?? []).filter(isFundamental).map((item) => item.metric)),
+  ];
+  if (metrics.length === 0) return null;
+  const lookup = options.fetchCorpCode ?? corpCodeFor;
+  const search = options.fetchDisclosures ?? periodicDisclosures;
+  const indicators = options.fetchIndicators ?? majorIndicators;
+  const corpCode = lookup(data.symbol);
+  if (corpCode === null) return null;
+  const reports = periodicReports(search(corpCode, from, to), from, to);
+  return withValues(reports, metrics, (report, idxClCode) =>
+    indicators(corpCode, report, idxClCode),
+  );
+}
+
 export function score(paths, options = {}) {
   const today = options.today ?? todayCompact();
   const entries = expandPaths(paths).map((path) => readEntry(path));
@@ -157,7 +186,8 @@ export function score(paths, options = {}) {
     const fetchIndex = options.fetchIndex ?? sectorDailyRange;
     const prices = fetchPrices(data.symbol, referenceDate, end);
     const index = fetchIndex(benchmarkFor(data.market), referenceDate, end);
-    const result = scoreDecision(data, { prices, index, today });
+    const reports = reportsFor(data, referenceDate, end, options);
+    const result = scoreDecision(data, { prices, index, today, reports });
     if (options.write && result.status !== 'pending') {
       const block = renderScoring(result, {
         scoredAt: options.scoredAt ?? new Date().toISOString(),

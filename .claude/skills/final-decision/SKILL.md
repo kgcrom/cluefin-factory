@@ -53,6 +53,9 @@ frontmatter에 이미 있는 값을 본문에 다시 나열만 하지는 않는�
   `metric`/`op`/`value`/`source`/`check_on`을 채워 기계가 검증할 수 있게 쓴다.
   술어로 표현할 수 없는 조건은 `checkable: false`로 솔직히 표시한다 — 억지로
   숫자를 만들어내지 않는다.
+  재무 조건은 `scripts/lib/fundamentals.mjs`의 `FUNDAMENTAL_METRICS`에 있는 이름을 쓰면
+  채점이 자동으로 판정한다(예: `operating_profit_growth_yoy < 0`, `debt_to_equity > 200`).
+  값은 DART 주요지표와 같은 **% 단위**다 — 8%는 `0.08`이 아니라 `8`이다.
 - **무효화 조건의 시간 척도를 `horizon_days`에 맞춘다.** SMA20 하회 같은 일봉 조건만
   달아두면 90일·120일 판단이 사흘 만에 종료돼 horizon을 정한 의미가 사라진다.
   `check_on: daily` 가격 조건 하나로 끝내지 말고, horizon에 상응하는 조건
