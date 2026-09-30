@@ -41,9 +41,10 @@ directly, with `js-yaml` and `ajv` as its only dependencies.
                               # risk-position-sizing, investment-journal,
                               # decision-scorecard
 docs/                         # TODO.md + assets/ (GitHub Pages source)
-schemas/                      # final-decision frontmatter JSON Schema + example
+schemas/                      # final-decision frontmatter + blind case JSON Schemas
 scripts/                      # deterministic steps lifted out of the skills
-└── scorecard.mjs             # lint / score [--write] / aggregate
+├── scorecard.mjs             # lint / score [--write] / aggregate
+└── blind/                    # blind backward test: case masking, seal, restore
 tests/                        # vitest specs + fixtures
 ```
 
