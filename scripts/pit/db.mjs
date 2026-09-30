@@ -107,6 +107,22 @@ const UPSERT = {
     ON CONFLICT (sector_code, date) DO UPDATE SET close = excluded.close,
       fetched_at = excluded.fetched_at, raw_sha256 = excluded.raw_sha256
     WHERE excluded.fetched_at >= index_prices.fetched_at`,
+  flows: `INSERT INTO flows (symbol, date, foreign_net_qty, institution_net_qty, fetched_at, raw_sha256)
+    VALUES (:symbol, :date, :foreign_net_qty, :institution_net_qty, :fetched_at, :raw_sha256)
+    ON CONFLICT (symbol, date) DO UPDATE SET foreign_net_qty = excluded.foreign_net_qty,
+      institution_net_qty = excluded.institution_net_qty,
+      fetched_at = excluded.fetched_at, raw_sha256 = excluded.raw_sha256
+    WHERE excluded.fetched_at >= flows.fetched_at`,
+  short_sales: `INSERT INTO short_sales (symbol, date, short_qty, fetched_at, raw_sha256)
+    VALUES (:symbol, :date, :short_qty, :fetched_at, :raw_sha256)
+    ON CONFLICT (symbol, date) DO UPDATE SET short_qty = excluded.short_qty,
+      fetched_at = excluded.fetched_at, raw_sha256 = excluded.raw_sha256
+    WHERE excluded.fetched_at >= short_sales.fetched_at`,
+  technical: `INSERT INTO technical (symbol, as_of, candle_count, body, fetched_at, raw_sha256)
+    VALUES (:symbol, :as_of, :candle_count, :body, :fetched_at, :raw_sha256)
+    ON CONFLICT (symbol, as_of, candle_count) DO UPDATE SET body = excluded.body,
+      fetched_at = excluded.fetched_at, raw_sha256 = excluded.raw_sha256
+    WHERE excluded.fetched_at >= technical.fetched_at`,
   // A filing never changes once accepted; the first copy stays.
   disclosures: `INSERT INTO disclosures (rcept_no, corp_code, rcept_dt, known_at, report_nm, raw_sha256)
     VALUES (:rcept_no, :corp_code, :rcept_dt, :known_at, :report_nm, :raw_sha256)
@@ -118,6 +134,8 @@ const UPSERT = {
 };
 
 export const FACT_TABLES = Object.keys(UPSERT);
+/** Tables rebuilt from raw. `financials` is loaded by `loadFacts` until P3 and survives a rebuild. */
+const PARSED_TABLES = FACT_TABLES.filter((table) => table !== 'financials');
 
 /** The `:name` parameters a statement binds, so a row supplies exactly those. */
 const bound = (sql) => [...new Set([...sql.matchAll(/:(\w+)/g)].map((match) => match[1]))];
@@ -199,7 +217,7 @@ export function rebuild(db) {
     return at === -1 ? SOURCE_ORDER.length : at;
   };
   return transaction(db, () => {
-    for (const table of ['prices', 'index_prices', 'disclosures']) db.exec(`DELETE FROM ${table}`);
+    for (const table of PARSED_TABLES) db.exec(`DELETE FROM ${table}`);
     const raws = db
       .prepare(
         'SELECT sha256, source, params, fetched_at, body FROM raw ORDER BY fetched_at, sha256',
@@ -241,6 +259,35 @@ export function disclosuresAsOf(db, corpCode, asOf, { from = '00000000' } = {}) 
        WHERE corp_code = ? AND known_at BETWEEN ? AND ? ORDER BY known_at, rcept_no`,
     )
     .all(corpCode, from, asOf);
+}
+
+/** Net buying and short sales by day, joined — either side may be missing (null). */
+export function flowsAsOf(db, symbol, asOf, { from = '00000000' } = {}) {
+  return db
+    .prepare(
+      `SELECT date, max(foreign_net_qty) AS foreign_net_qty,
+              max(institution_net_qty) AS institution_net_qty, max(short_qty) AS short_qty
+       FROM (
+         SELECT date, foreign_net_qty, institution_net_qty, NULL AS short_qty
+         FROM flows WHERE symbol = :symbol AND date BETWEEN :from AND :asOf
+         UNION ALL
+         SELECT date, NULL, NULL, short_qty
+         FROM short_sales WHERE symbol = :symbol AND date BETWEEN :from AND :asOf
+       )
+       GROUP BY date ORDER BY date`,
+    )
+    .all({ symbol, from, asOf });
+}
+
+/**
+ * The `chart technical` reading taken as of `asOf` exactly, or null. A reading
+ * from an earlier day is not substituted — the case would describe the wrong day.
+ */
+export function technicalAt(db, symbol, asOf, candleCount = 120) {
+  const row = db
+    .prepare('SELECT body FROM technical WHERE symbol = ? AND as_of = ? AND candle_count = ?')
+    .get(symbol, asOf, candleCount);
+  return row ? JSON.parse(row.body) : null;
 }
 
 const FINANCIALS_PICK = `

@@ -16,7 +16,7 @@ export class CluefinError extends Error {
   }
 }
 
-function run(args, { cwd = process.env.CLUEFIN_OPENAPI_CWD || DEFAULT_CWD } = {}) {
+export function run(args, { cwd = process.env.CLUEFIN_OPENAPI_CWD || DEFAULT_CWD } = {}) {
   try {
     return JSON.parse(
       execFileSync('uv', ['run', 'cluefin-openapi-cli', ...args], {

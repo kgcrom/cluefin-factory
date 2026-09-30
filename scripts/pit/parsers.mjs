@@ -10,7 +10,14 @@
 import { compactDate, toInt, toReal } from './convert.mjs';
 
 /** Parse order for rebuild: the calendar (index closes) before anything that needs it. */
-export const SOURCE_ORDER = ['kis.sector.daily', 'kis.chart.period', 'dart.disclosure-search'];
+export const SOURCE_ORDER = [
+  'kis.sector.daily',
+  'kis.chart.period',
+  'kiwoom.analysis.institutional-trend',
+  'kis.analysis.short-selling-trend',
+  'kis.chart.technical',
+  'dart.disclosure-search',
+];
 
 function chartPeriod(body, params) {
   const symbol = String(body.stock_code ?? params.stock_code);
@@ -58,8 +65,50 @@ function disclosureSearch(body, _params, { nextTradingDay }) {
   return { rows: { disclosures }, skipped };
 }
 
+/**
+ * Kiwoom's daily net buying by investor. The price columns carry a direction
+ * sign and are not loaded; the `*_prsm_avg_pric` header fields are averages
+ * over the requested window, not a daily value, and are not loaded either.
+ */
+function institutionalTrend(body, params) {
+  const symbol = String(params.stock_code);
+  const flows = (body.stk_orgn_trde_trnsn ?? []).map((row) => ({
+    symbol,
+    date: compactDate(row.dt),
+    foreign_net_qty: toInt(row.for_daly_nettrde_qty),
+    institution_net_qty: toInt(row.orgn_daly_nettrde_qty),
+  }));
+  return { rows: { flows }, skipped: 0 };
+}
+
+function shortSellingTrend(body, params) {
+  const symbol = String(params.stock_code);
+  const short_sales = (body.data ?? []).map((row) => ({
+    symbol,
+    date: compactDate(row.stck_bsop_date),
+    short_qty: toInt(row.ssts_cntg_qty),
+  }));
+  return { rows: { short_sales }, skipped: 0 };
+}
+
+/** Kept whole — which readings survive masking is the case builder's call. */
+function chartTechnical(body, params) {
+  const technical = [
+    {
+      symbol: String(body.stock_code ?? params.stock_code),
+      as_of: compactDate(body.as_of),
+      candle_count: toInt(body.candle_count),
+      body: JSON.stringify(body),
+    },
+  ];
+  return { rows: { technical }, skipped: 0 };
+}
+
 export const PARSERS = {
   'kis.chart.period': chartPeriod,
   'kis.sector.daily': sectorDaily,
+  'kiwoom.analysis.institutional-trend': institutionalTrend,
+  'kis.analysis.short-selling-trend': shortSellingTrend,
+  'kis.chart.technical': chartTechnical,
   'dart.disclosure-search': disclosureSearch,
 };
