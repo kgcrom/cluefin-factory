@@ -86,4 +86,18 @@ describe('초과수익 부호', () => {
     ]);
     expect(row.excess).toBeCloseTo(-13.1, 2);
   });
+
+  it('블라인드 판단은 forward와 섞지 않고 따로 집계한다', () => {
+    const groups = aggregate([
+      decision({}),
+      decision({
+        decision_id: '2024-06-28-005930-01',
+        blind: { case_id: 'abcdefghijkl', seal_sha256: 'f'.repeat(64) },
+      }),
+    ]);
+    expect(groups.map((group) => [group.label, group.n])).toEqual([
+      ['forward', 1],
+      ['blind', 1],
+    ]);
+  });
 });
