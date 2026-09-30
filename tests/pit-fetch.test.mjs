@@ -1,89 +1,10 @@
-import { readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { buildCase } from '../scripts/blind/case.mjs';
 import { CluefinError } from '../scripts/lib/cluefin.mjs';
 import { FACT_TABLES, openPit, rebuild } from '../scripts/pit/db.mjs';
-import { createFetcher, shiftDays } from '../scripts/pit/fetch.mjs';
+import { createFetcher } from '../scripts/pit/fetch.mjs';
 import { caseInputs } from '../scripts/pit/inputs.mjs';
-
-const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const technicalFixture = JSON.parse(
-  readFileSync(join(ROOT, 'tests/fixtures/technical-005930-20240628.json'), 'utf8'),
-);
-
-// Weekdays of 2023-06 … 2024-12 stand in for the exchange calendar.
-const DAYS = [];
-for (let d = '20230601'; d <= '20241231'; d = shiftDays(d, 1)) {
-  const weekday = new Date(`${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6)}T00:00:00Z`).getUTCDay();
-  if (weekday !== 0 && weekday !== 6) DAYS.push(d);
-}
-const AS_OF = '20240628';
-const closeOn = (date) => (date === AS_OF ? 81500 : 80000 + (DAYS.indexOf(date) % 7) * 100);
-
-function flag(args, name) {
-  const at = args.indexOf(name);
-  return at === -1 ? undefined : args[at + 1];
-}
-
-/** The newest 100 rows of a window, newest first — how the four paged commands answer. */
-const window = (from, to) =>
-  DAYS.filter((d) => d >= from && d <= to)
-    .slice(-100)
-    .reverse();
-
-/** A fake cluefin CLI over the synthetic calendar. */
-function fakeCli(args) {
-  const path = args.slice(0, 3).join(' ');
-  if (path === 'kis chart period') {
-    return {
-      stock_code: flag(args, '--stock-code'),
-      summary: { stck_prpr: '999999' },
-      data: window(flag(args, '--start-date'), flag(args, '--end-date')).map((d) => ({
-        stck_bsop_date: d,
-        stck_oprc: String(closeOn(d)),
-        stck_hgpr: String(closeOn(d) + 500),
-        stck_lwpr: String(closeOn(d) - 500),
-        stck_clpr: String(closeOn(d)),
-        acml_vol: '1000000',
-        acml_tr_pbmn: '80000000000',
-      })),
-    };
-  }
-  if (path === 'kis sector daily') {
-    return {
-      data: window('00000000', flag(args, '--start-date')).map((d) => ({
-        stck_bsop_date: d,
-        bstp_nmix_prpr: (2700 + (DAYS.indexOf(d) % 11)).toFixed(2),
-      })),
-    };
-  }
-  if (path === 'kiwoom analysis institutional-trend') {
-    return {
-      stk_orgn_trde_trnsn: window(flag(args, '--start-date'), flag(args, '--end-date')).map(
-        (d) => ({
-          dt: d,
-          close_pric: `-${closeOn(d)}`,
-          for_daly_nettrde_qty: '100000',
-          orgn_daly_nettrde_qty: '-50000',
-        }),
-      ),
-    };
-  }
-  if (path === 'kis analysis short-selling-trend') {
-    return {
-      data: window(flag(args, '--start-date'), flag(args, '--end-date')).map((d) => ({
-        stck_bsop_date: d,
-        ssts_cntg_qty: '20000',
-      })),
-    };
-  }
-  if (path === 'kis chart technical') {
-    return { ...technicalFixture, as_of: flag(args, '--end-date'), candle_count: 120 };
-  }
-  throw new Error(`fake CLI: ${args.join(' ')}`);
-}
+import { AS_OF, DAYS, fakeCli, flag } from './helpers/fake-cluefin.mjs';
 
 const clock = () => '2026-09-30T00:00:00Z';
 
