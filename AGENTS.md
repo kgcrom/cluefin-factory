@@ -44,11 +44,14 @@ docs/                         # TODO.md + assets/ (GitHub Pages source)
 schemas/                      # final-decision frontmatter + blind case JSON Schemas
 scripts/                      # deterministic steps lifted out of the skills
 ├── scorecard.mjs             # lint / score [--write] / aggregate
-└── blind/                    # blind backward test: case masking, seal, restore
+├── blind/                    # blind backward test: case masking, seal, restore
+├── pit.mjs                   # PIT store: migrate / rebuild / stats / fill
+└── pit/                      # node:sqlite store, raw→fact parsers, as-of queries
 tests/                        # vitest specs + fixtures
 ```
 
-Investments data is per-user and git-ignored: `.claude/investments/`.
+Investments data is per-user and git-ignored: `.claude/investments/` (the PIT store is
+`.claude/investments/pit/pit.sqlite`).
 
 Each skill pins a model in its frontmatter: `sonnet` for rule-application, arithmetic
 and recording (data-sanity-check, technical-analysis, risk-position-sizing,
@@ -86,6 +89,10 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
 
 ## Gotchas
 
+- **PIT store needs Node ≥ 22.5** for the built-in `node:sqlite` (still experimental —
+  `scripts/pit/db.mjs` is the only module that imports it). A row dated after `as_of`
+  reaching the blind case builder is a bug upstream; the builder throws instead of
+  filtering it.
 - **cluefin path:** the agent runs the CLI from `$CLUEFIN_OPENAPI_CWD`, default
   `~/workspace/cluefin`; credentials come from that directory's `.env`.
 - `.claude/agents/market-review.md` holds the bash recipes for the cluefin CLI
