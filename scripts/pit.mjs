@@ -64,7 +64,8 @@ function fill(db, flags, fetcherOptions) {
   if (
     !/^\d{6}$/.test(symbol ?? '') ||
     !/^\d{8}$/.test(asOf ?? '') ||
-    !/^\d{4}$/.test(benchmark ?? '')
+    !/^\d{4}$/.test(benchmark ?? '') ||
+    !/^\d+$/.test(flags.horizon ?? '120')
   ) {
     return null;
   }

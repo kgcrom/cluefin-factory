@@ -198,6 +198,11 @@ export function ingest(db, { source, params = {}, body, fetchedAt }) {
  */
 export function loadFacts(db, table, rows, rawSha256) {
   if (!FACT_TABLES.includes(table)) throw new PitError(`모르는 테이블 ${table}`);
+  // rebuild() empties every parser-backed table and refills it from raw only;
+  // rows loaded by hand there would vanish on the next rebuild.
+  if (PARSED_TABLES.includes(table)) {
+    throw new PitError(`${table}는 raw에서 재생성되는 테이블이다 — ingest로 싣는다`);
+  }
   const raw = db.prepare('SELECT fetched_at FROM raw WHERE sha256 = ?').get(rawSha256);
   if (!raw) throw new PitError(`raw ${rawSha256}가 없다`);
   return transaction(db, () =>

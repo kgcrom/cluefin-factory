@@ -28,6 +28,11 @@ describe('pit.mjs', () => {
     const args = ['fill', '--symbol', '5930', '--as-of', '20240628', '--benchmark', '2001'];
     expect(main([...args, '--db', db], { fetcherOptions: { cli } })).toBe(2);
     expect(main(['fill', 'stray'])).toBe(2);
+    expect(
+      main([...args.slice(0, 2), '005930', ...args.slice(3), '--horizon', 'abc', '--db', db], {
+        fetcherOptions: { cli },
+      }),
+    ).toBe(2);
     expect(cli).not.toHaveBeenCalled();
   });
 

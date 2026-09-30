@@ -271,6 +271,11 @@ describe('제약 — 조용한 오류를 적재에서 막는다', () => {
     expect(financialsLatest(db, CORP)).toEqual([]);
   });
 
+  it('raw에서 재생성되는 테이블에는 loadFacts로 싣지 못한다', () => {
+    const { db, sha256 } = withFinancials([]);
+    expect(() => loadFacts(db, 'prices', [], sha256)).toThrow(/ingest/);
+  });
+
   it('없는 raw를 가리키는 행은 싣지 않는다', () => {
     const db = fresh();
     expect(() => loadFacts(db, 'financials', [ORIGINAL], 'f'.repeat(64))).toThrow(PitError);
