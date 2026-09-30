@@ -9,7 +9,8 @@
  */
 import { CluefinError, pageBackwards, run } from '../lib/cluefin.mjs';
 import { compactDate } from './convert.mjs';
-import { ingest } from './db.mjs';
+import { ingest, tradingCalendar } from './db.mjs';
+import { nonBlankRows } from './parsers.mjs';
 
 const DAY_MS = 86_400_000;
 const CALENDAR_SECTOR = '0001';
@@ -30,9 +31,9 @@ export function shiftDays(compact, days) {
 }
 
 /**
- * `{ cli, clock, sleep }` are injectable for tests. Rate limits (exit 5) and
- * broker errors the CLI marks retryable are retried with backoff; anything else
- * is thrown at once.
+ * `{ cli, clock, sleep }` are injectable for tests. Whatever the CLI marks
+ * retryable (per-second rate limits, transient broker errors) is retried with
+ * backoff; a daily quota or anything else is thrown at once.
  */
 export function createFetcher(
   db,
@@ -45,7 +46,7 @@ export function createFetcher(
         ingest(db, { source, params, body, fetchedAt: clock() });
         return body;
       } catch (error) {
-        const transient = error instanceof CluefinError && (error.code === 5 || error.retryable);
+        const transient = error instanceof CluefinError && error.retryable;
         if (!transient || attempt >= RETRY_DELAYS_MS.length) throw error;
         sleep(RETRY_DELAYS_MS[attempt]);
       }
@@ -54,9 +55,22 @@ export function createFetcher(
 
   const byDate = (rows) => rows.sort((a, b) => a.date.localeCompare(b.date));
 
+  /**
+   * True when the stored calendar covers [from, to] and has no session in it.
+   * pageBackwards asks for one more page when a window starts on a holiday, and
+   * `short-selling-trend` answers an empty window with a blank row the CLI's own
+   * validation rejects (exit 4) — so a window known to be empty is not asked.
+   */
+  function sessionless(from, to) {
+    const calendar = tradingCalendar(db);
+    if (calendar.length === 0 || calendar[0] > from) return false;
+    return !calendar.some((day) => day >= from && day <= to);
+  }
+
   function prices(symbol, from, to) {
     return pageBackwards(
       (endingOn) => {
+        if (sessionless(from, endingOn)) return [];
         const params = {
           stock_code: symbol,
           start_date: from,
@@ -83,7 +97,9 @@ export function createFetcher(
           ],
           params,
         );
-        return byDate((body.data ?? []).map((row) => ({ date: compactDate(row.stck_bsop_date) })));
+        return byDate(
+          nonBlankRows(body.data).map((row) => ({ date: compactDate(row.stck_bsop_date) })),
+        );
       },
       from,
       to,
@@ -99,7 +115,9 @@ export function createFetcher(
           ['kis', 'sector', 'daily', '--sector-code', sectorCode, '--start-date', endingOn],
           { sector_code: sectorCode, start_date: endingOn },
         );
-        return byDate((body.data ?? []).map((row) => ({ date: compactDate(row.stck_bsop_date) })));
+        return byDate(
+          nonBlankRows(body.data).map((row) => ({ date: compactDate(row.stck_bsop_date) })),
+        );
       },
       from,
       to,
@@ -109,6 +127,7 @@ export function createFetcher(
   function flows(symbol, from, to) {
     return pageBackwards(
       (endingOn) => {
+        if (sessionless(from, endingOn)) return [];
         const body = call(
           'kiwoom.analysis.institutional-trend',
           [
@@ -129,7 +148,7 @@ export function createFetcher(
           { stock_code: symbol, start_date: from, end_date: endingOn },
         );
         return byDate(
-          (body.stk_orgn_trde_trnsn ?? []).map((row) => ({ date: compactDate(row.dt) })),
+          nonBlankRows(body.stk_orgn_trde_trnsn).map((row) => ({ date: compactDate(row.dt) })),
         );
       },
       from,
@@ -140,6 +159,7 @@ export function createFetcher(
   function shortSales(symbol, from, to) {
     return pageBackwards(
       (endingOn) => {
+        if (sessionless(from, endingOn)) return [];
         const body = call(
           'kis.analysis.short-selling-trend',
           [
@@ -155,7 +175,9 @@ export function createFetcher(
           ],
           { stock_code: symbol, start_date: from, end_date: endingOn },
         );
-        return byDate((body.data ?? []).map((row) => ({ date: compactDate(row.stck_bsop_date) })));
+        return byDate(
+          nonBlankRows(body.data).map((row) => ({ date: compactDate(row.stck_bsop_date) })),
+        );
       },
       from,
       to,
@@ -190,14 +212,19 @@ export function createFetcher(
     const from = shiftDays(asOf, -LOOKBACK_DAYS);
     const horizonEnd = shiftDays(asOf, Math.ceil((horizonDays * 7) / 5) + 14);
     const to = today && horizonEnd > today ? today : horizonEnd;
-    const counts = {
-      prices: prices(symbol, from, to).length,
-      calendar: index(CALENDAR_SECTOR, from, to).length,
-    };
+    // The calendar first: the per-stock pages consult it to skip empty windows.
+    const calendar = index(CALENDAR_SECTOR, from, to).length;
+    const candles = prices(symbol, from, to);
+    const counts = { prices: candles.length, calendar };
     counts.index =
-      benchmarkCode === CALENDAR_SECTOR ? counts.calendar : index(benchmarkCode, from, to).length;
-    counts.flows = flows(symbol, from, asOf).length;
-    counts.short_sales = shortSales(symbol, from, asOf).length;
+      benchmarkCode === CALENDAR_SECTOR ? calendar : index(benchmarkCode, from, to).length;
+    // Not listed yet, or suspended on as_of: there is no case to build, and asking
+    // the flow commands about days before listing fails in the CLI's validation.
+    const traded = candles.filter((row) => row.date <= asOf);
+    if (traded.at(-1)?.date !== asOf) return { ...counts, untraded_on_as_of: true };
+    const flowsFrom = traded[0].date > from ? traded[0].date : from;
+    counts.flows = flows(symbol, flowsFrom, asOf).length;
+    counts.short_sales = shortSales(symbol, flowsFrom, asOf).length;
     counts.technical_as_of = technical(symbol, asOf).as_of;
     return counts;
   }

@@ -22,6 +22,10 @@ export function schemaFindings(data, schemaPath) {
   return validate.errors.map((error) => ({
     rule: 'schema',
     severity: 'error',
-    message: `${error.instancePath || '/'} ${error.message}`,
+    // Name the stray key: "must NOT have additional properties" alone does not
+    // say which one, and a judge retried on that message repeats the mistake.
+    message: `${error.instancePath || '/'} ${error.message}${
+      error.params?.additionalProperty ? ` (${error.params.additionalProperty})` : ''
+    }`,
   }));
 }

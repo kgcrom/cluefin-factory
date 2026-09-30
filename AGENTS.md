@@ -35,6 +35,7 @@ directly, with `js-yaml` and `ajv` as its only dependencies.
 ```
 .claude/
 ├── agents/market-review.md   # market-review subagent (the orchestrator)
+├── agents/blind-judge.md     # blind backward judge: Read only, guarded to one case file
 └── skills/                   # 13 analyst skills: bull/bear-analyst, fundamental-,
                               # technical-, macro-, news-analysis, scenario-planner,
                               # final-decision, data-sanity-check, portfolio-fit,
@@ -44,14 +45,15 @@ docs/                         # TODO.md + assets/ (GitHub Pages source)
 schemas/                      # final-decision frontmatter + blind case JSON Schemas
 scripts/                      # deterministic steps lifted out of the skills
 ├── scorecard.mjs             # lint / score [--write] / aggregate
-├── blind/                    # blind backward test: case masking, seal, restore
+├── blind.mjs                 # blind run: universe / register / build / judge / restore
+├── blind/                    # case masking, seal, sampling, restore, judge read-guard
 ├── pit.mjs                   # PIT store: migrate / rebuild / stats / fill
 └── pit/                      # node:sqlite store, raw→fact parsers, as-of queries
 tests/                        # vitest specs + fixtures
 ```
 
 Investments data is per-user and git-ignored: `.claude/investments/` (the PIT store is
-`.claude/investments/pit/pit.sqlite`).
+`.claude/investments/pit/pit.sqlite`, blind runs are `.claude/investments/blind/<run>/`).
 
 Each skill pins a model in its frontmatter: `sonnet` for rule-application, arithmetic
 and recording (data-sanity-check, technical-analysis, risk-position-sizing,
@@ -89,6 +91,10 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
 
 ## Gotchas
 
+- **`blind-judge` runs as a separate headless process** (`claude -p --agent blind-judge`,
+  driven by `node scripts/blind.mjs judge`), never as a subagent of a session that has
+  read seals. Agent definitions load at session start, so a new or edited agent file is
+  invisible to the Agent tool until restart — the headless process reads it fresh.
 - **PIT store needs Node ≥ 22.5** for the built-in `node:sqlite` (still experimental —
   `scripts/pit/db.mjs` is the only module that imports it). A row dated after `as_of`
   reaching the blind case builder is a bug upstream; the builder throws instead of

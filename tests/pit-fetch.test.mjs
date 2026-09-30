@@ -1,89 +1,10 @@
-import { readFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { buildCase } from '../scripts/blind/case.mjs';
 import { CluefinError } from '../scripts/lib/cluefin.mjs';
 import { FACT_TABLES, openPit, rebuild } from '../scripts/pit/db.mjs';
-import { createFetcher, shiftDays } from '../scripts/pit/fetch.mjs';
+import { createFetcher } from '../scripts/pit/fetch.mjs';
 import { caseInputs } from '../scripts/pit/inputs.mjs';
-
-const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const technicalFixture = JSON.parse(
-  readFileSync(join(ROOT, 'tests/fixtures/technical-005930-20240628.json'), 'utf8'),
-);
-
-// Weekdays of 2023-06 … 2024-12 stand in for the exchange calendar.
-const DAYS = [];
-for (let d = '20230601'; d <= '20241231'; d = shiftDays(d, 1)) {
-  const weekday = new Date(`${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6)}T00:00:00Z`).getUTCDay();
-  if (weekday !== 0 && weekday !== 6) DAYS.push(d);
-}
-const AS_OF = '20240628';
-const closeOn = (date) => (date === AS_OF ? 81500 : 80000 + (DAYS.indexOf(date) % 7) * 100);
-
-function flag(args, name) {
-  const at = args.indexOf(name);
-  return at === -1 ? undefined : args[at + 1];
-}
-
-/** The newest 100 rows of a window, newest first — how the four paged commands answer. */
-const window = (from, to) =>
-  DAYS.filter((d) => d >= from && d <= to)
-    .slice(-100)
-    .reverse();
-
-/** A fake cluefin CLI over the synthetic calendar. */
-function fakeCli(args) {
-  const path = args.slice(0, 3).join(' ');
-  if (path === 'kis chart period') {
-    return {
-      stock_code: flag(args, '--stock-code'),
-      summary: { stck_prpr: '999999' },
-      data: window(flag(args, '--start-date'), flag(args, '--end-date')).map((d) => ({
-        stck_bsop_date: d,
-        stck_oprc: String(closeOn(d)),
-        stck_hgpr: String(closeOn(d) + 500),
-        stck_lwpr: String(closeOn(d) - 500),
-        stck_clpr: String(closeOn(d)),
-        acml_vol: '1000000',
-        acml_tr_pbmn: '80000000000',
-      })),
-    };
-  }
-  if (path === 'kis sector daily') {
-    return {
-      data: window('00000000', flag(args, '--start-date')).map((d) => ({
-        stck_bsop_date: d,
-        bstp_nmix_prpr: (2700 + (DAYS.indexOf(d) % 11)).toFixed(2),
-      })),
-    };
-  }
-  if (path === 'kiwoom analysis institutional-trend') {
-    return {
-      stk_orgn_trde_trnsn: window(flag(args, '--start-date'), flag(args, '--end-date')).map(
-        (d) => ({
-          dt: d,
-          close_pric: `-${closeOn(d)}`,
-          for_daly_nettrde_qty: '100000',
-          orgn_daly_nettrde_qty: '-50000',
-        }),
-      ),
-    };
-  }
-  if (path === 'kis analysis short-selling-trend') {
-    return {
-      data: window(flag(args, '--start-date'), flag(args, '--end-date')).map((d) => ({
-        stck_bsop_date: d,
-        ssts_cntg_qty: '20000',
-      })),
-    };
-  }
-  if (path === 'kis chart technical') {
-    return { ...technicalFixture, as_of: flag(args, '--end-date'), candle_count: 120 };
-  }
-  throw new Error(`fake CLI: ${args.join(' ')}`);
-}
+import { AS_OF, DAYS, fakeCli, flag } from './helpers/fake-cluefin.mjs';
 
 const clock = () => '2026-09-30T00:00:00Z';
 
@@ -99,6 +20,16 @@ describe('createFetcher', () => {
     expect(cli.mock.calls.length).toBe(Math.ceil(expected.length / 100) + 1);
     expect(db.prepare('SELECT count(*) AS n FROM prices').get().n).toBe(expected.length);
     expect(db.prepare('SELECT count(*) AS n FROM raw').get().n).toBe(cli.mock.calls.length);
+  });
+
+  it('달력이 있으면 거래일 없는 구간은 부르지 않는다', () => {
+    const db = openPit(':memory:');
+    const fetcher = createFetcher(db, { cli: fakeCli, clock });
+    fetcher.index('0001', '20230601', '20240628');
+    const cli = vi.fn(fakeCli);
+    const rows = createFetcher(db, { cli, clock }).shortSales('005930', '20230701', '20240628');
+    expect(rows).toHaveLength(DAYS.filter((d) => d >= '20230701' && d <= '20240628').length);
+    expect(cli.mock.calls.length).toBe(Math.ceil(rows.length / 100));
   });
 
   it('sector daily는 --start-date에 끝 날짜를 넘긴다', () => {
@@ -126,6 +57,18 @@ describe('createFetcher', () => {
       createFetcher(db, { cli: fatal, clock, sleep }).technical('005930', AS_OF),
     ).toThrow(/exit 3/);
     expect(sleep).toHaveBeenCalledTimes(2);
+  });
+
+  it('DART 일일 한도(exit 5, retryable false)는 다시 부르지 않는다', () => {
+    const db = openPit(':memory:');
+    const sleep = vi.fn();
+    const quota = () => {
+      throw new CluefinError(5, '{"error": {"type": "RateLimitError", "retryable": false}}');
+    };
+    expect(() =>
+      createFetcher(db, { cli: quota, clock, sleep }).technical('005930', AS_OF),
+    ).toThrow(/exit 5/);
+    expect(sleep).not.toHaveBeenCalled();
   });
 
   it('재시도에도 계속 실패하면 네 번째에서 던진다', () => {
@@ -212,5 +155,40 @@ describe('fillCase → caseInputs → buildCase', () => {
     expect(
       caseInputs(db, { symbol: '005930', asOf: '20240629', benchmarkCode: '2001' }).technical,
     ).toBeNull();
+  });
+});
+
+describe('fillCase — 상장 전·거래 없는 as_of', () => {
+  it('as_of에 거래가 없으면 수급·기술적 지표를 묻지 않는다', () => {
+    const db = openPit(':memory:');
+    // A stock that starts trading on 2024-03-04.
+    const cli = vi.fn((args) => {
+      const body = fakeCli(args);
+      if (args[2] === 'period')
+        return { ...body, data: body.data.filter((r) => r.stck_bsop_date >= '20240304') };
+      return body;
+    });
+    const fetcher = createFetcher(db, { cli, clock });
+    const early = fetcher.fillCase({
+      symbol: '440110',
+      asOf: '20231016',
+      benchmarkCode: '1001',
+      today: '20241231',
+    });
+    expect(early.untraded_on_as_of).toBe(true);
+    expect(
+      cli.mock.calls.some((call) => call[0][1] === 'analysis' || call[0][2] === 'technical'),
+    ).toBe(false);
+
+    cli.mockClear();
+    fetcher.fillCase({
+      symbol: '440110',
+      asOf: '20240628',
+      benchmarkCode: '1001',
+      today: '20241231',
+    });
+    const flowCalls = cli.mock.calls.map((c) => c[0]).filter((a) => a[1] === 'analysis');
+    expect(flowCalls.length).toBeGreaterThan(0);
+    for (const args of flowCalls) expect(flag(args, '--start-date')).toBe('20240304');
   });
 });

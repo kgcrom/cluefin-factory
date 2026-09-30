@@ -49,6 +49,7 @@ export function toRows(entries) {
     .filter((entry) => ['scored', 'invalidated'].includes(entry.data?.scoring?.status))
     .map(({ data }) => ({
       decision_id: data.decision_id,
+      sample: data.blind ? 'blind' : 'forward',
       verdict: data.verdict,
       confidence: data.confidence,
       horizon_days: data.horizon_days,
@@ -86,7 +87,15 @@ export function summarise(rows, label) {
   };
 }
 
+/**
+ * One summary per sample. Blind backward judgments (frontmatter `blind`) answer
+ * "does the logic work", forward ones "can this agent be trusted" — they are
+ * never pooled, even when a caller passes both directories at once.
+ */
 export function aggregate(entries) {
   const rows = toRows(entries);
-  return rows.length === 0 ? [] : [summarise(rows, 'forward')];
+  return ['forward', 'blind']
+    .map((sample) => rows.filter((row) => row.sample === sample))
+    .filter((group) => group.length > 0)
+    .map((group) => summarise(group, group[0].sample));
 }

@@ -28,7 +28,7 @@ function reviewDue(asOf, horizonDays) {
  * `seal`: the matching seal from `buildCase`.
  * Returns a new object; the input is not modified.
  */
-export function restoreDecision(blind, seal, { generatorModel, seq = 1 } = {}) {
+export function restoreDecision(blind, seal, { generatorModel, seq = 1, decidedAt } = {}) {
   const caseId = blind?.blind?.case_id;
   if (!CASE_ID.test(caseId ?? '')) throw new RestoreError('blind.case_id가 없다');
   if (caseId !== seal.case_id) {
@@ -46,6 +46,8 @@ export function restoreDecision(blind, seal, { generatorModel, seq = 1 } = {}) {
   const out = structuredClone(blind);
 
   out.decision_id = `${iso(seal.as_of)}-${seal.symbol}-${String(seq).padStart(2, '0')}`;
+  // The runner cannot know today's date either; the restore time stands in for it.
+  out.decided_at = decidedAt ?? new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
   out.symbol = seal.symbol;
   out.name = seal.name;
   out.market = seal.market;

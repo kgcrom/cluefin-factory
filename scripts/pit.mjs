@@ -16,15 +16,9 @@ import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// node:sqlite prints an ExperimentalWarning on first load in Node 22. Filter that
-// one warning before the store module is imported; everything else still shows.
-const emit = process.emitWarning;
-process.emitWarning = (warning, ...rest) => {
-  const type = typeof rest[0] === 'string' ? rest[0] : rest[0]?.type;
-  if (type === 'ExperimentalWarning' && String(warning).includes('SQLite')) return;
-  emit.call(process, warning, ...rest);
-};
+import { silenceSqliteWarning } from './lib/quiet-sqlite.mjs';
 
+silenceSqliteWarning();
 const { FACT_TABLES, openPit, rebuild } = await import('./pit/db.mjs');
 const { createFetcher } = await import('./pit/fetch.mjs');
 const { caseInputs } = await import('./pit/inputs.mjs');
