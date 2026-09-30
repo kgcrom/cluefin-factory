@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cluefin-factory/schemas/blind-case.schema.json",
+  "title": "blind backward 케이스",
+  "description": "격리된 판단 실행기가 읽는 유일한 입력. 종목·날짜·절대 가격이 없다. 가격형 값은 D0 종가=100, 날짜는 상대 거래일 d(D0=0, 이전은 음수). scripts/blind/case.mjs가 만든다.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "case_id",
+    "market",
+    "horizon_days",
+    "horizon_basis",
+    "price_unit",
+    "prices",
+    "benchmark",
+    "technical",
+    "flows",
+    "financials",
+    "disclosures",
+    "opinions"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "d": {
+      "type": "integer",
+      "maximum": 0,
+      "description": "상대 거래일. 0이 기준일(as_of)."
+    },
+    "pct": { "type": ["number", "null"] },
+    "family": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "score": { "type": "number" },
+        "evaluated_rules": { "type": "integer" }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": { "const": 1 },
+    "case_id": { "type": "string", "pattern": "^[a-z]{12}$" },
+    "market": { "enum": ["KOSPI", "KOSDAQ"] },
+    "horizon_days": { "enum": [20, 60, 120] },
+    "horizon_basis": { "const": "trading" },
+    "price_unit": { "const": "D0 종가 = 100" },
+    "prices": {
+      "type": "array",
+      "minItems": 60,
+      "maxItems": 120,
+      "items": {
+        "type": "object",
+        "required": ["d", "open", "high", "low", "close", "volume_x"],
+        "additionalProperties": false,
+        "properties": {
+          "d": { "$ref": "#/$defs/d" },
+          "open": { "type": "number" },
+          "high": { "type": "number" },
+          "low": { "type": "number" },
+          "close": { "type": "number" },
+          "volume_x": {
+            "type": ["number", "null"],
+            "description": "그날 거래량 ÷ 최근 20거래일 평균 거래량."
+          }
+        }
+      }
+    },
+    "benchmark": {
+      "type": "object",
+      "required": ["name", "series"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "enum": ["KOSPI", "KOSDAQ", "KOSPI200", "INDEX"] },
+        "series": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["d", "close"],
+            "additionalProperties": false,
+            "properties": {
+              "d": { "$ref": "#/$defs/d" },
+              "close": { "type": "number", "description": "D0 지수=100." }
+            }
+          }
+        }
+      }
+    },
+    "technical": {
+      "type": ["object", "null"],
+      "required": ["indicators", "signal"],
+      "additionalProperties": false,
+      "properties": {
+        "indicators": { "type": "object" },
+        "signal": {
+          "type": "object",
+          "required": ["trend", "mean_reversion", "rules"],
+          "additionalProperties": false,
+          "properties": {
+            "trend": { "$ref": "#/$defs/family" },
+            "mean_reversion": { "$ref": "#/$defs/family" },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "family", "vote"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "type": "string" },
+                  "family": { "type": "string" },
+                  "vote": { "type": "integer", "minimum": -1, "maximum": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "flows": {
+      "type": ["array", "null"],
+      "description": "순매수·공매도 수량을 그날 거래량 대비 %로.",
+      "items": {
+        "type": "object",
+        "required": ["d", "foreign_net_pct", "institution_net_pct", "short_pct"],
+        "additionalProperties": false,
+        "properties": {
+          "d": { "$ref": "#/$defs/d" },
+          "foreign_net_pct": { "$ref": "#/$defs/pct" },
+          "institution_net_pct": { "$ref": "#/$defs/pct" },
+          "short_pct": { "$ref": "#/$defs/pct" }
+        }
+      }
+    },
+    "financials": {
+      "type": ["array", "null"],
+      "description": "비율만. 회계연도는 최신 보고서 기준 years_back으로.",
+      "items": {
+        "type": "object",
+        "required": ["known_d", "years_back", "period", "metrics"],
+        "additionalProperties": false,
+        "properties": {
+          "known_d": { "type": ["integer", "null"], "maximum": 0 },
+          "years_back": { "type": "integer", "minimum": 0 },
+          "period": { "enum": ["Q1", "H1", "Q3", "FY"] },
+          "metrics": {
+            "type": "object",
+            "additionalProperties": { "type": "number" }
+          }
+        }
+      }
+    },
+    "disclosures": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "required": ["d", "title"],
+        "additionalProperties": false,
+        "properties": {
+          "d": { "$ref": "#/$defs/d" },
+          "title": { "type": "string" }
+        }
+      }
+    },
+    "opinions": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "required": ["d", "broker", "opinion", "prev_opinion", "target_upside_pct"],
+        "additionalProperties": false,
+        "properties": {
+          "d": { "$ref": "#/$defs/d" },
+          "broker": { "type": "string", "pattern": "^[A-Z]{1,2}$" },
+          "opinion": { "type": ["string", "null"] },
+          "prev_opinion": { "type": ["string", "null"] },
+          "target_upside_pct": {
+            "$ref": "#/$defs/pct",
+            "description": "목표가 ÷ 그날 종가 − 1, %."
+          }
+        }
+      }
+    }
+  }
+}
