@@ -1,0 +1,78 @@
+{
+  "stock_code": "005930",
+  "source": "kis.chart.period",
+  "as_of": "20240628",
+  "candle_count": 120,
+  "missing_candles": 0,
+  "close": 81500.0,
+  "indicators": {
+    "sma_5": 81160.0,
+    "sma_20": 78565.0,
+    "sma_60": 79098.33,
+    "rsi_14": 59.95,
+    "macd": {
+      "macd": 1085.5025,
+      "signal": 703.5393,
+      "histogram": 381.9633
+    },
+    "bbands_20": {
+      "upper": 83599.79,
+      "middle": 78565.0,
+      "lower": 73530.21,
+      "percent_b": 0.7915
+    },
+    "stoch": {
+      "slow_k": 80.43,
+      "slow_d": 67.1
+    },
+    "adx_14": 17.71,
+    "atr_14": 1721.73,
+    "obv": -23470151.0,
+    "mdd": 0.1383,
+    "sharpe": 0.5868
+  },
+  "signal": {
+    "trend": {
+      "label": "BULLISH",
+      "score": 0.5,
+      "evaluated_rules": 2
+    },
+    "mean_reversion": {
+      "label": "NEUTRAL",
+      "score": -0.3333,
+      "evaluated_rules": 3
+    },
+    "rules": [
+      {
+        "name": "macd",
+        "family": "trend",
+        "vote": 1,
+        "reason": "MACD histogram 381.9633 above zero"
+      },
+      {
+        "name": "ma_stack",
+        "family": "trend",
+        "vote": 0,
+        "reason": "Moving averages are not stacked in either direction"
+      },
+      {
+        "name": "rsi",
+        "family": "mean_reversion",
+        "vote": 0,
+        "reason": "RSI 59.95 in the 30-70 band"
+      },
+      {
+        "name": "bbands",
+        "family": "mean_reversion",
+        "vote": 0,
+        "reason": "Close inside the bands"
+      },
+      {
+        "name": "stoch",
+        "family": "mean_reversion",
+        "vote": -1,
+        "reason": "Stochastic %K 80.43 above 80 (overbought)"
+      }
+    ]
+  }
+}
