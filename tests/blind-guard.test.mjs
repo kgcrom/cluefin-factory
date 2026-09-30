@@ -1,13 +1,14 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, realpathSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { decide } from '../scripts/blind/guard-read.mjs';
+import { decide as decideAt } from '../scripts/blind/guard-read.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const base = join(mkdtempSync(join(tmpdir(), 'guard-')), '.claude/investments/blind/pilot');
+const root = realpathSync(mkdtempSync(join(tmpdir(), 'guard-')));
+const base = join(root, '.claude/investments/blind/pilot');
 mkdirSync(join(base, 'cases'), { recursive: true });
 mkdirSync(join(base, 'seals'), { recursive: true });
 const casePath = join(base, 'cases/abcdefghijkl.json');
@@ -16,6 +17,7 @@ writeFileSync(casePath, '{}');
 writeFileSync(sealPath, '{}');
 symlinkSync(sealPath, join(base, 'cases/zzzzzzzzzzzz.json'));
 
+const decide = (payload) => decideAt(payload, { root });
 const read = (file_path) => ({ tool_name: 'Read', tool_input: { file_path } });
 
 describe('guard-read', () => {
@@ -41,6 +43,10 @@ describe('guard-read', () => {
     expect(decide(read(join(base, 'cases/../seals/abcdefghijkl.json'))).allowed).toBe(false);
   });
 
+  it('저장소 밖의 같은 모양 경로는 막는다', () => {
+    expect(decideAt(read(casePath)).allowed).toBe(false);
+  });
+
   it('Read 외 도구는 전부 막는다', () => {
     expect(decide({ tool_name: 'Bash', tool_input: { command: 'cat x' } }).allowed).toBe(false);
     expect(decide(null).allowed).toBe(false);
@@ -52,7 +58,9 @@ describe('guard-read', () => {
         input: JSON.stringify(payload),
         encoding: 'utf8',
       });
-    expect(run(read(casePath)).status).toBe(0);
+    // Run as a hook, the root is this repository: a case file elsewhere is refused.
+    expect(run(read(casePath)).status).toBe(2);
+    expect(run(read(join(ROOT, 'schemas/final-decision.schema.json'))).status).toBe(0);
     const blocked = run(read(sealPath));
     expect(blocked.status).toBe(2);
     expect(blocked.stderr).toMatch(/케이스 파일/);

@@ -39,6 +39,7 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const BLIND_ROOT = join(ROOT, '.claude/investments/blind');
 const DEFAULT_DB = join(ROOT, '.claude/investments/pit/pit.sqlite');
 const CALENDAR_START = '20151201';
+const JUDGE_TIMEOUT_MS = 15 * 60 * 1000;
 const DEFAULT_FROM = '20160104';
 
 const today = () => new Date().toISOString().slice(0, 10).replaceAll('-', '');
@@ -181,6 +182,8 @@ export function claudeJudge(casePath, feedback) {
   ];
   return new Promise((resolvePromise, reject) => {
     const child = spawn('claude', args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
+    // A hung judge would stall its worker forever; one run takes about a minute.
+    const timer = setTimeout(() => child.kill('SIGTERM'), JUDGE_TIMEOUT_MS);
     let out = '';
     let err = '';
     child.stdout.on('data', (chunk) => {
@@ -191,6 +194,7 @@ export function claudeJudge(casePath, feedback) {
     });
     child.on('error', reject);
     child.on('close', (code) => {
+      clearTimeout(timer);
       try {
         const body = JSON.parse(out);
         if (code !== 0 || body.is_error) throw new Error(body.result ?? err ?? `exit ${code}`);

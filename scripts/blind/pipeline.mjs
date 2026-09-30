@@ -129,7 +129,15 @@ export function restoreAll(paths, { generatorModel } = {}) {
       if (!existsSync(sealPath)) throw new Error('봉인 파일이 없다');
       const restored = restoreDecision(entry.data, readJson(sealPath), { generatorModel });
       const text = `---\n${dump(restored, { lineWidth: 120, quotingType: '"' })}---\n${entry.body}`;
-      writeFileSync(join(paths.restored, `${restored.decision_id}.md`), text);
+      const target = join(paths.restored, `${restored.decision_id}.md`);
+      // Re-restoring the same case refreshes its file; another case landing on the
+      // same decision_id would silently replace a judgment, so it is refused.
+      if (existsSync(target)) {
+        const existing = readEntry(target).data?.blind?.case_id;
+        if (existing !== caseId)
+          throw new Error(`${restored.decision_id}.md가 다른 케이스(${existing})의 판단이다`);
+      }
+      writeFileSync(target, text);
       results.push({ case_id: caseId, decision_id: restored.decision_id });
     } catch (error) {
       results.push({ case_id: caseId, error: error.message });

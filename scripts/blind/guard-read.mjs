@@ -9,10 +9,11 @@
  * model as the reason.
  */
 import { realpathSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const CASE_FILE = /\/\.claude\/investments\/blind\/[a-z0-9_-]+\/cases\/[a-z]{12}\.json$/;
+/** Relative to the repository root — a matching path anywhere else is not a case. */
+const CASE_FILE = /^\.claude\/investments\/blind\/[a-z0-9_-]+\/cases\/[a-z]{12}\.json$/;
 /** The decision schema and its example: rules for the output, no case data. */
 const REPO = realpathSync(fileURLToPath(new URL('../..', import.meta.url)));
 const OUTPUT_RULES = [
@@ -21,7 +22,7 @@ const OUTPUT_RULES = [
 ].map((file) => join(REPO, file));
 
 /** `{ allowed, reason }` for a hook payload. Exported for tests. */
-export function decide(payload) {
+export function decide(payload, { root = REPO } = {}) {
   if (payload?.tool_name !== 'Read')
     return { allowed: false, reason: `${payload?.tool_name} 도구는 쓸 수 없다` };
   const requested = payload.tool_input?.file_path;
@@ -33,7 +34,7 @@ export function decide(payload) {
   } catch {
     return { allowed: false, reason: `${requested}: 읽을 수 없다` };
   }
-  return CASE_FILE.test(real) || OUTPUT_RULES.includes(real)
+  return CASE_FILE.test(relative(root, real)) || OUTPUT_RULES.includes(real)
     ? { allowed: true }
     : {
         allowed: false,

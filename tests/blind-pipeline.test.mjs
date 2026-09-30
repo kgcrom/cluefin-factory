@@ -262,3 +262,53 @@ describe('judgeCases', () => {
     expect(result.error).toMatch(/실행 실패/);
   });
 });
+
+describe('restoreAll 충돌', () => {
+  it('다른 케이스의 판단 파일을 덮어쓰지 않는다', () => {
+    const { paths, db, fetcher } = setup(1);
+    buildCases(paths, { db, fetcher, today: '20241231' });
+    const [file] = readdirSync(paths.cases);
+    const blindCase = JSON.parse(readFileSync(join(paths.cases, file), 'utf8'));
+    const seal = JSON.parse(readFileSync(join(paths.seals, file), 'utf8'));
+    const data = {
+      schema_version: 1,
+      decision_id: '2000-01-01-BLIND-01',
+      decided_at: '2000-01-01T00:00:00+09:00',
+      supersedes: null,
+      data_as_of: { price: '2000-01-01' },
+      market: blindCase.market,
+      symbol: 'BLIND',
+      name: 'BLIND',
+      verdict: 'watch',
+      confidence: 'low',
+      horizon_days: blindCase.horizon_days,
+      horizon_basis: 'trading',
+      review_due: '2000-01-01',
+      reference: { price: 100, currency: 'KRW', price_type: 'close', adjusted: true },
+      thesis: 't',
+      biggest_risk: 'r',
+      invalidation: [{ id: 'inv-1', statement: 's', checkable: false }],
+      gates: { data_sanity: 'pass' },
+      skills_run: ['technical-analysis'],
+      scoring: { status: 'pending' },
+      blind: { case_id: blindCase.case_id },
+    };
+    mkdirSync(paths.decisions, { recursive: true });
+    writeFileSync(join(paths.decisions, file.replace('.json', '.md')), `---\n${dump(data)}---\n`);
+    const [first] = restoreAll(paths);
+    expect(first.decision_id).toBeTruthy();
+    // Same case again: refreshed, not refused.
+    expect(restoreAll(paths)[0].error).toBeUndefined();
+    // Another case claiming the same decision_id: refused.
+    const target = join(paths.restored, `${first.decision_id}.md`);
+    writeFileSync(
+      target,
+      readFileSync(target, 'utf8').replace(
+        `case_id: ${blindCase.case_id}`,
+        'case_id: zzzzzzzzzzzz',
+      ),
+    );
+    expect(restoreAll(paths)[0].error).toMatch(/다른 케이스/);
+    expect(seal.symbol).toBeTruthy();
+  });
+});
