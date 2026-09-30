@@ -66,7 +66,8 @@ export function relativeDay(tradingDates, date) {
 
 function priceBlock(prices, asOf) {
   assertNoFuture(prices, 'date', asOf, 'prices');
-  if (prices.at(-1)?.date !== asOf) {
+  if (prices.length === 0) throw new CaseError(`prices: as_of ${asOf}까지 거래가 없다 (상장 전)`);
+  if (prices.at(-1).date !== asOf) {
     throw new CaseError(`prices: 마지막 행 ${prices.at(-1)?.date}이 as_of ${asOf}가 아니다`);
   }
   const window = prices.slice(-PRICE_WINDOW);

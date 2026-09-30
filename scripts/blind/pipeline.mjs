@@ -15,7 +15,8 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { dump } from 'js-yaml';
-import { readEntry } from '../lib/journal.mjs';
+import { parseFrontmatter, readEntry, splitEntry } from '../lib/journal.mjs';
+import { schemaFindings } from '../lib/validate.mjs';
 import { caseInputs } from '../pit/inputs.mjs';
 import { buildCase, CaseError } from './case.mjs';
 import { restoreDecision } from './restore.mjs';
@@ -134,5 +135,85 @@ export function restoreAll(paths, { generatorModel } = {}) {
       results.push({ case_id: caseId, error: error.message });
     }
   }
+  return results;
+}
+
+/**
+ * The judge's reply → `{ text, data }` or `{ error }`. Anything before the
+ * opening `---` (a stray sentence) is dropped; the frontmatter must parse and,
+ * restored against the seal, pass the decision schema.
+ */
+export function checkDecision(reply, seal, schemaPath) {
+  const at = String(reply).search(/^---\r?\n/m);
+  if (at === -1) return { error: 'frontmatter(---)가 없다' };
+  const text = String(reply).slice(at);
+  const parts = splitEntry(text);
+  if (!parts) return { error: 'frontmatter 블록이 닫히지 않았다' };
+  let data;
+  try {
+    data = parseFrontmatter(parts.frontmatter);
+  } catch (error) {
+    return { error: `YAML 파싱 실패: ${error.message}` };
+  }
+  let restored;
+  try {
+    restored = restoreDecision(data, seal, { decidedAt: '2000-01-01T00:00:00Z' });
+  } catch (error) {
+    return { error: error.message };
+  }
+  const findings = schemaFindings(restored, schemaPath);
+  if (findings.length > 0) return { error: findings.map((f) => f.message).join('; ') };
+  return { text, data };
+}
+
+/**
+ * Judge every built case that has no decision yet, `concurrency` at a time.
+ * `invoke(casePath, feedback)` runs the judge and resolves to its reply; a reply
+ * that fails `checkDecision` is retried once with the errors as feedback, then
+ * recorded as failed. Only valid decisions are written.
+ */
+export async function judgeCases(
+  paths,
+  { invoke, schemaPath, concurrency = 4, retries = 1, log = () => {} },
+) {
+  const manifest = readManifest(paths);
+  mkdirSync(paths.decisions, { recursive: true });
+  const pending = Object.entries(manifest.entries)
+    .filter(([id, e]) => e.status === 'built' && !existsSync(join(paths.decisions, `${id}.md`)))
+    .sort(([, a], [, b]) => a.order - b.order)
+    .map(([id]) => id);
+  const results = [];
+  let next = 0;
+  async function worker() {
+    while (next < pending.length) {
+      const caseId = pending[next];
+      next += 1;
+      const seal = readJson(join(paths.seals, `${caseId}.json`));
+      const casePath = join(paths.cases, `${caseId}.json`);
+      let feedback = null;
+      let outcome;
+      for (let attempt = 0; attempt <= retries; attempt += 1) {
+        let reply;
+        try {
+          reply = await invoke(casePath, feedback);
+        } catch (error) {
+          outcome = { error: `실행 실패: ${error.message}` };
+          break;
+        }
+        outcome = checkDecision(reply, seal, schemaPath);
+        if (!outcome.error) break;
+        feedback = outcome.error;
+      }
+      if (outcome.error) {
+        results.push({ case_id: caseId, error: outcome.error });
+        log(`failed ${caseId}: ${outcome.error}`);
+      } else {
+        writeFileSync(join(paths.decisions, `${caseId}.md`), outcome.text);
+        results.push({ case_id: caseId, verdict: outcome.data.verdict });
+        log(`judged ${caseId}: ${outcome.data.verdict}`);
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.max(1, concurrency) }, worker));
   return results;
 }

@@ -11,7 +11,13 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dump } from 'js-yaml';
 import { describe, expect, it, vi } from 'vitest';
-import { buildCases, restoreAll, runPaths, writeRegistry } from '../scripts/blind/pipeline.mjs';
+import {
+  buildCases,
+  judgeCases,
+  restoreAll,
+  runPaths,
+  writeRegistry,
+} from '../scripts/blind/pipeline.mjs';
 import { createRegistry } from '../scripts/blind/sample.mjs';
 import { readEntry } from '../scripts/lib/journal.mjs';
 import { schemaFindings } from '../scripts/lib/validate.mjs';
@@ -160,5 +166,99 @@ describe('restoreAll', () => {
       blind: { case_id: blindCase.case_id, generator_model: 'claude-opus-5-5' },
     });
     expect(restored.body).toContain('본문');
+  });
+});
+
+describe('judgeCases', () => {
+  /** A valid judge reply for a case, in case units. */
+  function reply(blindCase, overrides = {}) {
+    const data = {
+      schema_version: 1,
+      decision_id: '2000-01-01-BLIND-01',
+      decided_at: '2000-01-01T00:00:00+09:00',
+      supersedes: null,
+      data_as_of: { price: '2000-01-01' },
+      market: blindCase.market,
+      symbol: 'BLIND',
+      name: 'BLIND',
+      verdict: 'watch',
+      confidence: 'low',
+      horizon_days: blindCase.horizon_days,
+      horizon_basis: 'trading',
+      review_due: '2000-01-01',
+      reference: { price: 100, currency: 'KRW', price_type: 'close', adjusted: true },
+      thesis: '합성',
+      biggest_risk: '합성',
+      invalidation: [
+        {
+          id: 'inv-1',
+          statement: 's',
+          checkable: true,
+          metric: 'price',
+          op: '<',
+          value: 90,
+          check_on: 'weekly',
+        },
+      ],
+      gates: { data_sanity: 'pass' },
+      skills_run: ['technical-analysis'],
+      scoring: { status: 'pending' },
+      blind: { case_id: blindCase.case_id },
+      ...overrides,
+    };
+    return `판단 결과입니다.\n---\n${dump(data)}---\n\n본문\n`;
+  }
+  const schemaPath = SCHEMA;
+  const readCase = (paths, file) => JSON.parse(readFileSync(join(paths.cases, file), 'utf8'));
+
+  it('유효한 답만 저장하고, 앞의 군말은 버린다', async () => {
+    const { paths, db, fetcher } = setup(2);
+    buildCases(paths, { db, fetcher, today: '20241231' });
+    const invoke = vi.fn(async (casePath) => reply(JSON.parse(readFileSync(casePath, 'utf8'))));
+    const results = await judgeCases(paths, { invoke, schemaPath, concurrency: 2 });
+    expect(results.every((r) => r.verdict === 'watch')).toBe(true);
+    const files = readdirSync(paths.decisions);
+    expect(files).toHaveLength(2);
+    const text = readFileSync(join(paths.decisions, files[0]), 'utf8');
+    expect(text.startsWith('---\n')).toBe(true);
+    // Already judged cases are not run again.
+    await judgeCases(paths, { invoke, schemaPath });
+    expect(invoke).toHaveBeenCalledTimes(2);
+  });
+
+  it('스키마에 없는 필드를 쓰면 오류를 붙여 한 번 다시 시키고, 또 틀리면 저장하지 않는다', async () => {
+    const { paths, db, fetcher } = setup(1);
+    buildCases(paths, { db, fetcher, today: '20241231' });
+    const [file] = readdirSync(paths.cases);
+    const blindCase = readCase(paths, file);
+    const feedbacks = [];
+    const bad = reply(blindCase, { levels: { stop: 92 } });
+    const invoke = vi.fn(async (_path, feedback) => {
+      feedbacks.push(feedback);
+      return feedbacks.length === 1 ? bad : reply(blindCase);
+    });
+    expect(await judgeCases(paths, { invoke, schemaPath })).toEqual([
+      { case_id: blindCase.case_id, verdict: 'watch' },
+    ]);
+    expect(feedbacks[0]).toBeNull();
+    expect(feedbacks[1]).toMatch(/additional properties/);
+
+    const again = setup(1);
+    buildCases(again.paths, { db: again.db, fetcher: again.fetcher, today: '20241231' });
+    const [other] = readdirSync(again.paths.cases);
+    const alwaysBad = async () => reply(readCase(again.paths, other), { horizon_days: 7 });
+    const [result] = await judgeCases(again.paths, { invoke: alwaysBad, schemaPath });
+    expect(result.error).toMatch(/horizon_days/);
+    expect(existsSync(again.paths.decisions) && readdirSync(again.paths.decisions)).toEqual([]);
+  });
+
+  it('판단기 실행이 실패하면 그 케이스만 실패로 남긴다', async () => {
+    const { paths, db, fetcher } = setup(1);
+    buildCases(paths, { db, fetcher, today: '20241231' });
+    const invoke = async () => {
+      throw new Error('claude exit 1');
+    };
+    const [result] = await judgeCases(paths, { invoke, schemaPath });
+    expect(result.error).toMatch(/실행 실패/);
   });
 });

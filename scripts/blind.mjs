@@ -8,6 +8,9 @@
  *   node scripts/blind.mjs register --run pilot --universe <file> --seed <int> --count 30
  *       [--from 20160104] [--to YYYYMMDD]   pre-register the candidates (once)
  *   node scripts/blind.mjs build --run pilot     fetch into PIT and write cases + seals
+ *   node scripts/blind.mjs judge --run pilot [--concurrency 4]
+ *       run `claude -p --agent blind-judge` on every unjudged case; a reply is
+ *       kept only if it restores against its seal into a schema-valid decision
  *   node scripts/blind.mjs restore --run pilot [--model <id>]
  *       decisions/<case_id>.md (case units) → restored/<decision_id>.md (real prices)
  *   node scripts/blind.mjs status --run pilot
@@ -16,6 +19,7 @@
  * judgments never mix: `node scripts/scorecard.mjs score <run>/restored --write`.
  * Runs live in the git-ignored `.claude/investments/blind/`.
  */
+import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,7 +31,7 @@ const { openPit, tradingCalendar } = await import('./pit/db.mjs');
 const { createFetcher } = await import('./pit/fetch.mjs');
 const { topByMarketCap } = await import('./blind/universe.mjs');
 const { createRegistry, MIN_GAP_SESSIONS } = await import('./blind/sample.mjs');
-const { buildCases, readManifest, restoreAll, runPaths, writeRegistry } = await import(
+const { buildCases, judgeCases, readManifest, restoreAll, runPaths, writeRegistry } = await import(
   './blind/pipeline.mjs'
 );
 
@@ -149,10 +153,57 @@ function status(flags) {
   };
 }
 
-const USAGE =
-  'usage: node scripts/blind.mjs <universe|register|build|restore|status> [...] (파일 머리 주석 참고)';
+/**
+ * One judge run: a fresh headless Claude process in the blind-judge agent, so
+ * it inherits nothing from the session that holds the seals. The agent's own
+ * frontmatter limits it to Read behind the case-file guard; the disallowed list
+ * repeats that in case the agent definition changes.
+ */
+export function claudeJudge(casePath, feedback) {
+  const prompt = [
+    `케이스 파일: ${casePath}`,
+    '이 파일 하나만 읽고 지시대로 판단해 frontmatter + 본문만 돌려줘.',
+    feedback ? `직전 답이 스키마 검사에서 떨어졌다. 고쳐서 다시 내라: ${feedback}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+  const args = [
+    '-p',
+    '--agent',
+    'blind-judge',
+    '--output-format',
+    'json',
+    '--disallowedTools',
+    'Bash Write Edit WebFetch WebSearch Glob Grep Agent NotebookEdit',
+    prompt,
+  ];
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn('claude', args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
+    let out = '';
+    let err = '';
+    child.stdout.on('data', (chunk) => {
+      out += chunk;
+    });
+    child.stderr.on('data', (chunk) => {
+      err += chunk;
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      try {
+        const body = JSON.parse(out);
+        if (code !== 0 || body.is_error) throw new Error(body.result ?? err ?? `exit ${code}`);
+        resolvePromise(body.result);
+      } catch (error) {
+        reject(new Error(`claude exit ${code}: ${error.message}`.slice(0, 500)));
+      }
+    });
+  });
+}
 
-export function main(argv, { cli = run } = {}) {
+const USAGE =
+  'usage: node scripts/blind.mjs <universe|register|build|judge|restore|status> [...] (파일 머리 주석 참고)';
+
+export async function main(argv, { cli = run, invoke = claudeJudge } = {}) {
   const { command, flags, error } = parseArgs(argv);
   const commands = {
     universe: () => universe(flags, { cli }),
@@ -163,12 +214,21 @@ export function main(argv, { cli = run } = {}) {
         ? restoreAll(runPaths(BLIND_ROOT, flags.run), { generatorModel: flags.model })
         : null,
     status: () => status(flags),
+    judge: () =>
+      flags.run
+        ? judgeCases(runPaths(BLIND_ROOT, flags.run), {
+            invoke,
+            schemaPath: join(ROOT, 'schemas/final-decision.schema.json'),
+            concurrency: Number(flags.concurrency ?? 4),
+            log: (line) => console.error(line),
+          })
+        : null,
   };
   if (error || !commands[command]) {
     console.error(error ?? USAGE);
     return 2;
   }
-  const result = commands[command]();
+  const result = await commands[command]();
   if (result === null) {
     console.error(USAGE);
     return 2;
@@ -178,5 +238,5 @@ export function main(argv, { cli = run } = {}) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  process.exitCode = main(process.argv.slice(2));
+  process.exitCode = await main(process.argv.slice(2));
 }
