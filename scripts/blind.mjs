@@ -167,15 +167,17 @@ export function claudeJudge(casePath, feedback) {
   ]
     .filter(Boolean)
     .join('\n');
+  // The prompt goes right after -p: `--disallowedTools` is variadic and would
+  // swallow a trailing positional argument as one more tool name.
   const args = [
     '-p',
+    prompt,
     '--agent',
     'blind-judge',
+    '--disallowedTools',
+    'Bash,Write,Edit,WebFetch,WebSearch,Glob,Grep,Agent,NotebookEdit',
     '--output-format',
     'json',
-    '--disallowedTools',
-    'Bash Write Edit WebFetch WebSearch Glob Grep Agent NotebookEdit',
-    prompt,
   ];
   return new Promise((resolvePromise, reject) => {
     const child = spawn('claude', args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -194,7 +196,7 @@ export function claudeJudge(casePath, feedback) {
         if (code !== 0 || body.is_error) throw new Error(body.result ?? err ?? `exit ${code}`);
         resolvePromise(body.result);
       } catch (error) {
-        reject(new Error(`claude exit ${code}: ${error.message}`.slice(0, 500)));
+        reject(new Error(`claude exit ${code}: ${error.message} ${err}`.slice(0, 500)));
       }
     });
   });
