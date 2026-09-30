@@ -168,7 +168,7 @@
         "additionalProperties": false,
         "properties": {
           "d": { "$ref": "#/$defs/d" },
-          "broker": { "type": "string", "pattern": "^[A-Z]$" },
+          "broker": { "type": "string", "pattern": "^[A-Z]{1,2}$" },
           "opinion": { "type": ["string", "null"] },
           "prev_opinion": { "type": ["string", "null"] },
           "target_upside_pct": {

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import Ajv from 'ajv/dist/2020.js';
 import { describe, expect, it } from 'vitest';
 import {
+  brokerAlias,
   buildCase,
   CaseError,
   canonicalJson,
@@ -168,6 +169,23 @@ describe('buildCase', () => {
     expect(blind.opinions[2].target_upside_pct).toBeNull();
   });
 
+  it('의견: 증권사가 26곳을 넘으면 AA부터 두 글자로 잇는다', () => {
+    expect([0, 25, 26, 27, 51, 52].map(brokerAlias)).toEqual(['A', 'Z', 'AA', 'AB', 'AZ', 'BA']);
+    const opinions = Array.from({ length: 30 }, (_, i) => ({
+      known_at: AS_OF,
+      broker: `증권${String.fromCharCode(0xac00 + i)}`,
+      opinion: 'BUY',
+    }));
+    const { case: blind } = build({ opinions });
+    expect(blind.opinions.at(-1).broker).toBe('AD');
+    expect(validateCase(blind)).toBe(true);
+  });
+
+  it('거래량이 숫자가 아니면 조용히 null로 두지 않고 멈춘다', () => {
+    const broken = prices.slice(0, 70).map((row, i) => (i === 65 ? { ...row, volume: null } : row));
+    expect(() => buildCase(META, { prices: broken, index })).toThrow(/volume/);
+  });
+
   it('수급은 그날 거래량 대비 %', () => {
     const day = prices[69];
     const { case: blind } = build({
@@ -221,6 +239,8 @@ describe('technicalBlock', () => {
   it('as_of나 종가가 가격 블록과 다르면 거부한다', () => {
     expect(() => technicalBlock(technical, '20240627', reference, rebase)).toThrow(/as_of/);
     expect(() => technicalBlock(technical, '20240628', 80000, rebase)).toThrow(/종가/);
+    const { close: _close, ...noClose } = technical;
+    expect(() => technicalBlock(noClose, '20240628', reference, rebase)).toThrow(/close/);
   });
 });
 

@@ -74,6 +74,7 @@ function priceBlock(prices, asOf) {
     throw new CaseError(`prices: ${window.length}행 — 최소 ${MIN_PRICE_ROWS}행이 필요하다`);
   }
   const reference = requireFinite(window.at(-1).close, 'prices D0 close');
+  for (const row of window) requireFinite(row.volume, `prices ${row.date} volume`);
   const baseVolume =
     window.slice(-VOLUME_BASE_DAYS).reduce((sum, row) => sum + row.volume, 0) / VOLUME_BASE_DAYS;
   const rebase = (value) => round2((value / reference) * 100);
@@ -83,7 +84,7 @@ function priceBlock(prices, asOf) {
     high: rebase(requireFinite(row.high, `prices ${row.date} high`)),
     low: rebase(requireFinite(row.low, `prices ${row.date} low`)),
     close: rebase(requireFinite(row.close, `prices ${row.date} close`)),
-    volume_x: baseVolume > 0 ? round2(requireFinite(row.volume, 'volume') / baseVolume) : null,
+    volume_x: baseVolume > 0 ? round2(row.volume / baseVolume) : null,
   }));
   return { reference, rebase, dates: window.map((row) => row.date), rows };
 }
@@ -110,7 +111,8 @@ export function technicalBlock(technical, asOf, reference, rebase) {
   if (technical.as_of !== asOf) {
     throw new CaseError(`technical: as_of ${technical.as_of} ≠ 케이스 as_of ${asOf}`);
   }
-  if (Math.abs(technical.close - reference) / reference > 0.001) {
+  const close = requireFinite(technical.close, 'technical close');
+  if (Math.abs(close - reference) / reference > 0.001) {
     throw new CaseError(`technical: 종가 ${technical.close}가 가격 블록 D0 ${reference}와 다르다`);
   }
   const src = technical.indicators ?? {};
@@ -208,6 +210,12 @@ function disclosureBlock(disclosures, dates, asOf, names) {
     .sort((a, b) => a.d - b.d);
 }
 
+/** Spreadsheet-style letters: 0 → A, 25 → Z, 26 → AA. A big cap draws 30+ houses. */
+export function brokerAlias(n) {
+  const letter = String.fromCharCode(65 + (n % 26));
+  return n < 26 ? letter : brokerAlias(Math.floor(n / 26) - 1) + letter;
+}
+
 /**
  * Broker names become letters in order of first appearance, so revisions by the
  * same house stay linked. Target prices become upside vs. that day's close —
@@ -223,7 +231,7 @@ function opinionBlock(opinions, prices, dates, asOf) {
     .filter(({ d }) => d !== null)
     .sort((a, b) => a.d - b.d)
     .map(({ row, d }) => {
-      if (!aliases.has(row.broker)) aliases.set(row.broker, String.fromCharCode(65 + aliases.size));
+      if (!aliases.has(row.broker)) aliases.set(row.broker, brokerAlias(aliases.size));
       const close = closeOn(d);
       return {
         d,
