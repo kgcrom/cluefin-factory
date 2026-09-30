@@ -214,11 +214,17 @@ export function createFetcher(
     const to = today && horizonEnd > today ? today : horizonEnd;
     // The calendar first: the per-stock pages consult it to skip empty windows.
     const calendar = index(CALENDAR_SECTOR, from, to).length;
-    const counts = { prices: prices(symbol, from, to).length, calendar };
+    const candles = prices(symbol, from, to);
+    const counts = { prices: candles.length, calendar };
     counts.index =
-      benchmarkCode === CALENDAR_SECTOR ? counts.calendar : index(benchmarkCode, from, to).length;
-    counts.flows = flows(symbol, from, asOf).length;
-    counts.short_sales = shortSales(symbol, from, asOf).length;
+      benchmarkCode === CALENDAR_SECTOR ? calendar : index(benchmarkCode, from, to).length;
+    // Not listed yet, or suspended on as_of: there is no case to build, and asking
+    // the flow commands about days before listing fails in the CLI's validation.
+    const traded = candles.filter((row) => row.date <= asOf);
+    if (traded.at(-1)?.date !== asOf) return { ...counts, untraded_on_as_of: true };
+    const flowsFrom = traded[0].date > from ? traded[0].date : from;
+    counts.flows = flows(symbol, flowsFrom, asOf).length;
+    counts.short_sales = shortSales(symbol, flowsFrom, asOf).length;
     counts.technical_as_of = technical(symbol, asOf).as_of;
     return counts;
   }

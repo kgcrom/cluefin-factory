@@ -145,3 +145,38 @@ describe('fillCase → caseInputs → buildCase', () => {
     ).toBeNull();
   });
 });
+
+describe('fillCase — 상장 전·거래 없는 as_of', () => {
+  it('as_of에 거래가 없으면 수급·기술적 지표를 묻지 않는다', () => {
+    const db = openPit(':memory:');
+    // A stock that starts trading on 2024-03-04.
+    const cli = vi.fn((args) => {
+      const body = fakeCli(args);
+      if (args[2] === 'period')
+        return { ...body, data: body.data.filter((r) => r.stck_bsop_date >= '20240304') };
+      return body;
+    });
+    const fetcher = createFetcher(db, { cli, clock });
+    const early = fetcher.fillCase({
+      symbol: '440110',
+      asOf: '20231016',
+      benchmarkCode: '1001',
+      today: '20241231',
+    });
+    expect(early.untraded_on_as_of).toBe(true);
+    expect(
+      cli.mock.calls.some((call) => call[0][1] === 'analysis' || call[0][2] === 'technical'),
+    ).toBe(false);
+
+    cli.mockClear();
+    fetcher.fillCase({
+      symbol: '440110',
+      asOf: '20240628',
+      benchmarkCode: '1001',
+      today: '20241231',
+    });
+    const flowCalls = cli.mock.calls.map((c) => c[0]).filter((a) => a[1] === 'analysis');
+    expect(flowCalls.length).toBeGreaterThan(0);
+    for (const args of flowCalls) expect(flag(args, '--start-date')).toBe('20240304');
+  });
+});
