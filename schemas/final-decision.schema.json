@@ -572,6 +572,33 @@
           ]
         }
       }
+    },
+    "blind": {
+      "type": "object",
+      "description": "블라인드 backward 판단에만 있다. scripts/blind/restore.mjs가 채운다. 이 필드가 있는 판단은 .claude/investments/blind/decisions/에만 두고 forward journal과 집계하지 않는다.",
+      "required": [
+        "case_id",
+        "seal_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "pattern": "^[a-z]{12}$"
+        },
+        "seal_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "복원에 쓴 봉인 파일의 해시(scripts/blind/case.mjs sealHash)."
+        },
+        "generator_model": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "판단을 낸 모델 ID. 컷오프 전후 비교에 쓴다."
+        }
+      }
     }
   },
   "allOf": [
