@@ -9,7 +9,7 @@
  */
 import { CluefinError, pageBackwards, run } from '../lib/cluefin.mjs';
 import { compactDate } from './convert.mjs';
-import { ingest } from './db.mjs';
+import { ingest, tradingCalendar } from './db.mjs';
 import { nonBlankRows } from './parsers.mjs';
 
 const DAY_MS = 86_400_000;
@@ -55,9 +55,22 @@ export function createFetcher(
 
   const byDate = (rows) => rows.sort((a, b) => a.date.localeCompare(b.date));
 
+  /**
+   * True when the stored calendar covers [from, to] and has no session in it.
+   * pageBackwards asks for one more page when a window starts on a holiday, and
+   * `short-selling-trend` answers an empty window with a blank row the CLI's own
+   * validation rejects (exit 4) — so a window known to be empty is not asked.
+   */
+  function sessionless(from, to) {
+    const calendar = tradingCalendar(db);
+    if (calendar.length === 0 || calendar[0] > from) return false;
+    return !calendar.some((day) => day >= from && day <= to);
+  }
+
   function prices(symbol, from, to) {
     return pageBackwards(
       (endingOn) => {
+        if (sessionless(from, endingOn)) return [];
         const params = {
           stock_code: symbol,
           start_date: from,
@@ -114,6 +127,7 @@ export function createFetcher(
   function flows(symbol, from, to) {
     return pageBackwards(
       (endingOn) => {
+        if (sessionless(from, endingOn)) return [];
         const body = call(
           'kiwoom.analysis.institutional-trend',
           [
@@ -145,6 +159,7 @@ export function createFetcher(
   function shortSales(symbol, from, to) {
     return pageBackwards(
       (endingOn) => {
+        if (sessionless(from, endingOn)) return [];
         const body = call(
           'kis.analysis.short-selling-trend',
           [
@@ -197,10 +212,9 @@ export function createFetcher(
     const from = shiftDays(asOf, -LOOKBACK_DAYS);
     const horizonEnd = shiftDays(asOf, Math.ceil((horizonDays * 7) / 5) + 14);
     const to = today && horizonEnd > today ? today : horizonEnd;
-    const counts = {
-      prices: prices(symbol, from, to).length,
-      calendar: index(CALENDAR_SECTOR, from, to).length,
-    };
+    // The calendar first: the per-stock pages consult it to skip empty windows.
+    const calendar = index(CALENDAR_SECTOR, from, to).length;
+    const counts = { prices: prices(symbol, from, to).length, calendar };
     counts.index =
       benchmarkCode === CALENDAR_SECTOR ? counts.calendar : index(benchmarkCode, from, to).length;
     counts.flows = flows(symbol, from, asOf).length;

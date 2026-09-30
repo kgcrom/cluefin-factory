@@ -22,6 +22,16 @@ describe('createFetcher', () => {
     expect(db.prepare('SELECT count(*) AS n FROM raw').get().n).toBe(cli.mock.calls.length);
   });
 
+  it('달력이 있으면 거래일 없는 구간은 부르지 않는다', () => {
+    const db = openPit(':memory:');
+    const fetcher = createFetcher(db, { cli: fakeCli, clock });
+    fetcher.index('0001', '20230601', '20240628');
+    const cli = vi.fn(fakeCli);
+    const rows = createFetcher(db, { cli, clock }).shortSales('005930', '20230701', '20240628');
+    expect(rows).toHaveLength(DAYS.filter((d) => d >= '20230701' && d <= '20240628').length);
+    expect(cli.mock.calls.length).toBe(Math.ceil(rows.length / 100));
+  });
+
   it('sector daily는 --start-date에 끝 날짜를 넘긴다', () => {
     const db = openPit(':memory:');
     const cli = vi.fn(fakeCli);
