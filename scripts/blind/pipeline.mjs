@@ -3,6 +3,7 @@
  *
  *   .claude/investments/blind/<run>/
  *     registry.json   pre-registered candidates (written once, hash-checked)
+ *     rules.json      optional run rules, e.g. fixed exits { stop_pct, target_pct }
  *     manifest.json   per-candidate status: built | excluded (+ reason)
  *     cases/          <case_id>.json — the only thing the judge ever sees
  *     seals/          <case_id>.json — symbol, as_of, reference price
@@ -12,13 +13,21 @@
  * `cases/` and `seals/` are siblings on purpose: the judge is given one case's
  * content in its prompt and has no tools, so a path is never handed to it.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { dump } from 'js-yaml';
 import { parseFrontmatter, readEntry, splitEntry } from '../lib/journal.mjs';
 import { schemaFindings } from '../lib/validate.mjs';
 import { caseInputs } from '../pit/inputs.mjs';
 import { buildCase, CaseError } from './case.mjs';
+import { exitRuleFindings } from './exits.mjs';
 import { restoreDecision } from './restore.mjs';
 import { verifyRegistry } from './sample.mjs';
 
@@ -32,6 +41,7 @@ export function runPaths(root, run) {
     seals: join(base, 'seals'),
     decisions: join(base, 'decisions'),
     restored: join(base, 'restored'),
+    rules: join(base, 'rules.json'),
   };
 }
 
@@ -151,7 +161,7 @@ export function restoreAll(paths, { generatorModel } = {}) {
  * opening `---` (a stray sentence) is dropped; the frontmatter must parse and,
  * restored against the seal, pass the decision schema.
  */
-export function checkDecision(reply, seal, schemaPath) {
+export function checkDecision(reply, seal, schemaPath, rules = null) {
   const at = String(reply).search(/^---\r?\n/m);
   if (at === -1) return { error: 'frontmatter(---)가 없다' };
   const text = String(reply).slice(at);
@@ -169,8 +179,10 @@ export function checkDecision(reply, seal, schemaPath) {
   } catch (error) {
     return { error: error.message };
   }
-  const findings = schemaFindings(restored, schemaPath);
-  if (findings.length > 0) return { error: findings.map((f) => f.message).join('; ') };
+  const findings = schemaFindings(restored, schemaPath).map((f) => f.message);
+  // Exit rules are checked in case units, on the judge's own numbers.
+  if (rules?.stop_pct) findings.push(...exitRuleFindings(data, rules));
+  if (findings.length > 0) return { error: findings.join('; ') };
   return { text, data };
 }
 
@@ -185,6 +197,7 @@ export async function judgeCases(
   { invoke, schemaPath, concurrency = 4, retries = 1, log = () => {} },
 ) {
   const manifest = readManifest(paths);
+  const rules = readRules(paths);
   mkdirSync(paths.decisions, { recursive: true });
   const pending = Object.entries(manifest.entries)
     .filter(([id, e]) => e.status === 'built' && !existsSync(join(paths.decisions, `${id}.md`)))
@@ -203,12 +216,12 @@ export async function judgeCases(
       for (let attempt = 0; attempt <= retries; attempt += 1) {
         let reply;
         try {
-          reply = await invoke(casePath, feedback);
+          reply = await invoke(casePath, feedback, rules);
         } catch (error) {
           outcome = { error: `실행 실패: ${error.message}` };
           break;
         }
-        outcome = checkDecision(reply, seal, schemaPath);
+        outcome = checkDecision(reply, seal, schemaPath, rules);
         if (!outcome.error) break;
         feedback = outcome.error;
       }
@@ -224,4 +237,31 @@ export async function judgeCases(
   }
   await Promise.all(Array.from({ length: Math.max(1, concurrency) }, worker));
   return results;
+}
+
+export function readRules(paths) {
+  return existsSync(paths.rules) ? readJson(paths.rules) : null;
+}
+
+/**
+ * A new run over the same registered cases: registry, manifest, cases and
+ * seals are copied unchanged (the registry hash still verifies), decisions are
+ * not. `rules` is what differs between the two runs.
+ */
+export function forkRun(from, to, rules) {
+  if (existsSync(to.base)) throw new Error(`${to.base}가 이미 있다`);
+  verifyRegistry(readJson(from.registry));
+  for (const dir of [to.cases, to.seals]) mkdirSync(dir, { recursive: true });
+  copyFileSync(from.registry, to.registry);
+  const manifest = readManifest(from);
+  const built = Object.fromEntries(
+    Object.entries(manifest.entries).filter(([, e]) => e.status === 'built'),
+  );
+  writeJson(to.manifest, { ...manifest, entries: { ...manifest.entries }, forked_from: from.base });
+  for (const caseId of Object.keys(built)) {
+    copyFileSync(join(from.cases, `${caseId}.json`), join(to.cases, `${caseId}.json`));
+    copyFileSync(join(from.seals, `${caseId}.json`), join(to.seals, `${caseId}.json`));
+  }
+  writeJson(to.rules, rules);
+  return { cases: Object.keys(built).length, rules };
 }

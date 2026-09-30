@@ -13,6 +13,7 @@ import { dump } from 'js-yaml';
 import { describe, expect, it, vi } from 'vitest';
 import {
   buildCases,
+  forkRun,
   judgeCases,
   restoreAll,
   runPaths,
@@ -310,5 +311,70 @@ describe('restoreAll 충돌', () => {
     );
     expect(restoreAll(paths)[0].error).toMatch(/다른 케이스/);
     expect(seal.symbol).toBeTruthy();
+  });
+});
+
+describe('forkRun + 고정 청산 규칙', () => {
+  it('같은 케이스·봉인으로 새 실행을 만들고, 판단은 규칙 검사를 통과해야 저장된다', async () => {
+    const { paths, db, fetcher } = setup(1);
+    buildCases(paths, { db, fetcher, today: '20241231' });
+    const forked = runPaths(join(paths.base, '..'), 'pilot-sl8-tp24');
+    expect(forkRun(paths, forked, { stop_pct: 8, target_pct: 24 })).toMatchObject({ cases: 1 });
+    expect(readdirSync(forked.cases)).toEqual(readdirSync(paths.cases));
+    expect(readFileSync(forked.registry, 'utf8')).toBe(readFileSync(paths.registry, 'utf8'));
+    expect(() => forkRun(paths, forked, { stop_pct: 8, target_pct: 24 })).toThrow(/이미/);
+
+    const [file] = readdirSync(forked.cases);
+    const blindCase = JSON.parse(readFileSync(join(forked.cases, file), 'utf8'));
+    const base = {
+      schema_version: 1,
+      decision_id: '2000-01-01-BLIND-01',
+      decided_at: '2000-01-01T00:00:00+09:00',
+      supersedes: null,
+      data_as_of: { price: '2000-01-01' },
+      market: blindCase.market,
+      symbol: 'BLIND',
+      name: 'BLIND',
+      confidence: 'low',
+      horizon_days: blindCase.horizon_days,
+      horizon_basis: 'trading',
+      review_due: '2000-01-01',
+      reference: { price: 100, currency: 'KRW', price_type: 'close', adjusted: true },
+      thesis: 't',
+      biggest_risk: 'r',
+      gates: { data_sanity: 'pass' },
+      skills_run: ['technical-analysis'],
+      scoring: { status: 'pending' },
+      blind: { case_id: blindCase.case_id },
+    };
+    const cond = (id, op, value) => ({
+      id,
+      statement: 's',
+      checkable: true,
+      metric: 'price',
+      op,
+      value,
+      check_on: 'daily',
+    });
+    const bad = {
+      ...base,
+      verdict: 'buy',
+      levels: { entry: { min: 99, max: 101 }, stop_loss: 90, targets: [{ price: 115, weight: 1 }] },
+      invalidation: [cond('inv-1', '<', 90)],
+    };
+    const good = {
+      ...bad,
+      levels: { entry: { min: 99, max: 101 }, stop_loss: 92, targets: [{ price: 124, weight: 1 }] },
+      invalidation: [cond('inv-1', '<', 92), cond('inv-2', '>=', 124)],
+    };
+    const seen = [];
+    const invoke = async (_path, feedback, rules) => {
+      seen.push({ feedback, rules });
+      return `---\n${dump(seen.length === 1 ? bad : good)}---\n`;
+    };
+    const [result] = await judgeCases(forked, { invoke, schemaPath: SCHEMA });
+    expect(result).toEqual({ case_id: blindCase.case_id, verdict: 'buy' });
+    expect(seen[0].rules).toEqual({ stop_pct: 8, target_pct: 24 });
+    expect(seen[1].feedback).toMatch(/stop_loss는 92/);
   });
 });

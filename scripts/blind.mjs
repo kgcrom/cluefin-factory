@@ -8,6 +8,8 @@
  *   node scripts/blind.mjs register --run pilot --universe <file> --seed <int> --count 30
  *       [--from 20160104] [--to YYYYMMDD]   pre-register the candidates (once)
  *   node scripts/blind.mjs build --run pilot     fetch into PIT and write cases + seals
+ *   node scripts/blind.mjs fork --from pilot --run pilot-sl8-tp24 --stop-pct 8 --target-pct 24
+ *       same registered cases and seals under new run rules (fixed exits); no decisions copied
  *   node scripts/blind.mjs judge --run pilot [--concurrency 4]
  *       run `claude -p --agent blind-judge` on every unjudged case; a reply is
  *       kept only if it restores against its seal into a schema-valid decision
@@ -30,10 +32,10 @@ const { run } = await import('./lib/cluefin.mjs');
 const { openPit, tradingCalendar } = await import('./pit/db.mjs');
 const { createFetcher } = await import('./pit/fetch.mjs');
 const { topByMarketCap } = await import('./blind/universe.mjs');
+const { describeExits } = await import('./blind/exits.mjs');
 const { createRegistry, MIN_GAP_SESSIONS } = await import('./blind/sample.mjs');
-const { buildCases, judgeCases, readManifest, restoreAll, runPaths, writeRegistry } = await import(
-  './blind/pipeline.mjs'
-);
+const { buildCases, forkRun, judgeCases, readManifest, restoreAll, runPaths, writeRegistry } =
+  await import('./blind/pipeline.mjs');
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const BLIND_ROOT = join(ROOT, '.claude/investments/blind');
@@ -160,11 +162,12 @@ function status(flags) {
  * frontmatter limits it to Read behind the case-file guard; the disallowed list
  * repeats that in case the agent definition changes.
  */
-export function claudeJudge(casePath, feedback) {
+export function claudeJudge(casePath, feedback, rules = null) {
   const prompt = [
     `케이스 파일: ${casePath}`,
     '이 파일 하나만 읽고 지시대로 판단해 frontmatter + 본문만 돌려줘.',
-    feedback ? `직전 답이 스키마 검사에서 떨어졌다. 고쳐서 다시 내라: ${feedback}` : '',
+    rules?.stop_pct ? describeExits(rules) : '',
+    feedback ? `직전 답이 검사에서 떨어졌다. 고쳐서 다시 내라: ${feedback}` : '',
   ]
     .filter(Boolean)
     .join('\n');
@@ -207,7 +210,7 @@ export function claudeJudge(casePath, feedback) {
 }
 
 const USAGE =
-  'usage: node scripts/blind.mjs <universe|register|build|judge|restore|status> [...] (파일 머리 주석 참고)';
+  'usage: node scripts/blind.mjs <universe|register|build|fork|judge|restore|status> [...] (파일 머리 주석 참고)';
 
 export async function main(argv, { cli = run, invoke = claudeJudge } = {}) {
   const { command, flags, error } = parseArgs(argv);
@@ -220,6 +223,16 @@ export async function main(argv, { cli = run, invoke = claudeJudge } = {}) {
         ? restoreAll(runPaths(BLIND_ROOT, flags.run), { generatorModel: flags.model })
         : null,
     status: () => status(flags),
+    fork: () => {
+      const stop = Number(flags['stop-pct']);
+      const target = Number(flags['target-pct']);
+      if (!flags.from || !flags.run || !(stop > 0 && stop < 100) || !(target > 0 && target < 100))
+        return null;
+      return forkRun(runPaths(BLIND_ROOT, flags.from), runPaths(BLIND_ROOT, flags.run), {
+        stop_pct: stop,
+        target_pct: target,
+      });
+    },
     judge: () =>
       flags.run
         ? judgeCases(runPaths(BLIND_ROOT, flags.run), {

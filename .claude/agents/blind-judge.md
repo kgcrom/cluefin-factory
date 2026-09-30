@@ -44,6 +44,8 @@ skills:
 2. `bull-analyst`와 `bear-analyst`를 각각 같은 데이터로 쓴다.
 3. `final-decision`: 규칙(손절폭 = 1.5 × ATR14 × √(horizon/30) 이상, 20% 초과면 watch, 무효화 조건의
    시간 척도, 술어 형식)을 그대로 지킨다. ATR은 `technical.indicators.atr_14`(케이스 단위)를 쓴다.
+   **프롬프트에 고정 청산 규칙(손절 n%, 익절 m%)이 있으면 그것이 손절폭·20% 규칙보다 우선한다.** 그때
+   `levels`와 checkable 조건은 프롬프트가 준 값 그대로 쓰고, 판단은 방향과 확신도에만 쓴다.
 
 ## 출력
 

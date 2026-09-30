@@ -15,6 +15,12 @@ describe('blind.mjs', () => {
     expect(await main(['judge'], deps)).toBe(2);
     expect(await main(['restore'], deps)).toBe(2);
     expect(await main(['status', 'stray'], deps)).toBe(2);
+    expect(
+      await main(
+        ['fork', '--from', 'pilot', '--run', 'x', '--stop-pct', '0', '--target-pct', '24'],
+        deps,
+      ),
+    ).toBe(2);
     expect(cli).not.toHaveBeenCalled();
     expect(invoke).not.toHaveBeenCalled();
   });
