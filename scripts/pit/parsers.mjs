@@ -19,9 +19,21 @@ export const SOURCE_ORDER = [
   'dart.disclosure-search',
 ];
 
+/**
+ * Kiwoom answers a window with no sessions with a single row whose every field
+ * is an empty string (2026-09-30); KIS row arrays are read the same way. Such a
+ * row means "nothing" and is dropped. A row with some fields filled and no date
+ * is still a conversion error.
+ */
+export function nonBlankRows(rows) {
+  return (rows ?? []).filter((row) =>
+    Object.values(row).some((value) => String(value).trim() !== ''),
+  );
+}
+
 function chartPeriod(body, params) {
   const symbol = String(body.stock_code ?? params.stock_code);
-  const prices = (body.data ?? []).map((row) => ({
+  const prices = nonBlankRows(body.data).map((row) => ({
     symbol,
     date: compactDate(row.stck_bsop_date),
     open: toInt(row.stck_oprc),
@@ -36,7 +48,7 @@ function chartPeriod(body, params) {
 
 function sectorDaily(body, params) {
   const sectorCode = String(params.sector_code);
-  const index_prices = (body.data ?? []).map((row) => ({
+  const index_prices = nonBlankRows(body.data).map((row) => ({
     sector_code: sectorCode,
     date: compactDate(row.stck_bsop_date),
     close: toReal(row.bstp_nmix_prpr),
@@ -72,7 +84,7 @@ function disclosureSearch(body, _params, { nextTradingDay }) {
  */
 function institutionalTrend(body, params) {
   const symbol = String(params.stock_code);
-  const flows = (body.stk_orgn_trde_trnsn ?? []).map((row) => ({
+  const flows = nonBlankRows(body.stk_orgn_trde_trnsn).map((row) => ({
     symbol,
     date: compactDate(row.dt),
     foreign_net_qty: toInt(row.for_daly_nettrde_qty),
@@ -83,7 +95,7 @@ function institutionalTrend(body, params) {
 
 function shortSellingTrend(body, params) {
   const symbol = String(params.stock_code);
-  const short_sales = (body.data ?? []).map((row) => ({
+  const short_sales = nonBlankRows(body.data).map((row) => ({
     symbol,
     date: compactDate(row.stck_bsop_date),
     short_qty: toInt(row.ssts_cntg_qty),

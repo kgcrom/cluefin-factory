@@ -10,6 +10,7 @@
 import { CluefinError, pageBackwards, run } from '../lib/cluefin.mjs';
 import { compactDate } from './convert.mjs';
 import { ingest } from './db.mjs';
+import { nonBlankRows } from './parsers.mjs';
 
 const DAY_MS = 86_400_000;
 const CALENDAR_SECTOR = '0001';
@@ -83,7 +84,9 @@ export function createFetcher(
           ],
           params,
         );
-        return byDate((body.data ?? []).map((row) => ({ date: compactDate(row.stck_bsop_date) })));
+        return byDate(
+          nonBlankRows(body.data).map((row) => ({ date: compactDate(row.stck_bsop_date) })),
+        );
       },
       from,
       to,
@@ -99,7 +102,9 @@ export function createFetcher(
           ['kis', 'sector', 'daily', '--sector-code', sectorCode, '--start-date', endingOn],
           { sector_code: sectorCode, start_date: endingOn },
         );
-        return byDate((body.data ?? []).map((row) => ({ date: compactDate(row.stck_bsop_date) })));
+        return byDate(
+          nonBlankRows(body.data).map((row) => ({ date: compactDate(row.stck_bsop_date) })),
+        );
       },
       from,
       to,
@@ -129,7 +134,7 @@ export function createFetcher(
           { stock_code: symbol, start_date: from, end_date: endingOn },
         );
         return byDate(
-          (body.stk_orgn_trde_trnsn ?? []).map((row) => ({ date: compactDate(row.dt) })),
+          nonBlankRows(body.stk_orgn_trde_trnsn).map((row) => ({ date: compactDate(row.dt) })),
         );
       },
       from,
@@ -155,7 +160,9 @@ export function createFetcher(
           ],
           { stock_code: symbol, start_date: from, end_date: endingOn },
         );
-        return byDate((body.data ?? []).map((row) => ({ date: compactDate(row.stck_bsop_date) })));
+        return byDate(
+          nonBlankRows(body.data).map((row) => ({ date: compactDate(row.stck_bsop_date) })),
+        );
       },
       from,
       to,

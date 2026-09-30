@@ -342,3 +342,25 @@ describe('미래 누출 속성 테스트', () => {
     }
   });
 });
+
+describe('빈 행', () => {
+  it('키움이 빈 구간에 주는 전부 빈 행은 버리고, 날짜만 빈 행은 오류로 둔다', () => {
+    const db = fresh();
+    const blank = { dt: '', close_pric: '', for_daly_nettrde_qty: '', orgn_daly_nettrde_qty: '' };
+    const result = ingest(db, {
+      source: 'kiwoom.analysis.institutional-trend',
+      params: { stock_code: '012750', start_date: '20241020', end_date: '20241020' },
+      body: { return_code: 0, stk_orgn_trde_trnsn: [blank] },
+      fetchedAt: '2026-09-30T00:00:00Z',
+    });
+    expect(result).toMatchObject({ parsed: true, rows: { flows: 0 } });
+    expect(() =>
+      ingest(db, {
+        source: 'kiwoom.analysis.institutional-trend',
+        params: { stock_code: '012750', start_date: '20241021', end_date: '20241021' },
+        body: { stk_orgn_trde_trnsn: [{ ...blank, for_daly_nettrde_qty: '100' }] },
+        fetchedAt: '2026-09-30T00:00:00Z',
+      }),
+    ).toThrow(/YYYYMMDD/);
+  });
+});
