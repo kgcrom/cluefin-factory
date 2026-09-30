@@ -80,7 +80,11 @@ thesis: 한두 문장
 key_drivers:
   - 근거
 biggest_risk: 한 문장
-debate: { bull_score: 6, bear_score: 5, winner: bull, decisive_factor: 한 문장 }
+debate:
+  bull_score: 6
+  bear_score: 5
+  winner: bull           # bull | bear | tie
+  decisive_factor: "한 문장, 200자 이내"   # 이 네 키만
 invalidation:            # 항목마다 이 키만: id, statement(200자 이내), checkable, metric, op, value, check_on
   - id: inv-1
     statement: 종가가 92.5 아래
@@ -96,12 +100,19 @@ invalidation:            # 항목마다 이 키만: id, statement(200자 이내)
     op: "<"
     value: 89.0
     check_on: weekly
-gates: { data_sanity: pass, notes: [짧은 메모] }   # pass | warn | blocked, notes 각 200자 이내
+gates:
+  data_sanity: pass      # pass | warn | blocked
+  notes:
+    - "짧은 메모, 200자 이내"
 skills_run: [technical-analysis, bull-analyst, bear-analyst, final-decision]
 scoring: { status: pending }
 blind: { case_id: abcdefghijkl }   # 케이스의 case_id
 ---
 ```
+
+**문장이 들어가는 값은 한 줄 `{ … }` 안에 쓰지 말고 위처럼 여러 줄로, 큰따옴표로 감싼다.**
+한 줄 매핑 안의 쉼표는 키 구분자로 읽혀서, `decisive_factor: A, B`의 `B`가 스키마에 없는 키가 된다
+(파일럿 30건 중 10건이 이것으로 버려졌다).
 
 "n일 연속" 같은 조건은 술어로 못 쓴다. 쓰고 싶으면 `checkable: false`로 두고 statement에만 적는다.
 

@@ -6,13 +6,17 @@ const DEFAULT_CWD = join(homedir(), 'workspace/cluefin');
 
 /**
  * Exit codes are a contract: 2 usage, 3 credentials, 4 broker/network
- * (retry only when `error.retryable`), 5 rate limit.
+ * (retry only when `error.retryable`), 5 rate limit. A rate limit is retryable
+ * unless the CLI says otherwise: DART's daily quota (status 020) comes as exit 5
+ * with `retryable: false`, and retrying it only burns the backoff.
  */
 export class CluefinError extends Error {
   constructor(code, detail) {
     super(`cluefin CLI exit ${code}: ${detail}`);
     this.code = code;
-    this.retryable = code === 4 && /"retryable":\s*true/.test(detail);
+    const text = String(detail);
+    if (code === 5) this.retryable = !/"retryable":\s*false/.test(text);
+    else this.retryable = code === 4 && /"retryable":\s*true/.test(text);
   }
 }
 

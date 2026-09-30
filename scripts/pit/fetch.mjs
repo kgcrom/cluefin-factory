@@ -31,9 +31,9 @@ export function shiftDays(compact, days) {
 }
 
 /**
- * `{ cli, clock, sleep }` are injectable for tests. Rate limits (exit 5) and
- * broker errors the CLI marks retryable are retried with backoff; anything else
- * is thrown at once.
+ * `{ cli, clock, sleep }` are injectable for tests. Whatever the CLI marks
+ * retryable (per-second rate limits, transient broker errors) is retried with
+ * backoff; a daily quota or anything else is thrown at once.
  */
 export function createFetcher(
   db,
@@ -46,7 +46,7 @@ export function createFetcher(
         ingest(db, { source, params, body, fetchedAt: clock() });
         return body;
       } catch (error) {
-        const transient = error instanceof CluefinError && (error.code === 5 || error.retryable);
+        const transient = error instanceof CluefinError && error.retryable;
         if (!transient || attempt >= RETRY_DELAYS_MS.length) throw error;
         sleep(RETRY_DELAYS_MS[attempt]);
       }

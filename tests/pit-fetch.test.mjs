@@ -59,6 +59,18 @@ describe('createFetcher', () => {
     expect(sleep).toHaveBeenCalledTimes(2);
   });
 
+  it('DART 일일 한도(exit 5, retryable false)는 다시 부르지 않는다', () => {
+    const db = openPit(':memory:');
+    const sleep = vi.fn();
+    const quota = () => {
+      throw new CluefinError(5, '{"error": {"type": "RateLimitError", "retryable": false}}');
+    };
+    expect(() =>
+      createFetcher(db, { cli: quota, clock, sleep }).technical('005930', AS_OF),
+    ).toThrow(/exit 5/);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
   it('재시도에도 계속 실패하면 네 번째에서 던진다', () => {
     const db = openPit(':memory:');
     const always = () => {

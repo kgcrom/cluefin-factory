@@ -241,7 +241,7 @@ describe('judgeCases', () => {
       { case_id: blindCase.case_id, verdict: 'watch' },
     ]);
     expect(feedbacks[0]).toBeNull();
-    expect(feedbacks[1]).toMatch(/additional properties/);
+    expect(feedbacks[1]).toMatch(/additional properties \(stop\)/);
 
     const again = setup(1);
     buildCases(again.paths, { db: again.db, fetcher: again.fetcher, today: '20241231' });
