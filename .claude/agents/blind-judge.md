@@ -9,6 +9,7 @@ hooks:
         - type: command
           command: node "$CLAUDE_PROJECT_DIR/scripts/blind/guard-read.mjs"
 model: opus
+effort: high
 skills:
   - technical-analysis
   - bull-analyst

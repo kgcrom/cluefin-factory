@@ -2,6 +2,7 @@
 name: investment-journal
 description: 투자 판단, 매수/매도 이유, 기준선, 사후 복기 항목을 .claude/investments/journal/에 기록한다. 개인 투자 습관 개선과 포트폴리오 분석에 사용한다.
 model: sonnet
+effort: low
 ---
 
 # Investment Journal
