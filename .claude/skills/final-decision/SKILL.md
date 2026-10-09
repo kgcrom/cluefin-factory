@@ -2,6 +2,7 @@
 name: final-decision
 description: 모든 분석 결과를 종합해 buy, hold, sell, 관망 중 하나와 기준선, 무효화 조건, 추적 지표를 제시한다.
 model: opus
+effort: xhigh
 ---
 
 # Final Decision

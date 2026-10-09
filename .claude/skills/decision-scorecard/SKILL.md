@@ -2,6 +2,7 @@
 name: decision-scorecard
 description: journal에 쌓인 과거 투자 판단을 기한 도래·무효화 조건 발동 기준으로 채점하고, 적중률·초과수익·확신도 캘리브레이션을 집계한다. 판단 성적표, 복기, 사후 검증 요청에 사용한다.
 model: sonnet
+effort: medium
 ---
 
 # Decision Scorecard

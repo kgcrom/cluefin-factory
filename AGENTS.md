@@ -58,7 +58,11 @@ Investments data is per-user and git-ignored: `.claude/investments/` (the PIT st
 Each skill pins a model in its frontmatter: `sonnet` for rule-application, arithmetic
 and recording (data-sanity-check, technical-analysis, risk-position-sizing,
 investment-journal, decision-scorecard), `opus` for everything that weighs multiple
-sources or argues a side.
+sources or argues a side. Each also pins an `effort`: `low` for recording
+(investment-journal), `medium` for applying rules or classifying (the other sonnet skills,
+news-analysis, market-review's orchestration), `high` for building or attacking a thesis
+(bull/bear, fundamental, macro, scenario, portfolio-fit, blind-judge), and `xhigh` only for
+final-decision, where every other output is weighed at once.
 
 ## Code vs. skill
 
