@@ -17,6 +17,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lookbackStart } from './lib/atr.mjs';
 import { CluefinError, dailyCandles, run, sectorDailyRange } from './lib/cluefin.mjs';
+import { kstClock, SETTLED_MINUTES } from './lib/kst.mjs';
 import { classify } from './watchlist/classify.mjs';
 import { features, MIN_CANDLES } from './watchlist/features.mjs';
 import { pivot } from './watchlist/pivot.mjs';
@@ -27,17 +28,8 @@ const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const CACHE_DIR = join(ROOT, '.claude/investments/watchlist');
 /** Calendar days fetched before as-of: comfortably more than MIN_CANDLES sessions. */
 const LOOKBACK_DAYS = 420;
-/** 15:30 close plus the closing auction settling; before this today's candle is partial. */
-const SETTLED_MINUTES = 15 * 60 + 40;
 
-/** Today's date and minutes past midnight in KST. */
-export function kstClock(now = new Date()) {
-  const kst = new Date(now.getTime() + 9 * 3_600_000);
-  return {
-    date: kst.toISOString().slice(0, 10).replaceAll('-', ''),
-    minutes: kst.getUTCHours() * 60 + kst.getUTCMinutes(),
-  };
-}
+export { kstClock };
 
 /** Today's listing of common shares, fetched once a day. */
 export function loadListing({ cli, today, cacheDir = CACHE_DIR }) {

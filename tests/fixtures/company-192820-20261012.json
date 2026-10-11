@@ -1,0 +1,4537 @@
+{
+  "statements": {
+    "2025-11011": [
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Assets",
+        "account_nm": "자산총계",
+        "thstrm_amount": "2125418400005",
+        "frmtrm_amount": "1933713489313",
+        "bfefrmtrm_amount": "1557077274819"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentAssets",
+        "account_nm": "유동자산",
+        "thstrm_amount": "975063355487",
+        "frmtrm_amount": "940910911301",
+        "bfefrmtrm_amount": "821629081841"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CashAndCashEquivalents",
+        "account_nm": "현금및현금성자산",
+        "thstrm_amount": "192279928597",
+        "frmtrm_amount": "256411937856",
+        "bfefrmtrm_amount": "256890168641"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentTradeReceivables",
+        "account_nm": "매출채권",
+        "thstrm_amount": "426885433744",
+        "frmtrm_amount": "349166438038",
+        "bfefrmtrm_amount": "271522375821"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Inventories",
+        "account_nm": "재고자산",
+        "thstrm_amount": "270823198801",
+        "frmtrm_amount": "257029474049",
+        "bfefrmtrm_amount": "218401261040"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentAssets",
+        "account_nm": "비유동자산",
+        "thstrm_amount": "1150390468292",
+        "frmtrm_amount": "991210588243",
+        "bfefrmtrm_amount": "735448192978"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Equity",
+        "account_nm": "자본총계",
+        "thstrm_amount": "612343808452",
+        "frmtrm_amount": "508810486465",
+        "bfefrmtrm_amount": "358561439285"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_EquityAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 지분",
+        "thstrm_amount": "558159240881",
+        "frmtrm_amount": "473397931954",
+        "bfefrmtrm_amount": "362516945771"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentLiabilities",
+        "account_nm": "유동부채",
+        "thstrm_amount": "1201480558675",
+        "frmtrm_amount": "1114158039590",
+        "bfefrmtrm_amount": "989364240038"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentFinancialLiabilities",
+        "account_nm": "단기금융부채",
+        "thstrm_amount": "772272966210",
+        "frmtrm_amount": "609382334585",
+        "bfefrmtrm_amount": "529518589251"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Liabilities",
+        "account_nm": "부채총계",
+        "thstrm_amount": "1513074591553",
+        "frmtrm_amount": "1424903002848",
+        "bfefrmtrm_amount": "1198515835534"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentLiabilities",
+        "account_nm": "비유동부채",
+        "thstrm_amount": "311594032878",
+        "frmtrm_amount": "310744963258",
+        "bfefrmtrm_amount": "209151595496"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentFinancialLiabilities",
+        "account_nm": "장기금융부채",
+        "thstrm_amount": "230009580903",
+        "frmtrm_amount": "229724978603",
+        "bfefrmtrm_amount": "148607920379"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "dart_OperatingIncomeLoss",
+        "account_nm": "영업이익",
+        "thstrm_amount": "195791661624",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "175395279105",
+        "bfefrmtrm_amount": "115685779856"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "dart_TotalSellingGeneralAdministrativeExpenses",
+        "account_nm": "판매비와관리비",
+        "thstrm_amount": "213223103198",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "242812025122",
+        "bfefrmtrm_amount": "177960958227"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_CostOfSales",
+        "account_nm": "매출원가",
+        "thstrm_amount": "1989743208026",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "1747882332515",
+        "bfefrmtrm_amount": "1483847710237"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_GrossProfit",
+        "account_nm": "매출총이익",
+        "thstrm_amount": "409014764822",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "418207304227",
+        "bfefrmtrm_amount": "293646738083"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "131076173228",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "88417411666",
+        "bfefrmtrm_amount": "37799983055"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossAttributableToOwnersOfParent",
+        "account_nm": "지배기업주주지분",
+        "thstrm_amount": "123064158267",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "85796823726",
+        "bfefrmtrm_amount": "57137182681"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossBeforeTax",
+        "account_nm": "법인세비용차감전순이익",
+        "thstrm_amount": "156515769949",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "137630905017",
+        "bfefrmtrm_amount": "84220832573"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_Revenue",
+        "account_nm": "수익(매출액)",
+        "thstrm_amount": "2398757972848",
+        "thstrm_add_amount": "",
+        "frmtrm_amount": "2166089636742",
+        "bfefrmtrm_amount": "1777494448320"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInFinancingActivities",
+        "account_nm": "재무활동현금흐름",
+        "thstrm_amount": "28332445263",
+        "frmtrm_amount": "67515595138",
+        "bfefrmtrm_amount": "-39181921094"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromBonds",
+        "account_nm": "사채의 증가",
+        "thstrm_amount": "20000000000",
+        "frmtrm_amount": "18214600000",
+        "bfefrmtrm_amount": "27500000000"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromLongTermBorrowings",
+        "account_nm": "장기차입금의 증가",
+        "thstrm_amount": "70539346636",
+        "frmtrm_amount": "73971563797",
+        "bfefrmtrm_amount": "39254756125"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromShortTermBorrowings",
+        "account_nm": "단기차입금의 증가",
+        "thstrm_amount": "476045663320",
+        "frmtrm_amount": "353612854117",
+        "bfefrmtrm_amount": "376603316994"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfShortTermBorrowings",
+        "account_nm": "단기차입금의 상환",
+        "thstrm_amount": "441907395000",
+        "frmtrm_amount": "317475314577",
+        "bfefrmtrm_amount": "410682739912"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_DividendsPaidClassifiedAsFinancingActivities",
+        "account_nm": "배당금의 지급",
+        "thstrm_amount": "26095022600",
+        "frmtrm_amount": "5672831000",
+        "bfefrmtrm_amount": "0"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_RepaymentsOfCurrentBorrowings",
+        "account_nm": "유동성장기차입금의 상환",
+        "thstrm_amount": "50523603466",
+        "frmtrm_amount": "38270087341",
+        "bfefrmtrm_amount": "56058511120"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInInvestingActivities",
+        "account_nm": "투자활동현금흐름",
+        "thstrm_amount": "-179427912301",
+        "frmtrm_amount": "-160026022210",
+        "bfefrmtrm_amount": "-104549447579"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "account_nm": "유형자산의 취득",
+        "thstrm_amount": "186962756440",
+        "frmtrm_amount": "164916321050",
+        "bfefrmtrm_amount": "86283324363"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInOperatingActivities",
+        "account_nm": "영업활동현금흐름",
+        "thstrm_amount": "86704661578",
+        "frmtrm_amount": "72966186220",
+        "bfefrmtrm_amount": "231020761952"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "dart_AdjustmentsForInterestExpenses",
+        "account_nm": "이자비용",
+        "thstrm_amount": "46717900009",
+        "frmtrm_amount": "45349292201",
+        "bfefrmtrm_amount": "32114912997"
+      },
+      {
+        "rcept_no": "20260318000694",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "131076173228",
+        "frmtrm_amount": "88417411666",
+        "bfefrmtrm_amount": "37799983055"
+      }
+    ],
+    "2025-11012": [
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Assets",
+        "account_nm": "자산총계",
+        "thstrm_amount": "2013645582326",
+        "frmtrm_amount": "1933713489313"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentAssets",
+        "account_nm": "유동자산",
+        "thstrm_amount": "987992147967",
+        "frmtrm_amount": "940910911301"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CashAndCashEquivalents",
+        "account_nm": "현금및현금성자산",
+        "thstrm_amount": "218987318637",
+        "frmtrm_amount": "256411937856"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentTradeReceivables",
+        "account_nm": "매출채권",
+        "thstrm_amount": "436651598663",
+        "frmtrm_amount": "349166438038"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Inventories",
+        "account_nm": "재고자산",
+        "thstrm_amount": "243815697693",
+        "frmtrm_amount": "257029474049"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentAssets",
+        "account_nm": "비유동자산",
+        "thstrm_amount": "1025653434359",
+        "frmtrm_amount": "991210588243"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Equity",
+        "account_nm": "자본총계",
+        "thstrm_amount": "490098103064",
+        "frmtrm_amount": "508810486465"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_EquityAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 지분",
+        "thstrm_amount": "437058744971",
+        "frmtrm_amount": "473397931954"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentLiabilities",
+        "account_nm": "유동부채",
+        "thstrm_amount": "1212143736266",
+        "frmtrm_amount": "1114158039590"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentFinancialLiabilities",
+        "account_nm": "단기금융부채",
+        "thstrm_amount": "779084481858",
+        "frmtrm_amount": "609382334585"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Liabilities",
+        "account_nm": "부채총계",
+        "thstrm_amount": "1523547479262",
+        "frmtrm_amount": "1424903002848"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentLiabilities",
+        "account_nm": "비유동부채",
+        "thstrm_amount": "311403742996",
+        "frmtrm_amount": "310744963258"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentFinancialLiabilities",
+        "account_nm": "장기금융부채",
+        "thstrm_amount": "229081042937",
+        "frmtrm_amount": "229724978603"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "dart_OperatingIncomeLoss",
+        "account_nm": "영업이익",
+        "thstrm_amount": "60812964839",
+        "thstrm_add_amount": "112159260064",
+        "frmtrm_q_amount": "46712160025",
+        "frmtrm_add_amount": "92165398818"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "dart_TotalSellingGeneralAdministrativeExpenses",
+        "account_nm": "판매비와관리비",
+        "thstrm_amount": "52042451582",
+        "thstrm_add_amount": "105528147388",
+        "frmtrm_q_amount": "65306349432",
+        "frmtrm_add_amount": "120443983755"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_CostOfSales",
+        "account_nm": "매출원가",
+        "thstrm_amount": "510705203028",
+        "thstrm_add_amount": "994447347733",
+        "frmtrm_q_amount": "439434714351",
+        "frmtrm_add_amount": "865646037746"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_GrossProfit",
+        "account_nm": "매출총이익",
+        "thstrm_amount": "112855416421",
+        "thstrm_add_amount": "217687407452",
+        "frmtrm_q_amount": "112018509457",
+        "frmtrm_add_amount": "212609382573"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "반기순이익",
+        "thstrm_amount": "21838012255",
+        "thstrm_add_amount": "32466948646",
+        "frmtrm_q_amount": "35296879567",
+        "frmtrm_add_amount": "54914817116"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 당기순이익(손실)",
+        "thstrm_amount": "20926993078",
+        "thstrm_add_amount": "29057795209",
+        "frmtrm_q_amount": "33639001029",
+        "frmtrm_add_amount": "52876449416"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossBeforeTax",
+        "account_nm": "법인세비용차감전순이익(손실)",
+        "thstrm_amount": "26398053907",
+        "thstrm_add_amount": "51606056018",
+        "frmtrm_q_amount": "51742865375",
+        "frmtrm_add_amount": "85617506155"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_Revenue",
+        "account_nm": "매출액",
+        "thstrm_amount": "623560619449",
+        "thstrm_add_amount": "1212134755185",
+        "frmtrm_q_amount": "551453223808",
+        "frmtrm_add_amount": "1078255420319"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInFinancingActivities",
+        "account_nm": "재무활동현금흐름",
+        "thstrm_amount": "61701662248",
+        "frmtrm_q_amount": "57142116804"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromBonds",
+        "account_nm": "사채의 증가",
+        "thstrm_amount": "20000000000"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromLongTermBorrowings",
+        "account_nm": "장기차입금의 증가",
+        "thstrm_amount": "34215554860",
+        "frmtrm_q_amount": "33401180198"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromShortTermBorrowings",
+        "account_nm": "단기차입금의 증가",
+        "thstrm_amount": "277148083560",
+        "frmtrm_q_amount": "196453888917"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfShortTermBorrowings",
+        "account_nm": "단기차입금의 상환",
+        "thstrm_amount": "223941560000",
+        "frmtrm_q_amount": "150587375620"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_DividendsPaidClassifiedAsFinancingActivities",
+        "account_nm": "배당금지급",
+        "thstrm_amount": "26095022600",
+        "frmtrm_q_amount": "5672831000"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_RepaymentsOfCurrentBorrowings",
+        "account_nm": "유동성장기차입금및사채의 상환",
+        "thstrm_amount": "10852071795",
+        "frmtrm_q_amount": "9130708904"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInInvestingActivities",
+        "account_nm": "투자활동현금흐름",
+        "thstrm_amount": "-81664241498",
+        "frmtrm_q_amount": "-55866641116"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "account_nm": "유형자산의 취득",
+        "thstrm_amount": "82472269385",
+        "frmtrm_q_amount": "70263101397"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInOperatingActivities",
+        "account_nm": "영업활동현금흐름",
+        "thstrm_amount": "-6481064807",
+        "frmtrm_q_amount": "43903389269"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "dart_AdjustmentsForInterestExpenses",
+        "account_nm": "이자비용 조정",
+        "thstrm_amount": "23279297503",
+        "frmtrm_q_amount": "22468111585"
+      },
+      {
+        "rcept_no": "20250814000437",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "반기순이익",
+        "thstrm_amount": "21838012255",
+        "frmtrm_q_amount": "35296879567"
+      }
+    ],
+    "2025-11013": [
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Assets",
+        "account_nm": "자산총계",
+        "thstrm_amount": "2047066936963",
+        "frmtrm_amount": "1933713489313"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentAssets",
+        "account_nm": "유동자산",
+        "thstrm_amount": "1029087920236",
+        "frmtrm_amount": "940910911301"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CashAndCashEquivalents",
+        "account_nm": "현금및현금성자산",
+        "thstrm_amount": "260266901664",
+        "frmtrm_amount": "256411937856"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentTradeReceivables",
+        "account_nm": "매출채권",
+        "thstrm_amount": "428975120615",
+        "frmtrm_amount": "349166438038"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Inventories",
+        "account_nm": "재고자산",
+        "thstrm_amount": "254515709956",
+        "frmtrm_amount": "257029474049"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentAssets",
+        "account_nm": "비유동자산",
+        "thstrm_amount": "1017979016727",
+        "frmtrm_amount": "991210588243"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Equity",
+        "account_nm": "자본총계",
+        "thstrm_amount": "493011590400",
+        "frmtrm_amount": "508810486465"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_EquityAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 지분",
+        "thstrm_amount": "437651357398",
+        "frmtrm_amount": "473397931954"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentLiabilities",
+        "account_nm": "유동부채",
+        "thstrm_amount": "1259784329389",
+        "frmtrm_amount": "1114158039590"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentFinancialLiabilities",
+        "account_nm": "단기금융부채",
+        "thstrm_amount": "766154345811",
+        "frmtrm_amount": "609382334585"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Liabilities",
+        "account_nm": "부채총계",
+        "thstrm_amount": "1554055346563",
+        "frmtrm_amount": "1424903002848"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentLiabilities",
+        "account_nm": "비유동부채",
+        "thstrm_amount": "294271017174",
+        "frmtrm_amount": "310744963258"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentFinancialLiabilities",
+        "account_nm": "장기금융부채",
+        "thstrm_amount": "214640116034",
+        "frmtrm_amount": "229724978603"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "dart_OperatingIncomeLoss",
+        "account_nm": "영업이익",
+        "thstrm_amount": "51346295225",
+        "thstrm_add_amount": "51346295225",
+        "frmtrm_q_amount": "45453238793",
+        "frmtrm_add_amount": "45453238793"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "dart_TotalSellingGeneralAdministrativeExpenses",
+        "account_nm": "판매비와관리비",
+        "thstrm_amount": "53485695806",
+        "thstrm_add_amount": "53485695806",
+        "frmtrm_q_amount": "55137634323",
+        "frmtrm_add_amount": "55137634323"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_CostOfSales",
+        "account_nm": "매출원가",
+        "thstrm_amount": "483742144705",
+        "thstrm_add_amount": "483742144705",
+        "frmtrm_q_amount": "426211323395",
+        "frmtrm_add_amount": "426211323395"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_GrossProfit",
+        "account_nm": "매출총이익",
+        "thstrm_amount": "104831991031",
+        "thstrm_add_amount": "104831991031",
+        "frmtrm_q_amount": "100590873116",
+        "frmtrm_add_amount": "100590873116"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "10628936391",
+        "thstrm_add_amount": "10628936391",
+        "frmtrm_q_amount": "19617937549",
+        "frmtrm_add_amount": "19617937549"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 당기순이익(손실)",
+        "thstrm_amount": "8130802131",
+        "thstrm_add_amount": "8130802131",
+        "frmtrm_q_amount": "19237448387",
+        "frmtrm_add_amount": "19237448387"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossBeforeTax",
+        "account_nm": "법인세비용차감전순이익(손실)",
+        "thstrm_amount": "25208002111",
+        "thstrm_add_amount": "25208002111",
+        "frmtrm_q_amount": "33874640780",
+        "frmtrm_add_amount": "33874640780"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_Revenue",
+        "account_nm": "매출액",
+        "thstrm_amount": "588574135736",
+        "thstrm_add_amount": "588574135736",
+        "frmtrm_q_amount": "526802196511",
+        "frmtrm_add_amount": "526802196511"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInFinancingActivities",
+        "account_nm": "재무활동현금흐름",
+        "thstrm_amount": "9102259051",
+        "frmtrm_q_amount": "7158802321"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromLongTermBorrowings",
+        "account_nm": "장기차입금의 증가",
+        "thstrm_amount": "6656873904",
+        "frmtrm_q_amount": "12544801416"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromShortTermBorrowings",
+        "account_nm": "단기차입금의 증가",
+        "thstrm_amount": "101581100000",
+        "frmtrm_q_amount": "99623152973"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfShortTermBorrowings",
+        "account_nm": "단기차입금의 상환",
+        "thstrm_amount": "89700230000",
+        "frmtrm_q_amount": "95495173120"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_RepaymentsOfCurrentBorrowings",
+        "account_nm": "유동성장기차입금및사채의 상환",
+        "thstrm_amount": "5390256418",
+        "frmtrm_q_amount": "5073659958"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInInvestingActivities",
+        "account_nm": "투자활동현금흐름",
+        "thstrm_amount": "-33046951707",
+        "frmtrm_q_amount": "-8983687926"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "account_nm": "유형자산의 취득",
+        "thstrm_amount": "33169294488",
+        "frmtrm_q_amount": "22858624133"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInOperatingActivities",
+        "account_nm": "영업활동현금흐름",
+        "thstrm_amount": "27814081026",
+        "frmtrm_q_amount": "14789098794"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "dart_AdjustmentsForInterestExpenses",
+        "account_nm": "이자비용 조정",
+        "thstrm_amount": "11500749244",
+        "frmtrm_q_amount": "11008792063"
+      },
+      {
+        "rcept_no": "20250514001171",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "10628936391",
+        "frmtrm_q_amount": "19617937549"
+      }
+    ],
+    "2025-11014": [
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Assets",
+        "account_nm": "자산총계",
+        "thstrm_amount": "2056508762657",
+        "frmtrm_amount": "1933713489313"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentAssets",
+        "account_nm": "유동자산",
+        "thstrm_amount": "985852782083",
+        "frmtrm_amount": "940910911301"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CashAndCashEquivalents",
+        "account_nm": "현금및현금성자산",
+        "thstrm_amount": "206014619941",
+        "frmtrm_amount": "256411937856"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentTradeReceivables",
+        "account_nm": "매출채권",
+        "thstrm_amount": "432968200754",
+        "frmtrm_amount": "349166438038"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Inventories",
+        "account_nm": "재고자산",
+        "thstrm_amount": "252977368148",
+        "frmtrm_amount": "257029474049"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentAssets",
+        "account_nm": "비유동자산",
+        "thstrm_amount": "1070655980574",
+        "frmtrm_amount": "991210588243"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Equity",
+        "account_nm": "자본총계",
+        "thstrm_amount": "506648656095",
+        "frmtrm_amount": "508810486465"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_EquityAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 지분",
+        "thstrm_amount": "457376993955",
+        "frmtrm_amount": "473397931954"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentLiabilities",
+        "account_nm": "유동부채",
+        "thstrm_amount": "1262212717567",
+        "frmtrm_amount": "1114158039590"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentFinancialLiabilities",
+        "account_nm": "단기금융부채",
+        "thstrm_amount": "823308775432",
+        "frmtrm_amount": "609382334585"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Liabilities",
+        "account_nm": "부채총계",
+        "thstrm_amount": "1549860106562",
+        "frmtrm_amount": "1424903002848"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentLiabilities",
+        "account_nm": "비유동부채",
+        "thstrm_amount": "287647388995",
+        "frmtrm_amount": "310744963258"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentFinancialLiabilities",
+        "account_nm": "장기금융부채",
+        "thstrm_amount": "203112749111",
+        "frmtrm_amount": "229724978603"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "dart_OperatingIncomeLoss",
+        "account_nm": "영업이익",
+        "thstrm_amount": "42726679740",
+        "thstrm_add_amount": "154885939804",
+        "frmtrm_q_amount": "43413150653",
+        "frmtrm_add_amount": "135578549471"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "dart_TotalSellingGeneralAdministrativeExpenses",
+        "account_nm": "판매비와관리비",
+        "thstrm_amount": "54703925873",
+        "thstrm_add_amount": "160232073261",
+        "frmtrm_q_amount": "54196255245",
+        "frmtrm_add_amount": "174640239000"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_CostOfSales",
+        "account_nm": "매출원가",
+        "thstrm_amount": "488186067336",
+        "thstrm_add_amount": "1482633415069",
+        "frmtrm_q_amount": "432222477185",
+        "frmtrm_add_amount": "1297868514931"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_GrossProfit",
+        "account_nm": "매출총이익",
+        "thstrm_amount": "97430605613",
+        "thstrm_add_amount": "315118013065",
+        "frmtrm_q_amount": "97609405898",
+        "frmtrm_add_amount": "310218788471"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "10664706367",
+        "thstrm_add_amount": "43131655013",
+        "frmtrm_q_amount": "20617886638",
+        "frmtrm_add_amount": "75532703754"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 당기순이익(손실)",
+        "thstrm_amount": "8955258212",
+        "thstrm_add_amount": "38013053421",
+        "frmtrm_q_amount": "21055113012",
+        "frmtrm_add_amount": "73931562428"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossBeforeTax",
+        "account_nm": "법인세비용차감전순이익(손실)",
+        "thstrm_amount": "40016924377",
+        "thstrm_add_amount": "91622980395",
+        "frmtrm_q_amount": "22570186662",
+        "frmtrm_add_amount": "108187692817"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_Revenue",
+        "account_nm": "매출액",
+        "thstrm_amount": "585616672949",
+        "thstrm_add_amount": "1797751428134",
+        "frmtrm_q_amount": "529831883083",
+        "frmtrm_add_amount": "1608087303402"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInFinancingActivities",
+        "account_nm": "재무활동현금흐름",
+        "thstrm_amount": "45106777960",
+        "frmtrm_q_amount": "72222849360"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromBonds",
+        "account_nm": "사채의 증가",
+        "thstrm_amount": "20000000000",
+        "frmtrm_q_amount": "18214600000"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromLongTermBorrowings",
+        "account_nm": "장기차입금의 증가",
+        "thstrm_amount": "41197226311",
+        "frmtrm_q_amount": "37308202293"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromShortTermBorrowings",
+        "account_nm": "단기차입금의 증가",
+        "thstrm_amount": "381572206880",
+        "frmtrm_q_amount": "307033286487"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfLongTermBorrowings",
+        "account_nm": "유동성장기차입금및사채의 상환",
+        "thstrm_amount": "22721210701",
+        "frmtrm_q_amount": "30863253880"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfShortTermBorrowings",
+        "account_nm": "단기차입금의 상환",
+        "thstrm_amount": "334396320000",
+        "frmtrm_q_amount": "240998670137"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_DividendsPaidClassifiedAsFinancingActivities",
+        "account_nm": "배당금지급",
+        "thstrm_amount": "26095022600",
+        "frmtrm_q_amount": "5672831000"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInInvestingActivities",
+        "account_nm": "투자활동현금흐름",
+        "thstrm_amount": "-142992533345",
+        "frmtrm_q_amount": "-109998265399"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "account_nm": "유형자산의 취득",
+        "thstrm_amount": "140065824616",
+        "frmtrm_q_amount": "107905445256"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInOperatingActivities",
+        "account_nm": "영업활동현금흐름",
+        "thstrm_amount": "51760268734",
+        "frmtrm_q_amount": "-18318762720"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "dart_AdjustmentsForInterestExpenses",
+        "account_nm": "이자비용 조정",
+        "thstrm_amount": "35002345361",
+        "frmtrm_q_amount": "34333693112"
+      },
+      {
+        "rcept_no": "20251113000556",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "10664706367",
+        "frmtrm_q_amount": "20617886638"
+      }
+    ],
+    "2026-11011": null,
+    "2026-11012": [
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Assets",
+        "account_nm": "자산총계",
+        "thstrm_amount": "2672145318030",
+        "frmtrm_amount": "2125418400005"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentAssets",
+        "account_nm": "유동 자산",
+        "thstrm_amount": "1355509045024",
+        "frmtrm_amount": "975063355487"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CashAndCashEquivalents",
+        "account_nm": "현금및현금성자산",
+        "thstrm_amount": "336726180991",
+        "frmtrm_amount": "192279928597"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentTradeReceivables",
+        "account_nm": "매출채권",
+        "thstrm_amount": "555877800225",
+        "frmtrm_amount": "426885433744"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Inventories",
+        "account_nm": "재고자산",
+        "thstrm_amount": "376850210044",
+        "frmtrm_amount": "270823198801"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentAssets",
+        "account_nm": "비유동 자산",
+        "thstrm_amount": "1316636273006",
+        "frmtrm_amount": "1150390468292"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Equity",
+        "account_nm": "자본총계",
+        "thstrm_amount": "710417732403",
+        "frmtrm_amount": "612343808452"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_EquityAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 지분",
+        "thstrm_amount": "646593121770",
+        "frmtrm_amount": "558159240881"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentLiabilities",
+        "account_nm": "유동 부채",
+        "thstrm_amount": "1504357259079",
+        "frmtrm_amount": "1201480558675"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentFinancialLiabilities",
+        "account_nm": "단기금융부채",
+        "thstrm_amount": "901001524807",
+        "frmtrm_amount": "772272966210"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Liabilities",
+        "account_nm": "부채총계",
+        "thstrm_amount": "1961727585627",
+        "frmtrm_amount": "1513074591553"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentLiabilities",
+        "account_nm": "비유동 부채",
+        "thstrm_amount": "457370326548",
+        "frmtrm_amount": "311594032878"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentFinancialLiabilities",
+        "account_nm": "장기금융부채",
+        "thstrm_amount": "371339626648",
+        "frmtrm_amount": "230009580903"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "dart_OperatingIncomeLoss",
+        "account_nm": "영업이익",
+        "thstrm_amount": "73735296100",
+        "thstrm_add_amount": "126766276730",
+        "frmtrm_q_amount": "60812964839",
+        "frmtrm_add_amount": "112159260064"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "dart_TotalSellingGeneralAdministrativeExpenses",
+        "account_nm": "판매비와관리비",
+        "thstrm_amount": "68750407479",
+        "thstrm_add_amount": "130732450353",
+        "frmtrm_q_amount": "52042451582",
+        "frmtrm_add_amount": "105528147388"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_CostOfSales",
+        "account_nm": "매출원가",
+        "thstrm_amount": "652405499967",
+        "thstrm_add_amount": "1219415802045",
+        "frmtrm_q_amount": "510705203028",
+        "frmtrm_add_amount": "994447347733"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_GrossProfit",
+        "account_nm": "매출총이익",
+        "thstrm_amount": "142485703579",
+        "thstrm_add_amount": "257498727083",
+        "frmtrm_q_amount": "112855416421",
+        "frmtrm_add_amount": "217687407452"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "50008710862",
+        "thstrm_add_amount": "93815190150",
+        "frmtrm_q_amount": "21838012255",
+        "frmtrm_add_amount": "32466948646"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 당기순이익(손실)",
+        "thstrm_amount": "48691974414",
+        "thstrm_add_amount": "90267558119",
+        "frmtrm_q_amount": "20926993078",
+        "frmtrm_add_amount": "29057795209"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossBeforeTax",
+        "account_nm": "법인세비용차감전순이익(손실)",
+        "thstrm_amount": "64744694109",
+        "thstrm_add_amount": "120159942536",
+        "frmtrm_q_amount": "26398053907",
+        "frmtrm_add_amount": "51606056018"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_Revenue",
+        "account_nm": "매출액",
+        "thstrm_amount": "794891203546",
+        "thstrm_add_amount": "1476914529128",
+        "frmtrm_q_amount": "623560619449",
+        "frmtrm_add_amount": "1212134755185"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInFinancingActivities",
+        "account_nm": "재무활동현금흐름",
+        "thstrm_amount": "167027392506",
+        "frmtrm_q_amount": "61701662248"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromBonds",
+        "account_nm": "사채의 증가",
+        "thstrm_amount": "0",
+        "frmtrm_q_amount": "20000000000"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromLongTermBorrowings",
+        "account_nm": "장기차입금의 증가",
+        "thstrm_amount": "144163639050",
+        "frmtrm_q_amount": "34215554860"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromShortTermBorrowings",
+        "account_nm": "단기차입금의 증가",
+        "thstrm_amount": "338103594443",
+        "frmtrm_q_amount": "277148083560"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfLongTermBorrowings",
+        "account_nm": "유동성장기차입금및사채의 상환",
+        "thstrm_amount": "33200843600",
+        "frmtrm_q_amount": "10852071795"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfShortTermBorrowings",
+        "account_nm": "단기차입금의 상환",
+        "thstrm_amount": "234225029132",
+        "frmtrm_q_amount": "223941560000"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_DividendsPaidClassifiedAsFinancingActivities",
+        "account_nm": "배당금 지급",
+        "thstrm_amount": "37440684600",
+        "frmtrm_q_amount": "26095022600"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInInvestingActivities",
+        "account_nm": "투자활동현금흐름",
+        "thstrm_amount": "-102426260790",
+        "frmtrm_q_amount": "-81664241498"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "account_nm": "유형자산의 취득",
+        "thstrm_amount": "122275383176",
+        "frmtrm_q_amount": "82472269385"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInOperatingActivities",
+        "account_nm": "영업활동현금흐름",
+        "thstrm_amount": "62963722657",
+        "frmtrm_q_amount": "-6481064807"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "dart_AdjustmentsForInterestExpenses",
+        "account_nm": "이자비용 조정",
+        "thstrm_amount": "26034336687",
+        "frmtrm_q_amount": "23279297503"
+      },
+      {
+        "rcept_no": "20260813001436",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "50008710862",
+        "frmtrm_q_amount": "21838012255"
+      }
+    ],
+    "2026-11013": [
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Assets",
+        "account_nm": "자산총계",
+        "thstrm_amount": "2516016008103",
+        "frmtrm_amount": "2125418400005"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentAssets",
+        "account_nm": "유동자산",
+        "thstrm_amount": "1265343529775",
+        "frmtrm_amount": "975063355487"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CashAndCashEquivalents",
+        "account_nm": "현금및현금성자산",
+        "thstrm_amount": "369319810991",
+        "frmtrm_amount": "192279928597"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentTradeReceivables",
+        "account_nm": "매출채권",
+        "thstrm_amount": "504067155723",
+        "frmtrm_amount": "426885433744"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Inventories",
+        "account_nm": "재고자산",
+        "thstrm_amount": "294261142115",
+        "frmtrm_amount": "270823198801"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentAssets",
+        "account_nm": "비유동자산",
+        "thstrm_amount": "1250672478328",
+        "frmtrm_amount": "1150390468292"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Equity",
+        "account_nm": "자본총계",
+        "thstrm_amount": "645788773845",
+        "frmtrm_amount": "612343808452"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_EquityAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 지분",
+        "thstrm_amount": "585583983673",
+        "frmtrm_amount": "558159240881"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentLiabilities",
+        "account_nm": "유동부채",
+        "thstrm_amount": "1480469753863",
+        "frmtrm_amount": "1201480558675"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_CurrentFinancialLiabilities",
+        "account_nm": "단기금융부채",
+        "thstrm_amount": "928924813985",
+        "frmtrm_amount": "772272966210"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_Liabilities",
+        "account_nm": "부채총계",
+        "thstrm_amount": "1870227234258",
+        "frmtrm_amount": "1513074591553"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentLiabilities",
+        "account_nm": "비유동부채",
+        "thstrm_amount": "389757480395",
+        "frmtrm_amount": "311594032878"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "BS",
+        "account_id": "ifrs-full_NoncurrentFinancialLiabilities",
+        "account_nm": "장기금융부채",
+        "thstrm_amount": "305696925755",
+        "frmtrm_amount": "230009580903"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "dart_OperatingIncomeLoss",
+        "account_nm": "영업이익",
+        "thstrm_amount": "53030980630",
+        "thstrm_add_amount": "53030980630",
+        "frmtrm_q_amount": "51346295225",
+        "frmtrm_add_amount": "51346295225"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "dart_TotalSellingGeneralAdministrativeExpenses",
+        "account_nm": "판매비와관리비",
+        "thstrm_amount": "61982042874",
+        "thstrm_add_amount": "61982042874",
+        "frmtrm_q_amount": "53485695806",
+        "frmtrm_add_amount": "53485695806"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_CostOfSales",
+        "account_nm": "매출원가",
+        "thstrm_amount": "567010302078",
+        "thstrm_add_amount": "567010302078",
+        "frmtrm_q_amount": "483742144705",
+        "frmtrm_add_amount": "483742144705"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_GrossProfit",
+        "account_nm": "매출총이익",
+        "thstrm_amount": "115013023504",
+        "thstrm_add_amount": "115013023504",
+        "frmtrm_q_amount": "104831991031",
+        "frmtrm_add_amount": "104831991031"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "43806479288",
+        "thstrm_add_amount": "43806479288",
+        "frmtrm_q_amount": "10628936391",
+        "frmtrm_add_amount": "10628936391"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossAttributableToOwnersOfParent",
+        "account_nm": "지배기업의 소유주에게 귀속되는 당기순이익(손실)",
+        "thstrm_amount": "41575583705",
+        "thstrm_add_amount": "41575583705",
+        "frmtrm_q_amount": "8130802131",
+        "frmtrm_add_amount": "8130802131"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_ProfitLossBeforeTax",
+        "account_nm": "법인세비용차감전순이익(손실)",
+        "thstrm_amount": "55415248427",
+        "thstrm_add_amount": "55415248427",
+        "frmtrm_q_amount": "25208002111",
+        "frmtrm_add_amount": "25208002111"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CIS",
+        "account_id": "ifrs-full_Revenue",
+        "account_nm": "매출액",
+        "thstrm_amount": "682023325582",
+        "thstrm_add_amount": "682023325582",
+        "frmtrm_q_amount": "588574135736",
+        "frmtrm_add_amount": "588574135736"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInFinancingActivities",
+        "account_nm": "재무활동현금흐름",
+        "thstrm_amount": "143226085620",
+        "frmtrm_q_amount": "9102259051"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromLongTermBorrowings",
+        "account_nm": "장기차입금의 증가",
+        "thstrm_amount": "87299345553",
+        "frmtrm_q_amount": "6656873904"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "dart_ProceedsFromShortTermBorrowings",
+        "account_nm": "단기차입금의 증가",
+        "thstrm_amount": "211579751183",
+        "frmtrm_q_amount": "101581100000"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfLongTermBorrowings",
+        "account_nm": "유동성장기차입금및사채의 상환",
+        "thstrm_amount": "26976740585",
+        "frmtrm_q_amount": "5390256418"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "dart_RepaymentsOfShortTermBorrowings",
+        "account_nm": "단기차입금의 상환",
+        "thstrm_amount": "122790312649",
+        "frmtrm_q_amount": "89700230000"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInInvestingActivities",
+        "account_nm": "투자활동현금흐름",
+        "thstrm_amount": "-77523098522",
+        "frmtrm_q_amount": "-33046951707"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+        "account_nm": "유형자산의 취득",
+        "thstrm_amount": "83465383956",
+        "frmtrm_q_amount": "33169294488"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_CashFlowsFromUsedInOperatingActivities",
+        "account_nm": "영업활동현금흐름",
+        "thstrm_amount": "99673641158",
+        "frmtrm_q_amount": "27814081026"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "dart_AdjustmentsForInterestExpenses",
+        "account_nm": "이자비용 조정",
+        "thstrm_amount": "12198544287",
+        "frmtrm_q_amount": "11500749244"
+      },
+      {
+        "rcept_no": "20260514000806",
+        "sj_div": "CF",
+        "account_id": "ifrs-full_ProfitLoss",
+        "account_nm": "당기순이익(손실)",
+        "thstrm_amount": "43806479288",
+        "frmtrm_q_amount": "10628936391"
+      }
+    ],
+    "2026-11014": null
+  },
+  "candles": [
+    {
+      "stck_bsop_date": "20250929",
+      "stck_oprc": "228500",
+      "stck_hgpr": "232500",
+      "stck_lwpr": "226500",
+      "stck_clpr": "228000",
+      "acml_vol": "55914",
+      "acml_tr_pbmn": "12823290980"
+    },
+    {
+      "stck_bsop_date": "20250930",
+      "stck_oprc": "228500",
+      "stck_hgpr": "228500",
+      "stck_lwpr": "211000",
+      "stck_clpr": "214500",
+      "acml_vol": "199528",
+      "acml_tr_pbmn": "43425610000"
+    },
+    {
+      "stck_bsop_date": "20251001",
+      "stck_oprc": "216500",
+      "stck_hgpr": "217000",
+      "stck_lwpr": "208500",
+      "stck_clpr": "209000",
+      "acml_vol": "142571",
+      "acml_tr_pbmn": "30133385000"
+    },
+    {
+      "stck_bsop_date": "20251002",
+      "stck_oprc": "210000",
+      "stck_hgpr": "212000",
+      "stck_lwpr": "203500",
+      "stck_clpr": "212000",
+      "acml_vol": "133199",
+      "acml_tr_pbmn": "27737454500"
+    },
+    {
+      "stck_bsop_date": "20251010",
+      "stck_oprc": "207500",
+      "stck_hgpr": "208000",
+      "stck_lwpr": "201500",
+      "stck_clpr": "204500",
+      "acml_vol": "96860",
+      "acml_tr_pbmn": "19732412750"
+    },
+    {
+      "stck_bsop_date": "20251013",
+      "stck_oprc": "201000",
+      "stck_hgpr": "206500",
+      "stck_lwpr": "200500",
+      "stck_clpr": "204000",
+      "acml_vol": "78014",
+      "acml_tr_pbmn": "15838407250"
+    },
+    {
+      "stck_bsop_date": "20251014",
+      "stck_oprc": "202000",
+      "stck_hgpr": "204000",
+      "stck_lwpr": "196600",
+      "stck_clpr": "198700",
+      "acml_vol": "77875",
+      "acml_tr_pbmn": "15547047900"
+    },
+    {
+      "stck_bsop_date": "20251015",
+      "stck_oprc": "200500",
+      "stck_hgpr": "203000",
+      "stck_lwpr": "199600",
+      "stck_clpr": "203000",
+      "acml_vol": "59653",
+      "acml_tr_pbmn": "12048948800"
+    },
+    {
+      "stck_bsop_date": "20251016",
+      "stck_oprc": "204500",
+      "stck_hgpr": "205500",
+      "stck_lwpr": "201000",
+      "stck_clpr": "202000",
+      "acml_vol": "62172",
+      "acml_tr_pbmn": "12581659500"
+    },
+    {
+      "stck_bsop_date": "20251017",
+      "stck_oprc": "200000",
+      "stck_hgpr": "201500",
+      "stck_lwpr": "197700",
+      "stck_clpr": "199400",
+      "acml_vol": "55247",
+      "acml_tr_pbmn": "11016688100"
+    },
+    {
+      "stck_bsop_date": "20251020",
+      "stck_oprc": "201500",
+      "stck_hgpr": "210000",
+      "stck_lwpr": "200000",
+      "stck_clpr": "209500",
+      "acml_vol": "76137",
+      "acml_tr_pbmn": "15764905250"
+    },
+    {
+      "stck_bsop_date": "20251021",
+      "stck_oprc": "211000",
+      "stck_hgpr": "211500",
+      "stck_lwpr": "204500",
+      "stck_clpr": "206500",
+      "acml_vol": "87714",
+      "acml_tr_pbmn": "18106573750"
+    },
+    {
+      "stck_bsop_date": "20251022",
+      "stck_oprc": "207500",
+      "stck_hgpr": "210500",
+      "stck_lwpr": "206000",
+      "stck_clpr": "208500",
+      "acml_vol": "49777",
+      "acml_tr_pbmn": "10358919000"
+    },
+    {
+      "stck_bsop_date": "20251023",
+      "stck_oprc": "210000",
+      "stck_hgpr": "213500",
+      "stck_lwpr": "205000",
+      "stck_clpr": "205500",
+      "acml_vol": "64228",
+      "acml_tr_pbmn": "13391326000"
+    },
+    {
+      "stck_bsop_date": "20251024",
+      "stck_oprc": "207000",
+      "stck_hgpr": "207500",
+      "stck_lwpr": "203000",
+      "stck_clpr": "204000",
+      "acml_vol": "45319",
+      "acml_tr_pbmn": "9249127500"
+    },
+    {
+      "stck_bsop_date": "20251027",
+      "stck_oprc": "203500",
+      "stck_hgpr": "206000",
+      "stck_lwpr": "200000",
+      "stck_clpr": "205000",
+      "acml_vol": "73436",
+      "acml_tr_pbmn": "14939450750"
+    },
+    {
+      "stck_bsop_date": "20251028",
+      "stck_oprc": "206500",
+      "stck_hgpr": "211500",
+      "stck_lwpr": "203500",
+      "stck_clpr": "205500",
+      "acml_vol": "140082",
+      "acml_tr_pbmn": "28904436750"
+    },
+    {
+      "stck_bsop_date": "20251029",
+      "stck_oprc": "207500",
+      "stck_hgpr": "208500",
+      "stck_lwpr": "202000",
+      "stck_clpr": "204000",
+      "acml_vol": "62382",
+      "acml_tr_pbmn": "12680522000"
+    },
+    {
+      "stck_bsop_date": "20251030",
+      "stck_oprc": "207000",
+      "stck_hgpr": "209000",
+      "stck_lwpr": "201500",
+      "stck_clpr": "202000",
+      "acml_vol": "82366",
+      "acml_tr_pbmn": "16886528250"
+    },
+    {
+      "stck_bsop_date": "20251031",
+      "stck_oprc": "203000",
+      "stck_hgpr": "206000",
+      "stck_lwpr": "201000",
+      "stck_clpr": "204500",
+      "acml_vol": "44921",
+      "acml_tr_pbmn": "9160039250"
+    },
+    {
+      "stck_bsop_date": "20251103",
+      "stck_oprc": "209000",
+      "stck_hgpr": "211500",
+      "stck_lwpr": "200500",
+      "stck_clpr": "202000",
+      "acml_vol": "93416",
+      "acml_tr_pbmn": "19046734500"
+    },
+    {
+      "stck_bsop_date": "20251104",
+      "stck_oprc": "201500",
+      "stck_hgpr": "203000",
+      "stck_lwpr": "199400",
+      "stck_clpr": "199400",
+      "acml_vol": "75652",
+      "acml_tr_pbmn": "15160325150"
+    },
+    {
+      "stck_bsop_date": "20251105",
+      "stck_oprc": "201000",
+      "stck_hgpr": "201000",
+      "stck_lwpr": "188800",
+      "stck_clpr": "195600",
+      "acml_vol": "79434",
+      "acml_tr_pbmn": "15394927100"
+    },
+    {
+      "stck_bsop_date": "20251106",
+      "stck_oprc": "197200",
+      "stck_hgpr": "198000",
+      "stck_lwpr": "189600",
+      "stck_clpr": "191600",
+      "acml_vol": "85698",
+      "acml_tr_pbmn": "16500501500"
+    },
+    {
+      "stck_bsop_date": "20251107",
+      "stck_oprc": "187800",
+      "stck_hgpr": "203000",
+      "stck_lwpr": "187700",
+      "stck_clpr": "193600",
+      "acml_vol": "106665",
+      "acml_tr_pbmn": "21003656600"
+    },
+    {
+      "stck_bsop_date": "20251110",
+      "stck_oprc": "197700",
+      "stck_hgpr": "197700",
+      "stck_lwpr": "184600",
+      "stck_clpr": "189500",
+      "acml_vol": "120630",
+      "acml_tr_pbmn": "22684849050"
+    },
+    {
+      "stck_bsop_date": "20251111",
+      "stck_oprc": "180500",
+      "stck_hgpr": "180600",
+      "stck_lwpr": "155700",
+      "stck_clpr": "155700",
+      "acml_vol": "651102",
+      "acml_tr_pbmn": "105962158200"
+    },
+    {
+      "stck_bsop_date": "20251112",
+      "stck_oprc": "156300",
+      "stck_hgpr": "159300",
+      "stck_lwpr": "155700",
+      "stck_clpr": "158000",
+      "acml_vol": "213802",
+      "acml_tr_pbmn": "33609331300"
+    },
+    {
+      "stck_bsop_date": "20251113",
+      "stck_oprc": "156800",
+      "stck_hgpr": "160800",
+      "stck_lwpr": "155300",
+      "stck_clpr": "160800",
+      "acml_vol": "144321",
+      "acml_tr_pbmn": "22973315050"
+    },
+    {
+      "stck_bsop_date": "20251114",
+      "stck_oprc": "157500",
+      "stck_hgpr": "161500",
+      "stck_lwpr": "155800",
+      "stck_clpr": "156200",
+      "acml_vol": "99824",
+      "acml_tr_pbmn": "15783255050"
+    },
+    {
+      "stck_bsop_date": "20251117",
+      "stck_oprc": "158100",
+      "stck_hgpr": "159000",
+      "stck_lwpr": "156000",
+      "stck_clpr": "158800",
+      "acml_vol": "50111",
+      "acml_tr_pbmn": "7923123650"
+    },
+    {
+      "stck_bsop_date": "20251118",
+      "stck_oprc": "157300",
+      "stck_hgpr": "159500",
+      "stck_lwpr": "155200",
+      "stck_clpr": "155800",
+      "acml_vol": "78597",
+      "acml_tr_pbmn": "12267651500"
+    },
+    {
+      "stck_bsop_date": "20251119",
+      "stck_oprc": "156200",
+      "stck_hgpr": "162800",
+      "stck_lwpr": "155500",
+      "stck_clpr": "162100",
+      "acml_vol": "172408",
+      "acml_tr_pbmn": "27677410000"
+    },
+    {
+      "stck_bsop_date": "20251120",
+      "stck_oprc": "161900",
+      "stck_hgpr": "169400",
+      "stck_lwpr": "160000",
+      "stck_clpr": "167700",
+      "acml_vol": "136354",
+      "acml_tr_pbmn": "22795470670"
+    },
+    {
+      "stck_bsop_date": "20251121",
+      "stck_oprc": "171300",
+      "stck_hgpr": "175550",
+      "stck_lwpr": "167000",
+      "stck_clpr": "174100",
+      "acml_vol": "236723",
+      "acml_tr_pbmn": "40900195596"
+    },
+    {
+      "stck_bsop_date": "20251124",
+      "stck_oprc": "174100",
+      "stck_hgpr": "174200",
+      "stck_lwpr": "165600",
+      "stck_clpr": "165600",
+      "acml_vol": "79573",
+      "acml_tr_pbmn": "13433902700"
+    },
+    {
+      "stck_bsop_date": "20251125",
+      "stck_oprc": "167500",
+      "stck_hgpr": "167600",
+      "stck_lwpr": "160000",
+      "stck_clpr": "161200",
+      "acml_vol": "57156",
+      "acml_tr_pbmn": "9321877200"
+    },
+    {
+      "stck_bsop_date": "20251126",
+      "stck_oprc": "161300",
+      "stck_hgpr": "163100",
+      "stck_lwpr": "160600",
+      "stck_clpr": "163100",
+      "acml_vol": "38652",
+      "acml_tr_pbmn": "6259586550"
+    },
+    {
+      "stck_bsop_date": "20251127",
+      "stck_oprc": "163200",
+      "stck_hgpr": "164400",
+      "stck_lwpr": "160900",
+      "stck_clpr": "161500",
+      "acml_vol": "74188",
+      "acml_tr_pbmn": "12018130000"
+    },
+    {
+      "stck_bsop_date": "20251128",
+      "stck_oprc": "162300",
+      "stck_hgpr": "167500",
+      "stck_lwpr": "162300",
+      "stck_clpr": "166000",
+      "acml_vol": "47654",
+      "acml_tr_pbmn": "7860186750"
+    },
+    {
+      "stck_bsop_date": "20251201",
+      "stck_oprc": "167400",
+      "stck_hgpr": "167400",
+      "stck_lwpr": "162100",
+      "stck_clpr": "163400",
+      "acml_vol": "46691",
+      "acml_tr_pbmn": "7656782550"
+    },
+    {
+      "stck_bsop_date": "20251202",
+      "stck_oprc": "163900",
+      "stck_hgpr": "164400",
+      "stck_lwpr": "161100",
+      "stck_clpr": "163000",
+      "acml_vol": "38763",
+      "acml_tr_pbmn": "6287548550"
+    },
+    {
+      "stck_bsop_date": "20251203",
+      "stck_oprc": "163000",
+      "stck_hgpr": "164000",
+      "stck_lwpr": "160800",
+      "stck_clpr": "163500",
+      "acml_vol": "36552",
+      "acml_tr_pbmn": "5940235200"
+    },
+    {
+      "stck_bsop_date": "20251204",
+      "stck_oprc": "163500",
+      "stck_hgpr": "165200",
+      "stck_lwpr": "161000",
+      "stck_clpr": "163100",
+      "acml_vol": "47461",
+      "acml_tr_pbmn": "7688352550"
+    },
+    {
+      "stck_bsop_date": "20251205",
+      "stck_oprc": "162400",
+      "stck_hgpr": "165700",
+      "stck_lwpr": "162400",
+      "stck_clpr": "165200",
+      "acml_vol": "53972",
+      "acml_tr_pbmn": "8867867700"
+    },
+    {
+      "stck_bsop_date": "20251208",
+      "stck_oprc": "166300",
+      "stck_hgpr": "166300",
+      "stck_lwpr": "162600",
+      "stck_clpr": "163300",
+      "acml_vol": "34321",
+      "acml_tr_pbmn": "5621030000"
+    },
+    {
+      "stck_bsop_date": "20251209",
+      "stck_oprc": "166700",
+      "stck_hgpr": "170000",
+      "stck_lwpr": "163300",
+      "stck_clpr": "164200",
+      "acml_vol": "44843",
+      "acml_tr_pbmn": "7406081700"
+    },
+    {
+      "stck_bsop_date": "20251210",
+      "stck_oprc": "165400",
+      "stck_hgpr": "165600",
+      "stck_lwpr": "161700",
+      "stck_clpr": "162300",
+      "acml_vol": "77241",
+      "acml_tr_pbmn": "12556919600"
+    },
+    {
+      "stck_bsop_date": "20251211",
+      "stck_oprc": "163900",
+      "stck_hgpr": "165400",
+      "stck_lwpr": "161000",
+      "stck_clpr": "162600",
+      "acml_vol": "79710",
+      "acml_tr_pbmn": "12965548950"
+    },
+    {
+      "stck_bsop_date": "20251212",
+      "stck_oprc": "162900",
+      "stck_hgpr": "163900",
+      "stck_lwpr": "162100",
+      "stck_clpr": "163600",
+      "acml_vol": "38264",
+      "acml_tr_pbmn": "6235557700"
+    },
+    {
+      "stck_bsop_date": "20251215",
+      "stck_oprc": "162300",
+      "stck_hgpr": "163200",
+      "stck_lwpr": "159700",
+      "stck_clpr": "161600",
+      "acml_vol": "40907",
+      "acml_tr_pbmn": "6620335850"
+    },
+    {
+      "stck_bsop_date": "20251216",
+      "stck_oprc": "161400",
+      "stck_hgpr": "171500",
+      "stck_lwpr": "160900",
+      "stck_clpr": "169900",
+      "acml_vol": "141662",
+      "acml_tr_pbmn": "23821169750"
+    },
+    {
+      "stck_bsop_date": "20251217",
+      "stck_oprc": "172000",
+      "stck_hgpr": "175500",
+      "stck_lwpr": "169000",
+      "stck_clpr": "170500",
+      "acml_vol": "89680",
+      "acml_tr_pbmn": "15293246550"
+    },
+    {
+      "stck_bsop_date": "20251218",
+      "stck_oprc": "167600",
+      "stck_hgpr": "169500",
+      "stck_lwpr": "165200",
+      "stck_clpr": "168300",
+      "acml_vol": "47403",
+      "acml_tr_pbmn": "7976449100"
+    },
+    {
+      "stck_bsop_date": "20251219",
+      "stck_oprc": "169900",
+      "stck_hgpr": "170500",
+      "stck_lwpr": "167500",
+      "stck_clpr": "168700",
+      "acml_vol": "50465",
+      "acml_tr_pbmn": "8519643850"
+    },
+    {
+      "stck_bsop_date": "20251222",
+      "stck_oprc": "170000",
+      "stck_hgpr": "170800",
+      "stck_lwpr": "168600",
+      "stck_clpr": "169300",
+      "acml_vol": "32887",
+      "acml_tr_pbmn": "5570452750"
+    },
+    {
+      "stck_bsop_date": "20251223",
+      "stck_oprc": "169500",
+      "stck_hgpr": "169800",
+      "stck_lwpr": "167700",
+      "stck_clpr": "168100",
+      "acml_vol": "22192",
+      "acml_tr_pbmn": "3738391750"
+    },
+    {
+      "stck_bsop_date": "20251224",
+      "stck_oprc": "168200",
+      "stck_hgpr": "169200",
+      "stck_lwpr": "166600",
+      "stck_clpr": "167200",
+      "acml_vol": "24125",
+      "acml_tr_pbmn": "4043139700"
+    },
+    {
+      "stck_bsop_date": "20251226",
+      "stck_oprc": "167500",
+      "stck_hgpr": "170300",
+      "stck_lwpr": "162300",
+      "stck_clpr": "162300",
+      "acml_vol": "51226",
+      "acml_tr_pbmn": "8446175950"
+    },
+    {
+      "stck_bsop_date": "20251229",
+      "stck_oprc": "162000",
+      "stck_hgpr": "165700",
+      "stck_lwpr": "161000",
+      "stck_clpr": "165700",
+      "acml_vol": "39343",
+      "acml_tr_pbmn": "6451617600"
+    },
+    {
+      "stck_bsop_date": "20251230",
+      "stck_oprc": "167000",
+      "stck_hgpr": "168600",
+      "stck_lwpr": "162100",
+      "stck_clpr": "163000",
+      "acml_vol": "62886",
+      "acml_tr_pbmn": "10299412950"
+    },
+    {
+      "stck_bsop_date": "20260102",
+      "stck_oprc": "166600",
+      "stck_hgpr": "178000",
+      "stck_lwpr": "166400",
+      "stck_clpr": "178000",
+      "acml_vol": "154699",
+      "acml_tr_pbmn": "26923472150"
+    },
+    {
+      "stck_bsop_date": "20260105",
+      "stck_oprc": "181000",
+      "stck_hgpr": "181000",
+      "stck_lwpr": "170600",
+      "stck_clpr": "173000",
+      "acml_vol": "139566",
+      "acml_tr_pbmn": "24236297200"
+    },
+    {
+      "stck_bsop_date": "20260106",
+      "stck_oprc": "175000",
+      "stck_hgpr": "178000",
+      "stck_lwpr": "173400",
+      "stck_clpr": "175800",
+      "acml_vol": "64835",
+      "acml_tr_pbmn": "11377286800"
+    },
+    {
+      "stck_bsop_date": "20260107",
+      "stck_oprc": "175800",
+      "stck_hgpr": "177400",
+      "stck_lwpr": "169800",
+      "stck_clpr": "174500",
+      "acml_vol": "103352",
+      "acml_tr_pbmn": "17759166550"
+    },
+    {
+      "stck_bsop_date": "20260108",
+      "stck_oprc": "172400",
+      "stck_hgpr": "173200",
+      "stck_lwpr": "170200",
+      "stck_clpr": "173200",
+      "acml_vol": "78877",
+      "acml_tr_pbmn": "13523468750"
+    },
+    {
+      "stck_bsop_date": "20260109",
+      "stck_oprc": "172200",
+      "stck_hgpr": "176500",
+      "stck_lwpr": "169700",
+      "stck_clpr": "174600",
+      "acml_vol": "103608",
+      "acml_tr_pbmn": "18004558850"
+    },
+    {
+      "stck_bsop_date": "20260112",
+      "stck_oprc": "174600",
+      "stck_hgpr": "174700",
+      "stck_lwpr": "168000",
+      "stck_clpr": "173100",
+      "acml_vol": "62783",
+      "acml_tr_pbmn": "10815842000"
+    },
+    {
+      "stck_bsop_date": "20260113",
+      "stck_oprc": "173900",
+      "stck_hgpr": "174000",
+      "stck_lwpr": "170800",
+      "stck_clpr": "172800",
+      "acml_vol": "50550",
+      "acml_tr_pbmn": "8673177900"
+    },
+    {
+      "stck_bsop_date": "20260114",
+      "stck_oprc": "174300",
+      "stck_hgpr": "183700",
+      "stck_lwpr": "173400",
+      "stck_clpr": "179900",
+      "acml_vol": "139232",
+      "acml_tr_pbmn": "25099641150"
+    },
+    {
+      "stck_bsop_date": "20260115",
+      "stck_oprc": "179900",
+      "stck_hgpr": "183000",
+      "stck_lwpr": "178200",
+      "stck_clpr": "181600",
+      "acml_vol": "87728",
+      "acml_tr_pbmn": "15864127900"
+    },
+    {
+      "stck_bsop_date": "20260116",
+      "stck_oprc": "181900",
+      "stck_hgpr": "188500",
+      "stck_lwpr": "179500",
+      "stck_clpr": "187300",
+      "acml_vol": "138069",
+      "acml_tr_pbmn": "25741152450"
+    },
+    {
+      "stck_bsop_date": "20260119",
+      "stck_oprc": "185700",
+      "stck_hgpr": "187300",
+      "stck_lwpr": "181300",
+      "stck_clpr": "184100",
+      "acml_vol": "103261",
+      "acml_tr_pbmn": "18985049400"
+    },
+    {
+      "stck_bsop_date": "20260120",
+      "stck_oprc": "182000",
+      "stck_hgpr": "186000",
+      "stck_lwpr": "181500",
+      "stck_clpr": "184300",
+      "acml_vol": "55087",
+      "acml_tr_pbmn": "10151646450"
+    },
+    {
+      "stck_bsop_date": "20260121",
+      "stck_oprc": "180200",
+      "stck_hgpr": "184300",
+      "stck_lwpr": "175400",
+      "stck_clpr": "184200",
+      "acml_vol": "93547",
+      "acml_tr_pbmn": "16920204550"
+    },
+    {
+      "stck_bsop_date": "20260122",
+      "stck_oprc": "184300",
+      "stck_hgpr": "198800",
+      "stck_lwpr": "183100",
+      "stck_clpr": "193000",
+      "acml_vol": "184730",
+      "acml_tr_pbmn": "35641348750"
+    },
+    {
+      "stck_bsop_date": "20260123",
+      "stck_oprc": "195700",
+      "stck_hgpr": "196500",
+      "stck_lwpr": "189700",
+      "stck_clpr": "193800",
+      "acml_vol": "80012",
+      "acml_tr_pbmn": "15430971200"
+    },
+    {
+      "stck_bsop_date": "20260126",
+      "stck_oprc": "194500",
+      "stck_hgpr": "195900",
+      "stck_lwpr": "189400",
+      "stck_clpr": "189900",
+      "acml_vol": "70718",
+      "acml_tr_pbmn": "13509327200"
+    },
+    {
+      "stck_bsop_date": "20260127",
+      "stck_oprc": "190000",
+      "stck_hgpr": "191000",
+      "stck_lwpr": "187000",
+      "stck_clpr": "189400",
+      "acml_vol": "61879",
+      "acml_tr_pbmn": "11700744100"
+    },
+    {
+      "stck_bsop_date": "20260128",
+      "stck_oprc": "192100",
+      "stck_hgpr": "195200",
+      "stck_lwpr": "190900",
+      "stck_clpr": "195000",
+      "acml_vol": "91208",
+      "acml_tr_pbmn": "17679601700"
+    },
+    {
+      "stck_bsop_date": "20260129",
+      "stck_oprc": "193900",
+      "stck_hgpr": "199900",
+      "stck_lwpr": "192900",
+      "stck_clpr": "198700",
+      "acml_vol": "108057",
+      "acml_tr_pbmn": "21303793600"
+    },
+    {
+      "stck_bsop_date": "20260130",
+      "stck_oprc": "197600",
+      "stck_hgpr": "206500",
+      "stck_lwpr": "196500",
+      "stck_clpr": "202500",
+      "acml_vol": "150037",
+      "acml_tr_pbmn": "30535226800"
+    },
+    {
+      "stck_bsop_date": "20260202",
+      "stck_oprc": "202000",
+      "stck_hgpr": "202500",
+      "stck_lwpr": "187100",
+      "stck_clpr": "189400",
+      "acml_vol": "88233",
+      "acml_tr_pbmn": "17072141550"
+    },
+    {
+      "stck_bsop_date": "20260203",
+      "stck_oprc": "194000",
+      "stck_hgpr": "194900",
+      "stck_lwpr": "187500",
+      "stck_clpr": "194900",
+      "acml_vol": "72383",
+      "acml_tr_pbmn": "13820672350"
+    },
+    {
+      "stck_bsop_date": "20260204",
+      "stck_oprc": "192500",
+      "stck_hgpr": "198500",
+      "stck_lwpr": "190300",
+      "stck_clpr": "191900",
+      "acml_vol": "57104",
+      "acml_tr_pbmn": "10998031000"
+    },
+    {
+      "stck_bsop_date": "20260205",
+      "stck_oprc": "192000",
+      "stck_hgpr": "201500",
+      "stck_lwpr": "191500",
+      "stck_clpr": "196800",
+      "acml_vol": "121572",
+      "acml_tr_pbmn": "24007224250"
+    },
+    {
+      "stck_bsop_date": "20260206",
+      "stck_oprc": "196400",
+      "stck_hgpr": "205500",
+      "stck_lwpr": "186000",
+      "stck_clpr": "198200",
+      "acml_vol": "107532",
+      "acml_tr_pbmn": "21266628300"
+    },
+    {
+      "stck_bsop_date": "20260209",
+      "stck_oprc": "198300",
+      "stck_hgpr": "209000",
+      "stck_lwpr": "198300",
+      "stck_clpr": "207500",
+      "acml_vol": "104788",
+      "acml_tr_pbmn": "21620578350"
+    },
+    {
+      "stck_bsop_date": "20260210",
+      "stck_oprc": "207000",
+      "stck_hgpr": "209500",
+      "stck_lwpr": "204500",
+      "stck_clpr": "207500",
+      "acml_vol": "52893",
+      "acml_tr_pbmn": "10935485750"
+    },
+    {
+      "stck_bsop_date": "20260211",
+      "stck_oprc": "206500",
+      "stck_hgpr": "207500",
+      "stck_lwpr": "202500",
+      "stck_clpr": "203000",
+      "acml_vol": "34831",
+      "acml_tr_pbmn": "7104775000"
+    },
+    {
+      "stck_bsop_date": "20260212",
+      "stck_oprc": "203500",
+      "stck_hgpr": "209000",
+      "stck_lwpr": "199900",
+      "stck_clpr": "209000",
+      "acml_vol": "77683",
+      "acml_tr_pbmn": "15806744000"
+    },
+    {
+      "stck_bsop_date": "20260213",
+      "stck_oprc": "203500",
+      "stck_hgpr": "206000",
+      "stck_lwpr": "200000",
+      "stck_clpr": "203000",
+      "acml_vol": "48517",
+      "acml_tr_pbmn": "9840074750"
+    },
+    {
+      "stck_bsop_date": "20260219",
+      "stck_oprc": "200000",
+      "stck_hgpr": "204000",
+      "stck_lwpr": "196200",
+      "stck_clpr": "200000",
+      "acml_vol": "84915",
+      "acml_tr_pbmn": "16884898850"
+    },
+    {
+      "stck_bsop_date": "20260220",
+      "stck_oprc": "199000",
+      "stck_hgpr": "200500",
+      "stck_lwpr": "193400",
+      "stck_clpr": "194800",
+      "acml_vol": "103088",
+      "acml_tr_pbmn": "20250209450"
+    },
+    {
+      "stck_bsop_date": "20260223",
+      "stck_oprc": "195800",
+      "stck_hgpr": "196700",
+      "stck_lwpr": "189100",
+      "stck_clpr": "189900",
+      "acml_vol": "109406",
+      "acml_tr_pbmn": "20936843250"
+    },
+    {
+      "stck_bsop_date": "20260224",
+      "stck_oprc": "194000",
+      "stck_hgpr": "202500",
+      "stck_lwpr": "189000",
+      "stck_clpr": "196200",
+      "acml_vol": "183306",
+      "acml_tr_pbmn": "36105853500"
+    },
+    {
+      "stck_bsop_date": "20260225",
+      "stck_oprc": "196400",
+      "stck_hgpr": "197100",
+      "stck_lwpr": "190700",
+      "stck_clpr": "192900",
+      "acml_vol": "97792",
+      "acml_tr_pbmn": "18790472550"
+    },
+    {
+      "stck_bsop_date": "20260226",
+      "stck_oprc": "193100",
+      "stck_hgpr": "194500",
+      "stck_lwpr": "188500",
+      "stck_clpr": "189000",
+      "acml_vol": "161767",
+      "acml_tr_pbmn": "30913848600"
+    },
+    {
+      "stck_bsop_date": "20260227",
+      "stck_oprc": "189900",
+      "stck_hgpr": "190900",
+      "stck_lwpr": "185200",
+      "stck_clpr": "190000",
+      "acml_vol": "100488",
+      "acml_tr_pbmn": "18952016750"
+    },
+    {
+      "stck_bsop_date": "20260303",
+      "stck_oprc": "186700",
+      "stck_hgpr": "186800",
+      "stck_lwpr": "177000",
+      "stck_clpr": "177100",
+      "acml_vol": "94647",
+      "acml_tr_pbmn": "17172225650"
+    },
+    {
+      "stck_bsop_date": "20260304",
+      "stck_oprc": "168200",
+      "stck_hgpr": "171700",
+      "stck_lwpr": "155500",
+      "stck_clpr": "160700",
+      "acml_vol": "127848",
+      "acml_tr_pbmn": "20953257600"
+    },
+    {
+      "stck_bsop_date": "20260305",
+      "stck_oprc": "168900",
+      "stck_hgpr": "170900",
+      "stck_lwpr": "165600",
+      "stck_clpr": "167100",
+      "acml_vol": "105429",
+      "acml_tr_pbmn": "17681812500"
+    },
+    {
+      "stck_bsop_date": "20260306",
+      "stck_oprc": "164700",
+      "stck_hgpr": "170900",
+      "stck_lwpr": "161600",
+      "stck_clpr": "168900",
+      "acml_vol": "58646",
+      "acml_tr_pbmn": "9758147900"
+    },
+    {
+      "stck_bsop_date": "20260309",
+      "stck_oprc": "162000",
+      "stck_hgpr": "165000",
+      "stck_lwpr": "159400",
+      "stck_clpr": "164000",
+      "acml_vol": "50957",
+      "acml_tr_pbmn": "8321832800"
+    },
+    {
+      "stck_bsop_date": "20260310",
+      "stck_oprc": "169900",
+      "stck_hgpr": "173900",
+      "stck_lwpr": "168300",
+      "stck_clpr": "172000",
+      "acml_vol": "44242",
+      "acml_tr_pbmn": "7574030600"
+    },
+    {
+      "stck_bsop_date": "20260311",
+      "stck_oprc": "174000",
+      "stck_hgpr": "175700",
+      "stck_lwpr": "169000",
+      "stck_clpr": "170500",
+      "acml_vol": "48028",
+      "acml_tr_pbmn": "8320742450"
+    },
+    {
+      "stck_bsop_date": "20260312",
+      "stck_oprc": "169100",
+      "stck_hgpr": "175000",
+      "stck_lwpr": "168100",
+      "stck_clpr": "174300",
+      "acml_vol": "67876",
+      "acml_tr_pbmn": "11742100800"
+    },
+    {
+      "stck_bsop_date": "20260313",
+      "stck_oprc": "169500",
+      "stck_hgpr": "179100",
+      "stck_lwpr": "169400",
+      "stck_clpr": "177200",
+      "acml_vol": "67175",
+      "acml_tr_pbmn": "11865507650"
+    },
+    {
+      "stck_bsop_date": "20260316",
+      "stck_oprc": "175000",
+      "stck_hgpr": "175000",
+      "stck_lwpr": "170700",
+      "stck_clpr": "170700",
+      "acml_vol": "45991",
+      "acml_tr_pbmn": "7898361200"
+    },
+    {
+      "stck_bsop_date": "20260317",
+      "stck_oprc": "173500",
+      "stck_hgpr": "177500",
+      "stck_lwpr": "172400",
+      "stck_clpr": "175700",
+      "acml_vol": "33111",
+      "acml_tr_pbmn": "5833873550"
+    },
+    {
+      "stck_bsop_date": "20260318",
+      "stck_oprc": "176900",
+      "stck_hgpr": "178600",
+      "stck_lwpr": "175000",
+      "stck_clpr": "175900",
+      "acml_vol": "46259",
+      "acml_tr_pbmn": "8164160400"
+    },
+    {
+      "stck_bsop_date": "20260319",
+      "stck_oprc": "172000",
+      "stck_hgpr": "180800",
+      "stck_lwpr": "171900",
+      "stck_clpr": "179200",
+      "acml_vol": "41929",
+      "acml_tr_pbmn": "7476062900"
+    },
+    {
+      "stck_bsop_date": "20260320",
+      "stck_oprc": "179000",
+      "stck_hgpr": "205000",
+      "stck_lwpr": "178500",
+      "stck_clpr": "196100",
+      "acml_vol": "304911",
+      "acml_tr_pbmn": "60056319000"
+    },
+    {
+      "stck_bsop_date": "20260323",
+      "stck_oprc": "192200",
+      "stck_hgpr": "205000",
+      "stck_lwpr": "189300",
+      "stck_clpr": "198000",
+      "acml_vol": "187818",
+      "acml_tr_pbmn": "37706485500"
+    },
+    {
+      "stck_bsop_date": "20260324",
+      "stck_oprc": "204000",
+      "stck_hgpr": "204000",
+      "stck_lwpr": "190800",
+      "stck_clpr": "193500",
+      "acml_vol": "84641",
+      "acml_tr_pbmn": "16460861300"
+    },
+    {
+      "stck_bsop_date": "20260325",
+      "stck_oprc": "197300",
+      "stck_hgpr": "202000",
+      "stck_lwpr": "194400",
+      "stck_clpr": "196300",
+      "acml_vol": "73486",
+      "acml_tr_pbmn": "14483539200"
+    },
+    {
+      "stck_bsop_date": "20260326",
+      "stck_oprc": "198500",
+      "stck_hgpr": "198500",
+      "stck_lwpr": "186900",
+      "stck_clpr": "188800",
+      "acml_vol": "50346",
+      "acml_tr_pbmn": "9625884200"
+    },
+    {
+      "stck_bsop_date": "20260327",
+      "stck_oprc": "188700",
+      "stck_hgpr": "208000",
+      "stck_lwpr": "185100",
+      "stck_clpr": "205000",
+      "acml_vol": "146270",
+      "acml_tr_pbmn": "29609361000"
+    },
+    {
+      "stck_bsop_date": "20260330",
+      "stck_oprc": "199100",
+      "stck_hgpr": "201000",
+      "stck_lwpr": "191000",
+      "stck_clpr": "192100",
+      "acml_vol": "83968",
+      "acml_tr_pbmn": "16259350500"
+    },
+    {
+      "stck_bsop_date": "20260331",
+      "stck_oprc": "188100",
+      "stck_hgpr": "206000",
+      "stck_lwpr": "187500",
+      "stck_clpr": "196500",
+      "acml_vol": "152539",
+      "acml_tr_pbmn": "30399526850"
+    },
+    {
+      "stck_bsop_date": "20260401",
+      "stck_oprc": "202000",
+      "stck_hgpr": "206500",
+      "stck_lwpr": "198100",
+      "stck_clpr": "200000",
+      "acml_vol": "94505",
+      "acml_tr_pbmn": "19046304200"
+    },
+    {
+      "stck_bsop_date": "20260402",
+      "stck_oprc": "200000",
+      "stck_hgpr": "208000",
+      "stck_lwpr": "192500",
+      "stck_clpr": "194500",
+      "acml_vol": "97867",
+      "acml_tr_pbmn": "19545361050"
+    },
+    {
+      "stck_bsop_date": "20260403",
+      "stck_oprc": "199400",
+      "stck_hgpr": "199400",
+      "stck_lwpr": "188900",
+      "stck_clpr": "189300",
+      "acml_vol": "69187",
+      "acml_tr_pbmn": "13293308750"
+    },
+    {
+      "stck_bsop_date": "20260406",
+      "stck_oprc": "191400",
+      "stck_hgpr": "195300",
+      "stck_lwpr": "183200",
+      "stck_clpr": "186500",
+      "acml_vol": "77488",
+      "acml_tr_pbmn": "14467163150"
+    },
+    {
+      "stck_bsop_date": "20260407",
+      "stck_oprc": "188000",
+      "stck_hgpr": "193000",
+      "stck_lwpr": "179500",
+      "stck_clpr": "180100",
+      "acml_vol": "61456",
+      "acml_tr_pbmn": "11320750650"
+    },
+    {
+      "stck_bsop_date": "20260408",
+      "stck_oprc": "188300",
+      "stck_hgpr": "190600",
+      "stck_lwpr": "178500",
+      "stck_clpr": "185400",
+      "acml_vol": "99873",
+      "acml_tr_pbmn": "18272945150"
+    },
+    {
+      "stck_bsop_date": "20260409",
+      "stck_oprc": "186200",
+      "stck_hgpr": "190500",
+      "stck_lwpr": "183600",
+      "stck_clpr": "185800",
+      "acml_vol": "117725",
+      "acml_tr_pbmn": "21956386750"
+    },
+    {
+      "stck_bsop_date": "20260410",
+      "stck_oprc": "188000",
+      "stck_hgpr": "190000",
+      "stck_lwpr": "184100",
+      "stck_clpr": "186700",
+      "acml_vol": "95459",
+      "acml_tr_pbmn": "17728357350"
+    },
+    {
+      "stck_bsop_date": "20260413",
+      "stck_oprc": "181900",
+      "stck_hgpr": "202000",
+      "stck_lwpr": "181100",
+      "stck_clpr": "199100",
+      "acml_vol": "146590",
+      "acml_tr_pbmn": "29023103700"
+    },
+    {
+      "stck_bsop_date": "20260414",
+      "stck_oprc": "201500",
+      "stck_hgpr": "201500",
+      "stck_lwpr": "192700",
+      "stck_clpr": "196900",
+      "acml_vol": "70068",
+      "acml_tr_pbmn": "13727258250"
+    },
+    {
+      "stck_bsop_date": "20260415",
+      "stck_oprc": "197000",
+      "stck_hgpr": "201500",
+      "stck_lwpr": "194500",
+      "stck_clpr": "198000",
+      "acml_vol": "87472",
+      "acml_tr_pbmn": "17321000500"
+    },
+    {
+      "stck_bsop_date": "20260416",
+      "stck_oprc": "199900",
+      "stck_hgpr": "206000",
+      "stck_lwpr": "196000",
+      "stck_clpr": "203500",
+      "acml_vol": "90177",
+      "acml_tr_pbmn": "18315260150"
+    },
+    {
+      "stck_bsop_date": "20260417",
+      "stck_oprc": "208500",
+      "stck_hgpr": "216000",
+      "stck_lwpr": "205500",
+      "stck_clpr": "213500",
+      "acml_vol": "117472",
+      "acml_tr_pbmn": "25000278000"
+    },
+    {
+      "stck_bsop_date": "20260420",
+      "stck_oprc": "214000",
+      "stck_hgpr": "215500",
+      "stck_lwpr": "207500",
+      "stck_clpr": "210500",
+      "acml_vol": "44662",
+      "acml_tr_pbmn": "9457204250"
+    },
+    {
+      "stck_bsop_date": "20260421",
+      "stck_oprc": "212000",
+      "stck_hgpr": "215500",
+      "stck_lwpr": "209500",
+      "stck_clpr": "214000",
+      "acml_vol": "77510",
+      "acml_tr_pbmn": "16527480000"
+    },
+    {
+      "stck_bsop_date": "20260422",
+      "stck_oprc": "212000",
+      "stck_hgpr": "219500",
+      "stck_lwpr": "212000",
+      "stck_clpr": "217500",
+      "acml_vol": "69710",
+      "acml_tr_pbmn": "15187621500"
+    },
+    {
+      "stck_bsop_date": "20260423",
+      "stck_oprc": "224000",
+      "stck_hgpr": "224000",
+      "stck_lwpr": "215500",
+      "stck_clpr": "218500",
+      "acml_vol": "84108",
+      "acml_tr_pbmn": "18315231750"
+    },
+    {
+      "stck_bsop_date": "20260424",
+      "stck_oprc": "225000",
+      "stck_hgpr": "231000",
+      "stck_lwpr": "222000",
+      "stck_clpr": "227000",
+      "acml_vol": "115728",
+      "acml_tr_pbmn": "26299044750"
+    },
+    {
+      "stck_bsop_date": "20260427",
+      "stck_oprc": "234000",
+      "stck_hgpr": "234500",
+      "stck_lwpr": "225000",
+      "stck_clpr": "225500",
+      "acml_vol": "59960",
+      "acml_tr_pbmn": "13631210000"
+    },
+    {
+      "stck_bsop_date": "20260428",
+      "stck_oprc": "223500",
+      "stck_hgpr": "227500",
+      "stck_lwpr": "220500",
+      "stck_clpr": "221000",
+      "acml_vol": "49659",
+      "acml_tr_pbmn": "11064544250"
+    },
+    {
+      "stck_bsop_date": "20260429",
+      "stck_oprc": "228000",
+      "stck_hgpr": "230000",
+      "stck_lwpr": "220000",
+      "stck_clpr": "222000",
+      "acml_vol": "55993",
+      "acml_tr_pbmn": "12527866750"
+    },
+    {
+      "stck_bsop_date": "20260430",
+      "stck_oprc": "221000",
+      "stck_hgpr": "221000",
+      "stck_lwpr": "210000",
+      "stck_clpr": "210500",
+      "acml_vol": "86004",
+      "acml_tr_pbmn": "18316015750"
+    },
+    {
+      "stck_bsop_date": "20260504",
+      "stck_oprc": "216500",
+      "stck_hgpr": "221500",
+      "stck_lwpr": "208000",
+      "stck_clpr": "209000",
+      "acml_vol": "75378",
+      "acml_tr_pbmn": "16032450000"
+    },
+    {
+      "stck_bsop_date": "20260506",
+      "stck_oprc": "209000",
+      "stck_hgpr": "213000",
+      "stck_lwpr": "205000",
+      "stck_clpr": "209000",
+      "acml_vol": "89205",
+      "acml_tr_pbmn": "18719518250"
+    },
+    {
+      "stck_bsop_date": "20260507",
+      "stck_oprc": "211500",
+      "stck_hgpr": "213000",
+      "stck_lwpr": "205000",
+      "stck_clpr": "208000",
+      "acml_vol": "56023",
+      "acml_tr_pbmn": "11665021250"
+    },
+    {
+      "stck_bsop_date": "20260508",
+      "stck_oprc": "214000",
+      "stck_hgpr": "220000",
+      "stck_lwpr": "203500",
+      "stck_clpr": "210000",
+      "acml_vol": "99898",
+      "acml_tr_pbmn": "20845776500"
+    },
+    {
+      "stck_bsop_date": "20260511",
+      "stck_oprc": "214500",
+      "stck_hgpr": "223500",
+      "stck_lwpr": "210000",
+      "stck_clpr": "213000",
+      "acml_vol": "119077",
+      "acml_tr_pbmn": "25886658750"
+    },
+    {
+      "stck_bsop_date": "20260512",
+      "stck_oprc": "217000",
+      "stck_hgpr": "226000",
+      "stck_lwpr": "213000",
+      "stck_clpr": "219500",
+      "acml_vol": "164220",
+      "acml_tr_pbmn": "35950317750"
+    },
+    {
+      "stck_bsop_date": "20260513",
+      "stck_oprc": "206500",
+      "stck_hgpr": "207000",
+      "stck_lwpr": "186800",
+      "stck_clpr": "187100",
+      "acml_vol": "308536",
+      "acml_tr_pbmn": "58309048700"
+    },
+    {
+      "stck_bsop_date": "20260514",
+      "stck_oprc": "188900",
+      "stck_hgpr": "193900",
+      "stck_lwpr": "184200",
+      "stck_clpr": "193900",
+      "acml_vol": "146231",
+      "acml_tr_pbmn": "27377313100"
+    },
+    {
+      "stck_bsop_date": "20260515",
+      "stck_oprc": "192000",
+      "stck_hgpr": "192200",
+      "stck_lwpr": "184000",
+      "stck_clpr": "185700",
+      "acml_vol": "95944",
+      "acml_tr_pbmn": "18053369900"
+    },
+    {
+      "stck_bsop_date": "20260518",
+      "stck_oprc": "183700",
+      "stck_hgpr": "183900",
+      "stck_lwpr": "176800",
+      "stck_clpr": "180400",
+      "acml_vol": "65975",
+      "acml_tr_pbmn": "11866351050"
+    },
+    {
+      "stck_bsop_date": "20260519",
+      "stck_oprc": "181900",
+      "stck_hgpr": "183300",
+      "stck_lwpr": "173900",
+      "stck_clpr": "177000",
+      "acml_vol": "67501",
+      "acml_tr_pbmn": "11887996550"
+    },
+    {
+      "stck_bsop_date": "20260520",
+      "stck_oprc": "178300",
+      "stck_hgpr": "178400",
+      "stck_lwpr": "169700",
+      "stck_clpr": "173000",
+      "acml_vol": "57172",
+      "acml_tr_pbmn": "9843357800"
+    },
+    {
+      "stck_bsop_date": "20260521",
+      "stck_oprc": "175000",
+      "stck_hgpr": "177800",
+      "stck_lwpr": "171500",
+      "stck_clpr": "176500",
+      "acml_vol": "72017",
+      "acml_tr_pbmn": "12562143850"
+    },
+    {
+      "stck_bsop_date": "20260522",
+      "stck_oprc": "180000",
+      "stck_hgpr": "187500",
+      "stck_lwpr": "179400",
+      "stck_clpr": "183000",
+      "acml_vol": "55879",
+      "acml_tr_pbmn": "10272076550"
+    },
+    {
+      "stck_bsop_date": "20260526",
+      "stck_oprc": "185700",
+      "stck_hgpr": "188500",
+      "stck_lwpr": "180600",
+      "stck_clpr": "181400",
+      "acml_vol": "42688",
+      "acml_tr_pbmn": "7791651500"
+    },
+    {
+      "stck_bsop_date": "20260527",
+      "stck_oprc": "180600",
+      "stck_hgpr": "181700",
+      "stck_lwpr": "173800",
+      "stck_clpr": "176200",
+      "acml_vol": "62807",
+      "acml_tr_pbmn": "11098917750"
+    },
+    {
+      "stck_bsop_date": "20260528",
+      "stck_oprc": "179000",
+      "stck_hgpr": "179000",
+      "stck_lwpr": "168600",
+      "stck_clpr": "175100",
+      "acml_vol": "47676",
+      "acml_tr_pbmn": "8218763600"
+    },
+    {
+      "stck_bsop_date": "20260529",
+      "stck_oprc": "175500",
+      "stck_hgpr": "177000",
+      "stck_lwpr": "169100",
+      "stck_clpr": "173700",
+      "acml_vol": "76004",
+      "acml_tr_pbmn": "13150655600"
+    },
+    {
+      "stck_bsop_date": "20260601",
+      "stck_oprc": "173800",
+      "stck_hgpr": "178500",
+      "stck_lwpr": "170500",
+      "stck_clpr": "172000",
+      "acml_vol": "130507",
+      "acml_tr_pbmn": "22552188200"
+    },
+    {
+      "stck_bsop_date": "20260602",
+      "stck_oprc": "172700",
+      "stck_hgpr": "172700",
+      "stck_lwpr": "167000",
+      "stck_clpr": "170000",
+      "acml_vol": "71882",
+      "acml_tr_pbmn": "12189049750"
+    },
+    {
+      "stck_bsop_date": "20260604",
+      "stck_oprc": "170100",
+      "stck_hgpr": "172900",
+      "stck_lwpr": "167000",
+      "stck_clpr": "170300",
+      "acml_vol": "85636",
+      "acml_tr_pbmn": "14552094300"
+    },
+    {
+      "stck_bsop_date": "20260605",
+      "stck_oprc": "171500",
+      "stck_hgpr": "173200",
+      "stck_lwpr": "164600",
+      "stck_clpr": "165900",
+      "acml_vol": "58948",
+      "acml_tr_pbmn": "9838912450"
+    },
+    {
+      "stck_bsop_date": "20260608",
+      "stck_oprc": "160300",
+      "stck_hgpr": "162100",
+      "stck_lwpr": "156100",
+      "stck_clpr": "158500",
+      "acml_vol": "49610",
+      "acml_tr_pbmn": "7921638850"
+    },
+    {
+      "stck_bsop_date": "20260609",
+      "stck_oprc": "158500",
+      "stck_hgpr": "169500",
+      "stck_lwpr": "156900",
+      "stck_clpr": "165800",
+      "acml_vol": "62497",
+      "acml_tr_pbmn": "10339078600"
+    },
+    {
+      "stck_bsop_date": "20260610",
+      "stck_oprc": "168800",
+      "stck_hgpr": "170800",
+      "stck_lwpr": "160000",
+      "stck_clpr": "164100",
+      "acml_vol": "58307",
+      "acml_tr_pbmn": "9578961950"
+    },
+    {
+      "stck_bsop_date": "20260611",
+      "stck_oprc": "160600",
+      "stck_hgpr": "167200",
+      "stck_lwpr": "159400",
+      "stck_clpr": "165900",
+      "acml_vol": "73323",
+      "acml_tr_pbmn": "12000168650"
+    },
+    {
+      "stck_bsop_date": "20260612",
+      "stck_oprc": "170300",
+      "stck_hgpr": "171900",
+      "stck_lwpr": "164700",
+      "stck_clpr": "168600",
+      "acml_vol": "71464",
+      "acml_tr_pbmn": "12054055950"
+    },
+    {
+      "stck_bsop_date": "20260615",
+      "stck_oprc": "173300",
+      "stck_hgpr": "173600",
+      "stck_lwpr": "168200",
+      "stck_clpr": "168700",
+      "acml_vol": "75833",
+      "acml_tr_pbmn": "12922689200"
+    },
+    {
+      "stck_bsop_date": "20260616",
+      "stck_oprc": "169100",
+      "stck_hgpr": "175200",
+      "stck_lwpr": "167000",
+      "stck_clpr": "167000",
+      "acml_vol": "61330",
+      "acml_tr_pbmn": "10388087050"
+    },
+    {
+      "stck_bsop_date": "20260617",
+      "stck_oprc": "169800",
+      "stck_hgpr": "174000",
+      "stck_lwpr": "166000",
+      "stck_clpr": "168900",
+      "acml_vol": "58113",
+      "acml_tr_pbmn": "9890293350"
+    },
+    {
+      "stck_bsop_date": "20260618",
+      "stck_oprc": "168000",
+      "stck_hgpr": "168300",
+      "stck_lwpr": "164000",
+      "stck_clpr": "165600",
+      "acml_vol": "57453",
+      "acml_tr_pbmn": "9486688100"
+    },
+    {
+      "stck_bsop_date": "20260619",
+      "stck_oprc": "165600",
+      "stck_hgpr": "169400",
+      "stck_lwpr": "155900",
+      "stck_clpr": "159200",
+      "acml_vol": "144579",
+      "acml_tr_pbmn": "23237784100"
+    },
+    {
+      "stck_bsop_date": "20260622",
+      "stck_oprc": "160200",
+      "stck_hgpr": "162900",
+      "stck_lwpr": "153400",
+      "stck_clpr": "156000",
+      "acml_vol": "50515",
+      "acml_tr_pbmn": "7902682850"
+    },
+    {
+      "stck_bsop_date": "20260623",
+      "stck_oprc": "155600",
+      "stck_hgpr": "161900",
+      "stck_lwpr": "151200",
+      "stck_clpr": "152500",
+      "acml_vol": "112402",
+      "acml_tr_pbmn": "17516311400"
+    },
+    {
+      "stck_bsop_date": "20260624",
+      "stck_oprc": "152000",
+      "stck_hgpr": "155100",
+      "stck_lwpr": "148000",
+      "stck_clpr": "151700",
+      "acml_vol": "53736",
+      "acml_tr_pbmn": "8145862450"
+    },
+    {
+      "stck_bsop_date": "20260625",
+      "stck_oprc": "151800",
+      "stck_hgpr": "154100",
+      "stck_lwpr": "147200",
+      "stck_clpr": "148100",
+      "acml_vol": "60031",
+      "acml_tr_pbmn": "9002982250"
+    },
+    {
+      "stck_bsop_date": "20260626",
+      "stck_oprc": "147000",
+      "stck_hgpr": "149100",
+      "stck_lwpr": "141000",
+      "stck_clpr": "144900",
+      "acml_vol": "78603",
+      "acml_tr_pbmn": "11355718550"
+    },
+    {
+      "stck_bsop_date": "20260629",
+      "stck_oprc": "146300",
+      "stck_hgpr": "159600",
+      "stck_lwpr": "144600",
+      "stck_clpr": "159100",
+      "acml_vol": "74141",
+      "acml_tr_pbmn": "11544629650"
+    },
+    {
+      "stck_bsop_date": "20260630",
+      "stck_oprc": "157600",
+      "stck_hgpr": "163500",
+      "stck_lwpr": "154300",
+      "stck_clpr": "154900",
+      "acml_vol": "71374",
+      "acml_tr_pbmn": "11245674850"
+    },
+    {
+      "stck_bsop_date": "20260701",
+      "stck_oprc": "158200",
+      "stck_hgpr": "168000",
+      "stck_lwpr": "152200",
+      "stck_clpr": "165300",
+      "acml_vol": "76763",
+      "acml_tr_pbmn": "12585931750"
+    },
+    {
+      "stck_bsop_date": "20260702",
+      "stck_oprc": "166500",
+      "stck_hgpr": "178900",
+      "stck_lwpr": "164300",
+      "stck_clpr": "167300",
+      "acml_vol": "123088",
+      "acml_tr_pbmn": "21381312350"
+    },
+    {
+      "stck_bsop_date": "20260703",
+      "stck_oprc": "171000",
+      "stck_hgpr": "174500",
+      "stck_lwpr": "165000",
+      "stck_clpr": "168300",
+      "acml_vol": "73003",
+      "acml_tr_pbmn": "12275306150"
+    },
+    {
+      "stck_bsop_date": "20260706",
+      "stck_oprc": "170000",
+      "stck_hgpr": "183400",
+      "stck_lwpr": "169100",
+      "stck_clpr": "178000",
+      "acml_vol": "115004",
+      "acml_tr_pbmn": "20522912850"
+    },
+    {
+      "stck_bsop_date": "20260707",
+      "stck_oprc": "177000",
+      "stck_hgpr": "188800",
+      "stck_lwpr": "175000",
+      "stck_clpr": "183000",
+      "acml_vol": "124131",
+      "acml_tr_pbmn": "22807413550"
+    },
+    {
+      "stck_bsop_date": "20260708",
+      "stck_oprc": "185100",
+      "stck_hgpr": "186900",
+      "stck_lwpr": "174200",
+      "stck_clpr": "179600",
+      "acml_vol": "111191",
+      "acml_tr_pbmn": "20001603300"
+    },
+    {
+      "stck_bsop_date": "20260709",
+      "stck_oprc": "176000",
+      "stck_hgpr": "179600",
+      "stck_lwpr": "171500",
+      "stck_clpr": "173500",
+      "acml_vol": "95214",
+      "acml_tr_pbmn": "16646954300"
+    },
+    {
+      "stck_bsop_date": "20260710",
+      "stck_oprc": "175200",
+      "stck_hgpr": "182200",
+      "stck_lwpr": "168400",
+      "stck_clpr": "172700",
+      "acml_vol": "150381",
+      "acml_tr_pbmn": "26090518100"
+    },
+    {
+      "stck_bsop_date": "20260713",
+      "stck_oprc": "174700",
+      "stck_hgpr": "189500",
+      "stck_lwpr": "174700",
+      "stck_clpr": "184300",
+      "acml_vol": "115401",
+      "acml_tr_pbmn": "21256085800"
+    },
+    {
+      "stck_bsop_date": "20260714",
+      "stck_oprc": "183500",
+      "stck_hgpr": "183700",
+      "stck_lwpr": "173000",
+      "stck_clpr": "174800",
+      "acml_vol": "80224",
+      "acml_tr_pbmn": "14196859300"
+    },
+    {
+      "stck_bsop_date": "20260715",
+      "stck_oprc": "175100",
+      "stck_hgpr": "181500",
+      "stck_lwpr": "172500",
+      "stck_clpr": "179800",
+      "acml_vol": "88595",
+      "acml_tr_pbmn": "15829518800"
+    },
+    {
+      "stck_bsop_date": "20260716",
+      "stck_oprc": "183500",
+      "stck_hgpr": "188000",
+      "stck_lwpr": "177000",
+      "stck_clpr": "181100",
+      "acml_vol": "56229",
+      "acml_tr_pbmn": "10230921900"
+    },
+    {
+      "stck_bsop_date": "20260720",
+      "stck_oprc": "180600",
+      "stck_hgpr": "181000",
+      "stck_lwpr": "173000",
+      "stck_clpr": "173600",
+      "acml_vol": "44147",
+      "acml_tr_pbmn": "7767325100"
+    },
+    {
+      "stck_bsop_date": "20260721",
+      "stck_oprc": "170500",
+      "stck_hgpr": "176600",
+      "stck_lwpr": "170500",
+      "stck_clpr": "172200",
+      "acml_vol": "46441",
+      "acml_tr_pbmn": "8053653450"
+    },
+    {
+      "stck_bsop_date": "20260722",
+      "stck_oprc": "172300",
+      "stck_hgpr": "174600",
+      "stck_lwpr": "168500",
+      "stck_clpr": "169200",
+      "acml_vol": "48248",
+      "acml_tr_pbmn": "8259132900"
+    },
+    {
+      "stck_bsop_date": "20260723",
+      "stck_oprc": "167600",
+      "stck_hgpr": "178100",
+      "stck_lwpr": "167600",
+      "stck_clpr": "177000",
+      "acml_vol": "59127",
+      "acml_tr_pbmn": "10384634650"
+    },
+    {
+      "stck_bsop_date": "20260724",
+      "stck_oprc": "173000",
+      "stck_hgpr": "180800",
+      "stck_lwpr": "173000",
+      "stck_clpr": "178400",
+      "acml_vol": "56011",
+      "acml_tr_pbmn": "9967144500"
+    },
+    {
+      "stck_bsop_date": "20260727",
+      "stck_oprc": "180700",
+      "stck_hgpr": "194600",
+      "stck_lwpr": "178500",
+      "stck_clpr": "192500",
+      "acml_vol": "140295",
+      "acml_tr_pbmn": "26935073350"
+    },
+    {
+      "stck_bsop_date": "20260728",
+      "stck_oprc": "189800",
+      "stck_hgpr": "197500",
+      "stck_lwpr": "181200",
+      "stck_clpr": "184600",
+      "acml_vol": "81186",
+      "acml_tr_pbmn": "15305199650"
+    },
+    {
+      "stck_bsop_date": "20260729",
+      "stck_oprc": "185000",
+      "stck_hgpr": "195600",
+      "stck_lwpr": "183000",
+      "stck_clpr": "184700",
+      "acml_vol": "136847",
+      "acml_tr_pbmn": "25755535000"
+    },
+    {
+      "stck_bsop_date": "20260730",
+      "stck_oprc": "184700",
+      "stck_hgpr": "195400",
+      "stck_lwpr": "180500",
+      "stck_clpr": "185900",
+      "acml_vol": "106402",
+      "acml_tr_pbmn": "19936816500"
+    },
+    {
+      "stck_bsop_date": "20260731",
+      "stck_oprc": "182100",
+      "stck_hgpr": "186400",
+      "stck_lwpr": "171200",
+      "stck_clpr": "184700",
+      "acml_vol": "155770",
+      "acml_tr_pbmn": "28019402250"
+    },
+    {
+      "stck_bsop_date": "20260803",
+      "stck_oprc": "183800",
+      "stck_hgpr": "191500",
+      "stck_lwpr": "183100",
+      "stck_clpr": "185500",
+      "acml_vol": "57032",
+      "acml_tr_pbmn": "10600196550"
+    },
+    {
+      "stck_bsop_date": "20260804",
+      "stck_oprc": "183700",
+      "stck_hgpr": "198500",
+      "stck_lwpr": "183600",
+      "stck_clpr": "195200",
+      "acml_vol": "109802",
+      "acml_tr_pbmn": "21396914264"
+    },
+    {
+      "stck_bsop_date": "20260805",
+      "stck_oprc": "193000",
+      "stck_hgpr": "203500",
+      "stck_lwpr": "193000",
+      "stck_clpr": "195000",
+      "acml_vol": "106704",
+      "acml_tr_pbmn": "21076487800"
+    },
+    {
+      "stck_bsop_date": "20260806",
+      "stck_oprc": "194900",
+      "stck_hgpr": "205000",
+      "stck_lwpr": "194000",
+      "stck_clpr": "202000",
+      "acml_vol": "100465",
+      "acml_tr_pbmn": "20102512300"
+    },
+    {
+      "stck_bsop_date": "20260807",
+      "stck_oprc": "198200",
+      "stck_hgpr": "208000",
+      "stck_lwpr": "198000",
+      "stck_clpr": "205500",
+      "acml_vol": "66738",
+      "acml_tr_pbmn": "13606562900"
+    },
+    {
+      "stck_bsop_date": "20260810",
+      "stck_oprc": "203500",
+      "stck_hgpr": "205500",
+      "stck_lwpr": "197400",
+      "stck_clpr": "203500",
+      "acml_vol": "66417",
+      "acml_tr_pbmn": "13428540950"
+    },
+    {
+      "stck_bsop_date": "20260811",
+      "stck_oprc": "206500",
+      "stck_hgpr": "217000",
+      "stck_lwpr": "199500",
+      "stck_clpr": "210000",
+      "acml_vol": "133907",
+      "acml_tr_pbmn": "28291950150"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "stck_oprc": "232000",
+      "stck_hgpr": "260000",
+      "stck_lwpr": "212500",
+      "stck_clpr": "249500",
+      "acml_vol": "604965",
+      "acml_tr_pbmn": "149058716500"
+    },
+    {
+      "stck_bsop_date": "20260813",
+      "stck_oprc": "243000",
+      "stck_hgpr": "262000",
+      "stck_lwpr": "242000",
+      "stck_clpr": "249000",
+      "acml_vol": "266194",
+      "acml_tr_pbmn": "67487731000"
+    },
+    {
+      "stck_bsop_date": "20260814",
+      "stck_oprc": "241000",
+      "stck_hgpr": "251000",
+      "stck_lwpr": "239000",
+      "stck_clpr": "247500",
+      "acml_vol": "148572",
+      "acml_tr_pbmn": "36604559250"
+    },
+    {
+      "stck_bsop_date": "20260818",
+      "stck_oprc": "240500",
+      "stck_hgpr": "243000",
+      "stck_lwpr": "230500",
+      "stck_clpr": "239000",
+      "acml_vol": "172416",
+      "acml_tr_pbmn": "40486806250"
+    },
+    {
+      "stck_bsop_date": "20260819",
+      "stck_oprc": "236000",
+      "stck_hgpr": "250000",
+      "stck_lwpr": "233000",
+      "stck_clpr": "246000",
+      "acml_vol": "128017",
+      "acml_tr_pbmn": "31265629000"
+    },
+    {
+      "stck_bsop_date": "20260820",
+      "stck_oprc": "242500",
+      "stck_hgpr": "263000",
+      "stck_lwpr": "241500",
+      "stck_clpr": "260500",
+      "acml_vol": "163728",
+      "acml_tr_pbmn": "42286140250"
+    },
+    {
+      "stck_bsop_date": "20260821",
+      "stck_oprc": "260500",
+      "stck_hgpr": "274000",
+      "stck_lwpr": "257000",
+      "stck_clpr": "271000",
+      "acml_vol": "198135",
+      "acml_tr_pbmn": "52911595250"
+    },
+    {
+      "stck_bsop_date": "20260824",
+      "stck_oprc": "271500",
+      "stck_hgpr": "288000",
+      "stck_lwpr": "265500",
+      "stck_clpr": "286000",
+      "acml_vol": "214445",
+      "acml_tr_pbmn": "60533929500"
+    },
+    {
+      "stck_bsop_date": "20260825",
+      "stck_oprc": "286000",
+      "stck_hgpr": "289000",
+      "stck_lwpr": "280000",
+      "stck_clpr": "289000",
+      "acml_vol": "133363",
+      "acml_tr_pbmn": "37958258750"
+    },
+    {
+      "stck_bsop_date": "20260826",
+      "stck_oprc": "283000",
+      "stck_hgpr": "297000",
+      "stck_lwpr": "278000",
+      "stck_clpr": "288000",
+      "acml_vol": "172087",
+      "acml_tr_pbmn": "49778921500"
+    },
+    {
+      "stck_bsop_date": "20260827",
+      "stck_oprc": "285000",
+      "stck_hgpr": "287500",
+      "stck_lwpr": "271000",
+      "stck_clpr": "283000",
+      "acml_vol": "128026",
+      "acml_tr_pbmn": "36020142750"
+    },
+    {
+      "stck_bsop_date": "20260828",
+      "stck_oprc": "282500",
+      "stck_hgpr": "306000",
+      "stck_lwpr": "282500",
+      "stck_clpr": "303000",
+      "acml_vol": "341107",
+      "acml_tr_pbmn": "101649965250"
+    },
+    {
+      "stck_bsop_date": "20260831",
+      "stck_oprc": "297000",
+      "stck_hgpr": "304500",
+      "stck_lwpr": "291500",
+      "stck_clpr": "300000",
+      "acml_vol": "208637",
+      "acml_tr_pbmn": "62286141250"
+    },
+    {
+      "stck_bsop_date": "20260901",
+      "stck_oprc": "301500",
+      "stck_hgpr": "306500",
+      "stck_lwpr": "285500",
+      "stck_clpr": "287000",
+      "acml_vol": "128070",
+      "acml_tr_pbmn": "37215699250"
+    },
+    {
+      "stck_bsop_date": "20260902",
+      "stck_oprc": "278500",
+      "stck_hgpr": "292000",
+      "stck_lwpr": "271000",
+      "stck_clpr": "285500",
+      "acml_vol": "143517",
+      "acml_tr_pbmn": "40904894250"
+    },
+    {
+      "stck_bsop_date": "20260903",
+      "stck_oprc": "279500",
+      "stck_hgpr": "293000",
+      "stck_lwpr": "276000",
+      "stck_clpr": "282000",
+      "acml_vol": "125571",
+      "acml_tr_pbmn": "35552949750"
+    },
+    {
+      "stck_bsop_date": "20260904",
+      "stck_oprc": "281500",
+      "stck_hgpr": "283000",
+      "stck_lwpr": "266000",
+      "stck_clpr": "275500",
+      "acml_vol": "126187",
+      "acml_tr_pbmn": "34612819250"
+    },
+    {
+      "stck_bsop_date": "20260907",
+      "stck_oprc": "276000",
+      "stck_hgpr": "277500",
+      "stck_lwpr": "268000",
+      "stck_clpr": "274000",
+      "acml_vol": "85236",
+      "acml_tr_pbmn": "23212844750"
+    },
+    {
+      "stck_bsop_date": "20260908",
+      "stck_oprc": "275000",
+      "stck_hgpr": "275500",
+      "stck_lwpr": "256000",
+      "stck_clpr": "265000",
+      "acml_vol": "201589",
+      "acml_tr_pbmn": "52898513750"
+    },
+    {
+      "stck_bsop_date": "20260909",
+      "stck_oprc": "263000",
+      "stck_hgpr": "269500",
+      "stck_lwpr": "261000",
+      "stck_clpr": "266500",
+      "acml_vol": "112739",
+      "acml_tr_pbmn": "29918728750"
+    },
+    {
+      "stck_bsop_date": "20260910",
+      "stck_oprc": "269000",
+      "stck_hgpr": "274000",
+      "stck_lwpr": "259000",
+      "stck_clpr": "265000",
+      "acml_vol": "122828",
+      "acml_tr_pbmn": "32548010250"
+    },
+    {
+      "stck_bsop_date": "20260911",
+      "stck_oprc": "261500",
+      "stck_hgpr": "276000",
+      "stck_lwpr": "260000",
+      "stck_clpr": "270500",
+      "acml_vol": "166635",
+      "acml_tr_pbmn": "45123358250"
+    },
+    {
+      "stck_bsop_date": "20260914",
+      "stck_oprc": "278000",
+      "stck_hgpr": "282000",
+      "stck_lwpr": "269500",
+      "stck_clpr": "276000",
+      "acml_vol": "131228",
+      "acml_tr_pbmn": "36346623000"
+    },
+    {
+      "stck_bsop_date": "20260915",
+      "stck_oprc": "273000",
+      "stck_hgpr": "284500",
+      "stck_lwpr": "272000",
+      "stck_clpr": "273000",
+      "acml_vol": "60096",
+      "acml_tr_pbmn": "16650082500"
+    },
+    {
+      "stck_bsop_date": "20260916",
+      "stck_oprc": "274000",
+      "stck_hgpr": "285500",
+      "stck_lwpr": "270000",
+      "stck_clpr": "280500",
+      "acml_vol": "81362",
+      "acml_tr_pbmn": "22867047500"
+    },
+    {
+      "stck_bsop_date": "20260917",
+      "stck_oprc": "281000",
+      "stck_hgpr": "291500",
+      "stck_lwpr": "269500",
+      "stck_clpr": "272000",
+      "acml_vol": "98694",
+      "acml_tr_pbmn": "27307942250"
+    },
+    {
+      "stck_bsop_date": "20260918",
+      "stck_oprc": "272000",
+      "stck_hgpr": "281500",
+      "stck_lwpr": "267500",
+      "stck_clpr": "273000",
+      "acml_vol": "86308",
+      "acml_tr_pbmn": "23743658750"
+    },
+    {
+      "stck_bsop_date": "20260921",
+      "stck_oprc": "270000",
+      "stck_hgpr": "278000",
+      "stck_lwpr": "264500",
+      "stck_clpr": "275000",
+      "acml_vol": "53730",
+      "acml_tr_pbmn": "14628942250"
+    },
+    {
+      "stck_bsop_date": "20260922",
+      "stck_oprc": "274000",
+      "stck_hgpr": "277000",
+      "stck_lwpr": "265500",
+      "stck_clpr": "270000",
+      "acml_vol": "64088",
+      "acml_tr_pbmn": "17238597000"
+    },
+    {
+      "stck_bsop_date": "20260923",
+      "stck_oprc": "265500",
+      "stck_hgpr": "275000",
+      "stck_lwpr": "260000",
+      "stck_clpr": "272000",
+      "acml_vol": "67379",
+      "acml_tr_pbmn": "18282589500"
+    },
+    {
+      "stck_bsop_date": "20260928",
+      "stck_oprc": "270500",
+      "stck_hgpr": "277000",
+      "stck_lwpr": "268000",
+      "stck_clpr": "271000",
+      "acml_vol": "46616",
+      "acml_tr_pbmn": "12693820750"
+    },
+    {
+      "stck_bsop_date": "20260929",
+      "stck_oprc": "270000",
+      "stck_hgpr": "279000",
+      "stck_lwpr": "268000",
+      "stck_clpr": "277500",
+      "acml_vol": "59939",
+      "acml_tr_pbmn": "16526083000"
+    },
+    {
+      "stck_bsop_date": "20260930",
+      "stck_oprc": "279500",
+      "stck_hgpr": "292500",
+      "stck_lwpr": "265500",
+      "stck_clpr": "267000",
+      "acml_vol": "88996",
+      "acml_tr_pbmn": "24526184750"
+    },
+    {
+      "stck_bsop_date": "20261001",
+      "stck_oprc": "268000",
+      "stck_hgpr": "279500",
+      "stck_lwpr": "262500",
+      "stck_clpr": "279000",
+      "acml_vol": "77592",
+      "acml_tr_pbmn": "21294023750"
+    },
+    {
+      "stck_bsop_date": "20261002",
+      "stck_oprc": "280500",
+      "stck_hgpr": "285000",
+      "stck_lwpr": "257000",
+      "stck_clpr": "270000",
+      "acml_vol": "127723",
+      "acml_tr_pbmn": "34196917250"
+    },
+    {
+      "stck_bsop_date": "20261006",
+      "stck_oprc": "271500",
+      "stck_hgpr": "298500",
+      "stck_lwpr": "264500",
+      "stck_clpr": "298000",
+      "acml_vol": "192786",
+      "acml_tr_pbmn": "54645150500"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "stck_oprc": "311000",
+      "stck_hgpr": "320000",
+      "stck_lwpr": "296000",
+      "stck_clpr": "308500",
+      "acml_vol": "203211",
+      "acml_tr_pbmn": "62332699250"
+    },
+    {
+      "stck_bsop_date": "20261008",
+      "stck_oprc": "311000",
+      "stck_hgpr": "317500",
+      "stck_lwpr": "299500",
+      "stck_clpr": "303500",
+      "acml_vol": "150922",
+      "acml_tr_pbmn": "46193424000"
+    }
+  ],
+  "index": [
+    { "stck_bsop_date": "20261008", "bstp_nmix_prpr": "6625.93" },
+    { "stck_bsop_date": "20261007", "bstp_nmix_prpr": "6803.90" },
+    { "stck_bsop_date": "20261006", "bstp_nmix_prpr": "6941.39" },
+    { "stck_bsop_date": "20261002", "bstp_nmix_prpr": "7003.74" },
+    { "stck_bsop_date": "20261001", "bstp_nmix_prpr": "6971.35" }
+  ],
+  "corpCode": "01009789",
+  "overview": { "corp_name": "코스맥스(주)", "stock_name": "코스맥스", "corp_cls": "Y" },
+  "shareCount": [
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "se": "보통주",
+      "isu_stock_totqy": "30,000,000",
+      "now_to_isu_stock_totqy": "11,349,509",
+      "now_to_dcrs_stock_totqy": "-",
+      "redc": "-",
+      "profit_incnr": "-",
+      "rdmstk_repy": "-",
+      "etc": "-",
+      "istc_totqy": "11,349,509",
+      "tesstk_co": "3,847",
+      "distb_stock_co": "11,345,662",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "se": "우선주",
+      "isu_stock_totqy": "10,000,000",
+      "now_to_isu_stock_totqy": "-",
+      "now_to_dcrs_stock_totqy": "-",
+      "redc": "-",
+      "profit_incnr": "-",
+      "rdmstk_repy": "-",
+      "etc": "-",
+      "istc_totqy": "-",
+      "tesstk_co": "-",
+      "distb_stock_co": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "se": "합계",
+      "isu_stock_totqy": "40,000,000",
+      "now_to_isu_stock_totqy": "11,349,509",
+      "now_to_dcrs_stock_totqy": "-",
+      "redc": "-",
+      "profit_incnr": "-",
+      "rdmstk_repy": "-",
+      "etc": "-",
+      "istc_totqy": "11,349,509",
+      "tesstk_co": "3,847",
+      "distb_stock_co": "11,345,662",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "se": "비고",
+      "isu_stock_totqy": "-",
+      "now_to_isu_stock_totqy": "-",
+      "now_to_dcrs_stock_totqy": "-",
+      "redc": "-",
+      "profit_incnr": "-",
+      "rdmstk_repy": "-",
+      "etc": "-",
+      "istc_totqy": "-",
+      "tesstk_co": "-",
+      "distb_stock_co": "-",
+      "stlm_dt": "2026-06-30"
+    }
+  ],
+  "majorShareholder": [
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "코스맥스비티아이",
+      "relate": "최대주주",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "3,090,301",
+      "bsis_posesn_stock_qota_rt": "27.23",
+      "trmend_posesn_stock_co": "3,090,301",
+      "trmend_posesn_stock_qota_rt": "27.23",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "이경수",
+      "relate": "임원",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "118",
+      "bsis_posesn_stock_qota_rt": "0.00",
+      "trmend_posesn_stock_co": "118",
+      "trmend_posesn_stock_qota_rt": "0.00",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "이병만",
+      "relate": "임원",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "69",
+      "bsis_posesn_stock_qota_rt": "0.00",
+      "trmend_posesn_stock_co": "69",
+      "trmend_posesn_stock_qota_rt": "0.00",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "최경",
+      "relate": "임원",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "22,000",
+      "bsis_posesn_stock_qota_rt": "0.19",
+      "trmend_posesn_stock_co": "22,000",
+      "trmend_posesn_stock_qota_rt": "0.19",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "이영하",
+      "relate": "계열회사임원",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "1,661",
+      "bsis_posesn_stock_qota_rt": "0.01",
+      "trmend_posesn_stock_co": "1,661",
+      "trmend_posesn_stock_qota_rt": "0.01",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "정민경",
+      "relate": "계열회사임원",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "1,283",
+      "bsis_posesn_stock_qota_rt": "0.01",
+      "trmend_posesn_stock_co": "1,283",
+      "trmend_posesn_stock_qota_rt": "0.01",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "이상인",
+      "relate": "계열회사임원",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "6,346",
+      "bsis_posesn_stock_qota_rt": "0.06",
+      "trmend_posesn_stock_co": "6,340",
+      "trmend_posesn_stock_qota_rt": "0.06",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "양치연",
+      "relate": "계열회사임원",
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "1",
+      "bsis_posesn_stock_qota_rt": "0.00",
+      "trmend_posesn_stock_co": "1",
+      "trmend_posesn_stock_qota_rt": "0.00",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "계",
+      "relate": null,
+      "stock_knd": "보통주",
+      "bsis_posesn_stock_co": "3,121,779",
+      "bsis_posesn_stock_qota_rt": "27.51",
+      "trmend_posesn_stock_co": "3,121,773",
+      "trmend_posesn_stock_qota_rt": "27.51",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "계",
+      "relate": null,
+      "stock_knd": "우선주",
+      "bsis_posesn_stock_co": "-",
+      "bsis_posesn_stock_qota_rt": "-",
+      "trmend_posesn_stock_co": "-",
+      "trmend_posesn_stock_qota_rt": "-",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    },
+    {
+      "rcept_no": "20260813001436",
+      "corp_cls": "Y",
+      "corp_code": "01009789",
+      "corp_name": "코스맥스",
+      "nm": "계",
+      "relate": null,
+      "stock_knd": "기  타",
+      "bsis_posesn_stock_co": "-",
+      "bsis_posesn_stock_qota_rt": "-",
+      "trmend_posesn_stock_co": "-",
+      "trmend_posesn_stock_qota_rt": "-",
+      "rm": "-",
+      "stlm_dt": "2026-06-30"
+    }
+  ],
+  "currentPrice": { "current_price": 303500, "foreign_ratio": 34.48 },
+  "estimates": {
+    "summary": {
+      "sht_cd": "A192820",
+      "item_kor_nm": "코스맥스",
+      "name1": "김명주",
+      "name2": "",
+      "estdate": "20260812",
+      "rcmd_name": "매수",
+      "capital": "57.0",
+      "forn_item_lmtrt": "0.00"
+    },
+    "data": [
+      {
+        "data1": "17775.0",
+        "data2": "21661.0",
+        "data3": "23988.0",
+        "data4": "29957.0",
+        "data5": "35881.0"
+      },
+      { "data1": "111.0", "data2": "219.0", "data3": "107.0", "data4": "249.0", "data5": "198.0" },
+      {
+        "data1": "1157.0",
+        "data2": "1754.0",
+        "data3": "1958.0",
+        "data4": "2529.0",
+        "data5": "3093.0"
+      },
+      { "data1": "1179.0", "data2": "516.0", "data3": "116.0", "data4": "292.0", "data5": "223.0" },
+      {
+        "data1": "571.0",
+        "data2": "858.0",
+        "data3": "1231.0",
+        "data4": "1725.0",
+        "data5": "2089.0"
+      },
+      { "data1": "1741.0", "data2": "502.0", "data3": "434.0", "data4": "402.0", "data5": "211.0" }
+    ],
+    "data_detail": [
+      {
+        "data1": "1751.0",
+        "data2": "2442.0",
+        "data3": "2699.0",
+        "data4": "3376.0",
+        "data5": "3960.0"
+      },
+      {
+        "data1": "50360.0",
+        "data2": "75620.0",
+        "data3": "108470.0",
+        "data4": "152071.0",
+        "data5": "184138.0"
+      },
+      { "data1": "1740.0", "data2": "502.0", "data3": "434.0", "data4": "402.0", "data5": "211.0" },
+      { "data1": "251.0", "data2": "197.0", "data3": "150.0", "data4": "111.0", "data5": "91.0" },
+      { "data1": "105.0", "data2": "98.0", "data3": "101.0", "data4": "79.0", "data5": "65.0" },
+      { "data1": "121.0", "data2": "205.0", "data3": "239.0", "data4": "278.0", "data5": "273.0" },
+      {
+        "data1": "3343.0",
+        "data2": "2800.0",
+        "data3": "2471.0",
+        "data4": "2306.0",
+        "data5": "1964.0"
+      },
+      { "data1": "36.0", "data2": "39.0", "data3": "42.0", "data4": "54.0", "data5": "81.0" }
+    ],
+    "periods": [
+      { "dt": "2023.12" },
+      { "dt": "2024.12" },
+      { "dt": "2025.12" },
+      { "dt": "2026.12E" },
+      { "dt": "2027.12E" }
+    ]
+  },
+  "opinions": [
+    {
+      "stck_bsop_date": "20261008",
+      "invt_opnn": "Buy",
+      "rgbf_invt_opnn": "Buy",
+      "mbcr_name": "LS증권",
+      "hts_goal_prc": "400000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "다올투자",
+      "hts_goal_prc": "350000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "하나증권",
+      "hts_goal_prc": "380000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "삼성",
+      "hts_goal_prc": "370000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "SK",
+      "hts_goal_prc": "370000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "현대차",
+      "hts_goal_prc": "380000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "NH투자",
+      "hts_goal_prc": "370000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "메리츠",
+      "hts_goal_prc": "360000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "한국투자",
+      "hts_goal_prc": "370000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "신한투자증권",
+      "hts_goal_prc": "350000"
+    },
+    {
+      "stck_bsop_date": "20261007",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "교보",
+      "hts_goal_prc": "410000"
+    },
+    {
+      "stck_bsop_date": "20261001",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "메리츠",
+      "hts_goal_prc": "330000"
+    },
+    {
+      "stck_bsop_date": "20260930",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "유진투자",
+      "hts_goal_prc": "330000"
+    },
+    {
+      "stck_bsop_date": "20260921",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "한국투자",
+      "hts_goal_prc": "340000"
+    },
+    {
+      "stck_bsop_date": "20260911",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "상상인",
+      "hts_goal_prc": "350000"
+    },
+    {
+      "stck_bsop_date": "20260907",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "SK",
+      "hts_goal_prc": "350000"
+    },
+    {
+      "stck_bsop_date": "20260902",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "유안타",
+      "hts_goal_prc": "363000"
+    },
+    {
+      "stck_bsop_date": "20260824",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "NH투자",
+      "hts_goal_prc": "320000"
+    },
+    {
+      "stck_bsop_date": "20260821",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "한화투자",
+      "hts_goal_prc": "300000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "다올투자",
+      "hts_goal_prc": "290000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "Buy",
+      "rgbf_invt_opnn": "Buy",
+      "mbcr_name": "LS증권",
+      "hts_goal_prc": "350000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "하나증권",
+      "hts_goal_prc": "305000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "DB증권",
+      "hts_goal_prc": "320000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "삼성",
+      "hts_goal_prc": "270000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "SK",
+      "hts_goal_prc": "290000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "유안타",
+      "hts_goal_prc": "273000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "현대차",
+      "hts_goal_prc": "300000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "한화투자",
+      "hts_goal_prc": "270000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "NH투자",
+      "hts_goal_prc": "300000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "유진투자",
+      "hts_goal_prc": "280000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "신영",
+      "hts_goal_prc": "280000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "한국투자",
+      "hts_goal_prc": "300000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "신한투자증권",
+      "hts_goal_prc": "280000"
+    },
+    {
+      "stck_bsop_date": "20260812",
+      "invt_opnn": "BUY",
+      "rgbf_invt_opnn": "BUY",
+      "mbcr_name": "교보",
+      "hts_goal_prc": "310000"
+    },
+    {
+      "stck_bsop_date": "20260803",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "IBK투자",
+      "hts_goal_prc": "250000"
+    },
+    {
+      "stck_bsop_date": "20260716",
+      "invt_opnn": "매수",
+      "rgbf_invt_opnn": "매수",
+      "mbcr_name": "신한투자증권",
+      "hts_goal_prc": "240000"
+    }
+  ],
+  "disclosures": {
+    "total_count": 77,
+    "list": [
+      {
+        "rcept_dt": "20261006",
+        "report_nm": "임원ㆍ주요주주특정증권등소유상황보고서",
+        "flr_nm": "국민연금공단",
+        "rcept_no": "20261006000233"
+      },
+      {
+        "rcept_dt": "20260930",
+        "report_nm": "기업설명회(IR)개최(안내공시)              ",
+        "flr_nm": "코스맥스",
+        "rcept_no": "20260930800795"
+      },
+      {
+        "rcept_dt": "20260918",
+        "report_nm": "기업설명회(IR)개최(안내공시)              ",
+        "flr_nm": "코스맥스",
+        "rcept_no": "20260918800348"
+      },
+      {
+        "rcept_dt": "20260916",
+        "report_nm": "기업설명회(IR)개최(안내공시)              ",
+        "flr_nm": "코스맥스",
+        "rcept_no": "20260916800379"
+      },
+      {
+        "rcept_dt": "20260909",
+        "report_nm": "기업설명회(IR)개최(안내공시)              ",
+        "flr_nm": "코스맥스",
+        "rcept_no": "20260909800537"
+      }
+    ]
+  }
+}
