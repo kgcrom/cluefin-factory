@@ -50,6 +50,9 @@ scripts/                      # deterministic steps lifted out of the skills
 ├── blind/                    # case masking, seal, sampling, restore, judge read-guard
 ├── pit.mjs                   # PIT store: migrate / rebuild / stats / fill
 ├── watchlist.mjs             # check: watchlist group 1/2/3 + alert/watch/exclude
+├── company.mjs               # collect: market-review report data (quarters, statements,
+│                             # consensus, broker targets, Key Data) in one JSON
+├── company/                  # DART statement parsing, consensus/holder/opinion mapping
 └── pit/                      # node:sqlite store, raw→fact parsers, as-of queries
 tests/                        # vitest specs + fixtures
 ```

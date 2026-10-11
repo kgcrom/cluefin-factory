@@ -33,6 +33,27 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 - 다단계 작업은 `recipes --json` → `recipe <name> --json`을 참고한다
   (`stock-research`, `technical-analysis`, `disclosure-monitoring`, `market-scan`, `corporate-actions`).
 
+### 기업 데이터: `scripts/company.mjs collect`
+
+리포트에 들어가는 조회·계산 데이터는 저장소 루트에서 **한 번에** 모은다(약 20회 호출, 10초 남짓).
+
+```bash
+node scripts/company.mjs collect --symbol 192820
+```
+
+출력은 JSON 한 줄이고 금액은 억원이다. `keyData`(종가·52주 고저·60일 평균 거래·지수·주식수·
+최대주주·외국인 지분율), `consensus`, `opinions`(최근 90일 증권사별 마지막 목표가), `valuation`
+(기준 종가의 시총·TTM PER·PBR·연도별 PER), `quarters`(최근 8개 분기 단독 값과 YoY), `annual`
+(3개 연도 손익·재무상태·현금흐름·비율), `latest`(최신 보고 기간 누적), `disclosures`(1년 공시
+제목), `sources`, `notes`.
+
+- 이 출력에 있는 값은 **다시 조회하거나 다시 계산하지 않는다.** 분기 역산, 비율, 컨센서스 필드
+  해석은 스크립트가 테스트로 고정해 둔 것이다. 값이 이상해 보이면 직접 고치지 말고 그렇다고
+  리포트에 적는다.
+- `notes`와 `annual[].borrowingsBasis`(차입금을 무엇으로 셌는지)를 10번 섹션에 옮긴다.
+- exit가 0이 아니면 stderr의 `exit_code`로 아래 exit code 처리를 따르고, 채우지 못한 섹션은
+  "데이터 없음"으로 둔다.
+
 ### 주요 명령
 
 | 용도 | 명령 |
@@ -41,7 +62,7 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 | 현재가 | `uv run cluefin-openapi-cli kis stock current-price --stock-code 005930 --json` |
 | **기술적 지표** | `uv run cluefin-openapi-cli kis chart technical --stock-code 005930 --count 250 --json` |
 | 가격이력(원시 행) | `uv run cluefin-openapi-cli kis chart period --stock-code 005930 --start-date ... --end-date ... --json` (>120일은 구간 분할 후 병합) |
-| **최신 실적** | `uv run cluefin-openapi-cli dart financial-major-accounts --corp-code <8자리> --bsns-year 2026 --reprt-code 11012 --json` (11011 사업/11012 반기/11013 1Q/11014 3Q) |
+| 최신 실적 | `uv run cluefin-openapi-cli dart financial-major-accounts --corp-code <8자리> --bsns-year 2026 --reprt-code 11012 --json` (11011 사업/11012 반기/11013 1Q/11014 3Q) — 리포트용은 `collect`가 대신한다 |
 | **재무 비율·성장률** | `uv run cluefin-openapi-cli dart financial-major-indicators --corp-code <8자리> --bsns-year 2026 --reprt-code 11012 --idx-cl-code M210000 --json` (M210000 수익성/M220000 안정성/M230000 성장성/M240000 활동성) |
 | 주당지표 등 보조 비율 | `uv run cluefin-openapi-cli kis financial {ratio,stability}` — DART 주요지표에 없는 EPS·BPS·SPS·당좌비율·차입금의존도만 |
 | 과거 5개년 실적 | `uv run cluefin-openapi-cli kis financial {income-statement,balance-sheet} --div-cls-code 0` |
@@ -49,16 +70,13 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 | DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --stock-code 005930 --json` (필터 없이 부르면 약 12만 건 중 100행에서 잘린다) |
 | DART 개요 | `uv run cluefin-openapi-cli dart company-overview --corp-code <8자리> --json` |
 | DART 공시검색 | `uv run cluefin-openapi-cli dart disclosure-search --corp-code <8자리> --bgn-de ... --end-de ... --json` (아래 공시 규칙) |
-| 최대주주 현황 | `uv run cluefin-openapi-cli dart major-shareholder --corp-code <8자리> --bsns-year ... --reprt-code ... --json` |
-| 증권사 의견·목표가 | `uv run cluefin-openapi-cli kis stock investment-opinion` / `investment-opinion-by-brokerage` (날짜 형식이 특이하다 — `schema`로 먼저 확인) |
-| 컨센서스 추정실적 | `uv run cluefin-openapi-cli kis stock estimated-earnings` (처음 쓰면 `schema`·`--dry-run`) |
 
 ### 공시 규칙
 
+공시 목록은 `collect` 출력의 `disclosures`(최근 1년)를 쓰고 따로 조회하지 않는다.
 `disclosure-search`는 공시 **제목·접수번호·접수일만** 준다. 금액·상대방·합병 대상 같은 본문
-내용은 cluefin으로 알 수 없다. 그러니 기간을 한 번에 넓게(최근 1년) 잡아 **한 번만** 조회하고,
-본문이 필요한 공시는 접수번호와 함께 "금액·상대방 미확인"으로 적는다. 기간이나 `pblntf_ty`를
-바꿔 가며 다시 조회해도 본문은 나오지 않는다.
+내용은 cluefin으로 알 수 없으니, 본문이 필요한 공시는 접수번호와 함께 "금액·상대방 미확인"으로
+적는다. 기간이나 `pblntf_ty`를 바꿔 가며 다시 조회해도 본문은 나오지 않는다.
 
 ### exit code 처리
 
@@ -84,7 +102,7 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 말고 "데이터 없음"으로 남긴다.
 
 1. 시장과 종목을 식별한다.
-2. 기본적 분석 데이터를 수집한다.
+2. `scripts/company.mjs collect`로 기본적 분석 데이터를 모은다.
 3. 기술적 분석 데이터를 수집한다.
 4. 최근 뉴스를 수집한다.
 5. 환율, 미국/국내 금리, 채권 데이터를 수집한다.
@@ -114,7 +132,7 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 칸은 지우지 말고 "데이터 없음"으로 둔다. 선택 분석을 하지 않은 칸은 "선택 안 함"이다.
 
 **자체 추정치를 만들지 않는다.** 증권사 리포트의 2026F·2027F 열은 애널리스트 추정이다. 이
-리포트의 추정 열은 컨센서스(`kis stock estimated-earnings`)로만 채우고 "컨센서스"라고 표기한다.
+리포트의 추정 열은 `collect`의 `consensus`로만 채우고 "컨센서스"라고 표기한다.
 컨센서스가 없으면 그 열을 빼고 실적치만 둔다.
 
 ### 1. 요약 (첫 화면)
@@ -139,12 +157,13 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
   | 손절가 / 하락폭 | |
   | 판단 기간 | `horizon_days` |
 
-- **Key Data**: 지수(`kis sector daily` 0001/1001), 52주 최고/최저, 시가총액, 상장주식수,
-  60일 평균 거래량·거래대금, 외국인 지분율, 최대주주와 5% 이상 주주 지분율(`dart major-shareholder`).
-- **Consensus Data**: 최근 2개 연도 매출·영업이익·순이익·EPS·BPS 컨센서스, 증권사 목표가
-  평균/최고/최저와 의견 수(`kis stock investment-opinion`).
-- **Financial Data**: 최근 3개 연도 실적(+ 컨센서스 2개 연도) — 매출, 영업이익, 세전이익,
-  지배주주순이익, EPS, EPS 증감률, PER, PBR, ROE, BPS, DPS. 연도마다 출처를 적는다.
+- **Key Data** (`keyData`): 지수, 52주 최고/최저, 시가총액, 주식수, 60일 평균 거래량·거래대금,
+  외국인 지분율, 최대주주 지분율. 최대주주 측이 아닌 5% 이상 주주는 출력에 없다 — "데이터 없음".
+- **Consensus Data** (`consensus`, `opinions`): 최근 2개 연도 매출·영업이익·지배주주순이익·EPS·ROE
+  컨센서스, 증권사 목표가 평균/중앙값/최고/최저와 의견 수. BPS 컨센서스는 없다.
+- **Financial Data**: 최근 3개 연도 실적(`annual`) + 컨센서스 2개 연도 — 매출, 영업이익, 세전이익,
+  지배주주순이익, EPS, EPS 증감률, PER(`valuation.perByYear`, 기준 종가로 계산), PBR, ROE, DPS.
+  DPS는 출력에 없으니 배당금 지급 총액(`dividendsPaid`)으로 대신하고 그렇다고 적는다.
 
 ### 2. 밸류에이션 (목표가 산정)
 
@@ -156,7 +175,7 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 | 현재가 / 상승여력 | | |
 
 목표가는 `final-decision`의 `levels.targets`와 같은 값이어야 한다. 다르면 이 표가 틀렸거나
-판단이 틀린 것이니 맞춘다. PER/PBR 밴드 차트는 아직 계산 스크립트가 없어 "데이터 없음"으로 둔다.
+판단이 틀린 것이니 맞춘다. 현재가 기준 시총·TTM PER·PBR은 `valuation`에 있다. PER/PBR 밴드 차트는 아직 계산 스크립트가 없어 "데이터 없음"으로 둔다.
 
 ### 3. 사업 현황
 
@@ -174,13 +193,12 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 - 영업이익 / YoY / OPM
 - 지배주주순이익 / YoY (부호가 바뀌면 흑전·적전·적지)
 
-분기 단독 값은 `데이터 수집 기준`의 역산 규칙으로 구하고, 4Q는 연간 − 1~3Q 누적이다.
-역산한 값임을 표 아래에 적는다.
+분기는 `quarters`, 연간은 `annual`을 그대로 옮긴다. Q2~Q4는 누적에서 뺀 값(4Q는 연간 − 9개월
+누적)임을 표 아래에 적는다.
 
 ### 5. 재무제표 요약
 
-최근 3개 연도 + 최신 보고 기간. 손익은 `financial-major-accounts`, 현금흐름은
-`financial-full-statements`에서 읽는다.
+최근 3개 연도(`annual`) + 최신 보고 기간(`latest`, 손익·현금흐름은 연초부터 누적).
 
 - 손익계산서: 매출, 매출원가, 매출총이익, 판관비, 영업이익, 세전이익, 당기순이익, 지배주주순이익
 - 재무상태표: 유동자산(현금성자산·매출채권·재고), 비유동자산, 자산총계, 유동부채, 비유동부채,
@@ -206,11 +224,11 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 
 증권사 리포트의 "투자의견 변동 내역" 자리다. `.claude/investments/journal/`에서 같은 종목의
 과거 판단을 날짜·verdict·목표가·결과(`decision-scorecard` 채점)로 나열한다. 없으면
-"이전 판단 없음". 증권사 의견 변동(`kis stock investment-opinion-by-brokerage`)을 함께 둘 수 있다.
+"이전 판단 없음". 증권사 의견 변동(`opinions.brokers`의 의견·직전 의견)을 함께 둘 수 있다.
 
 ### 10. 데이터 출처와 한계
 
-재무 출처(dart-<보고서코드>/kis-annual)와 기간 목록, 데이터별 기준일, `data-sanity-check`
+재무 출처와 기간 목록(`collect`의 `sources`), 데이터별 기준일, `notes`의 계산값 목록, `data-sanity-check`
 판정과 경고, 수집에 실패한 항목, 계산값(역산·TTM·FCF)과 원문 값의 구분. 마지막 줄은
 "투자 조언이 아닌 의사결정 보조 리포트"다.
 
@@ -230,26 +248,17 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
   종목에 따라 연간 행만 돌려주고, 그 연간마저 한 해 뒤처질 수 있다(125020은 2026-09 시점에
   최신이 FY2024였다). 대형주로 확인하고 KIS를 기본 경로로 삼으면 소형주 분석이 1년 묵은
   수치 위에서 돈다. 반기·분기는 종목 불문 `dart financial-major-accounts`가 준다.
-- **DART 응답의 누적 필드를 쓴다.** 분기·반기 보고서의 손익 행은 `thstrm_amount`에 그 분기만,
-  `thstrm_add_amount`에 연초 누적이 들어온다(1Q는 같다). 반기 실적을 전년과 비교할 때는
-  누적 쪽이다. 재무상태표(BS) 행에는 누적 개념이 없어 `thstrm_add_amount`가 비어 있다.
-- **분기를 떼어낼 때는 역산한다.** 반기(11012)에서 2Q 단독은 `thstrm_amount`, 1Q는
-  `thstrm_add_amount − thstrm_amount`다. 3분기(11014)도 같은 꼴로 3Q 단독이 `thstrm_amount`,
-  1~3Q 누적이 `thstrm_add_amount`다. 분기별 이익률 추세는 누적만 봐서는 보이지 않는다 —
-  125020은 상반기 누적 이익률 4.5% 안에 1Q 6.3%와 2Q 3.1%가 섞여 있었다.
-- **CFS(연결)와 OFS(별도) 중 연결을 기본으로 쓴다.** 연결 자회사가 없으면 OFS만 오므로
-  자동으로 정해지고, 둘 다 오면 CFS다(005930의 2026 반기 매출은 CFS 305.4조, OFS 258.6조로
-  46.8조 차이다). 어느 쪽을 썼는지 리포트에 밝히고, **두 기준을 한 표에 섞지 않는다** —
-  전기 대비 성장률이 조용히 거짓이 된다.
+- **DART 재무제표를 읽는 규칙은 `scripts/company/statements.mjs`에 있다.** 누적 필드
+  (`thstrm_add_amount`), 분기 역산, 연결(CFS) 우선·별도(OFS) 대체, 차입금 계정 합산이 그 파일의
+  코드와 주석이다. 여기 다시 적지 않는다 — 두 벌이 되면 갈라진다. 연결과 별도를 한 표에 섞지
+  않는다(`collect`의 `statementBasis`).
 - **KIS `op_prfi`는 영업이익이 아니라 경상이익(법인세차감전)이다.** 영업이익은 `bsop_prti`,
   당기순이익은 `thtr_ntin`. 값이 없는 필드는 `99.99`로 오며 이것은 실값이 아니다.
-- **`financial-major-accounts`는 BS·IS·CIS 요약 계정만 준다.** 현금흐름표와 자본변동표는
-  없다. 현금흐름이나 계정 세부(예: 유동부채가 왜 늘었는지)가 필요하면 같은 키에
-  `--fs-div`를 붙여 `dart financial-full-statements`로 내려간다. 응답이 크므로 찾는 계정이
-  분명할 때만 쓰고, 그냥 "데이터 없음"으로 적기 전에 이 경로를 먼저 본다.
-- **비율·성장률(ROE, 부채비율, 유동비율, 매출·영업이익 증가율)은 `dart
-  financial-major-indicators`로 읽는다.** 최신 실적과 같은 보고서에서 나오므로 기간이
-  어긋나지 않는다. KIS `ratio/growth`는 최신 실적과 같은 커버리지 한계를 받는다 — 2026-09-29
+- `collect`에 없는 계정 세부(예: 유동부채가 왜 늘었는지)가 필요할 때만 `dart
+  financial-full-statements`를 직접 부른다. 응답이 크므로 찾는 계정이 분명할 때만 쓴다.
+- 리포트의 비율은 `collect`가 재무제표에서 계산한다. **무효화 조건(`metric`)이 쓰는 비율·성장률은
+  `dart financial-major-indicators` 값이다** — scorecard가 그 값으로 채점하므로, 조건 값을 정할 때는
+  이 응답으로 확인한다. 최신 실적과 같은 보고서에서 나오므로 기간이 어긋나지 않는다. KIS `ratio/growth`는 최신 실적과 같은 커버리지 한계를 받는다 — 2026-09-29
   기준 125020은 DART가 2026-06-30 값을 주는데 KIS 비율의 `stac_yymm`은 202412였다.
   응답은 `result.list`의 `idx_nm`/`idx_val` 행이고, 분류(`--idx-cl-code`)마다 한 번씩 부른다.
   - `idx_val`이 `null`이거나 `#########`(자릿수 초과)인 항목은 값이 없는 것이다. 당좌비율·
