@@ -49,6 +49,9 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 | DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --stock-code 005930 --json` (필터 없이 부르면 약 12만 건 중 100행에서 잘린다) |
 | DART 개요 | `uv run cluefin-openapi-cli dart company-overview --corp-code <8자리> --json` |
 | DART 공시검색 | `uv run cluefin-openapi-cli dart disclosure-search --corp-code <8자리> --bgn-de ... --end-de ... --json` |
+| 최대주주 현황 | `uv run cluefin-openapi-cli dart major-shareholder --corp-code <8자리> --bsns-year ... --reprt-code ... --json` |
+| 증권사 의견·목표가 | `uv run cluefin-openapi-cli kis stock investment-opinion` / `investment-opinion-by-brokerage` (날짜 형식이 특이하다 — `schema`로 먼저 확인) |
+| 컨센서스 추정실적 | `uv run cluefin-openapi-cli kis stock estimated-earnings` (처음 쓰면 `schema`·`--dry-run`) |
 
 ### exit code 처리
 
@@ -88,9 +91,120 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
     - 질문 대상: `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`
     - `multiSelect: true`로 네 가지를 각각 선택할 수 있게 하고, 각 옵션 설명에 그 분석이
       무엇을 더해주는지 한 줄로 적는다.
-    - 사용자가 고른 스킬만 호출해 해당 섹션을 이어 붙인다. 묻기 전에 미리 수행하지 않는다.
+    - 사용자가 고른 스킬만 호출해 리포트의 해당 섹션을 채운다. 묻기 전에 미리 수행하지 않는다.
     - 사용자가 아무것도 고르지 않으면 기본 코스 리포트로 종료한다.
 12. 사용자가 원하면 `investment-journal` 형식으로 기록할 내용을 제안한다.
+
+## 리포트 형식
+
+분석은 위 진행 순서대로 하되, 리포트는 **결론이 맨 앞에 오는 증권사 기업분석 형식**으로
+조립한다(하나증권 기업분석 리포트 구성을 따랐다). 아래 섹션을 이 순서로 쓰고, 데이터가 없는
+칸은 지우지 말고 "데이터 없음"으로 둔다. 선택 분석을 하지 않은 칸은 "선택 안 함"이다.
+
+**자체 추정치를 만들지 않는다.** 증권사 리포트의 2026F·2027F 열은 애널리스트 추정이다. 이
+리포트의 추정 열은 컨센서스(`kis stock estimated-earnings`)로만 채우고 "컨센서스"라고 표기한다.
+컨센서스가 없으면 그 열을 빼고 실적치만 둔다.
+
+### 1. 요약 (첫 화면)
+
+```
+<작성일> | 기업분석 | <회사명> (<종목코드>, <시장>)
+<한 줄 제목 — 투자 논지를 한 문장으로>
+```
+
+- **핵심 포인트 3개.** 각각 수치를 담은 굵은 소제목 한 줄 + 3~6문장 본문.
+  1. 실적 — 최신 보고 기간 매출·영업이익과 YoY, 이익률 변화
+     (예: **2Q26 매출 7,949억원(+27.5% YoY), 영업이익 737억원(OPM 9.3%)**)
+  2. 핵심 이슈 — 주가를 움직일 사업·이벤트(수주, 증설, 신사업, 지배구조, 공시)
+  3. 판단 — verdict·기준가·목표가·손절가와 그 근거
+- **판단 박스**
+
+  | 항목 | 값 |
+  | --- | --- |
+  | 판단 | buy/hold/sell/watch (확신도) |
+  | 기준가 (기준일) | |
+  | 목표가 / 상승여력 | |
+  | 손절가 / 하락폭 | |
+  | 판단 기간 | `horizon_days` |
+
+- **Key Data**: 지수(`kis sector daily` 0001/1001), 52주 최고/최저, 시가총액, 상장주식수,
+  60일 평균 거래량·거래대금, 외국인 지분율, 최대주주와 5% 이상 주주 지분율(`dart major-shareholder`).
+- **Consensus Data**: 최근 2개 연도 매출·영업이익·순이익·EPS·BPS 컨센서스, 증권사 목표가
+  평균/최고/최저와 의견 수(`kis stock investment-opinion`).
+- **Financial Data**: 최근 3개 연도 실적(+ 컨센서스 2개 연도) — 매출, 영업이익, 세전이익,
+  지배주주순이익, EPS, EPS 증감률, PER, PBR, ROE, BPS, DPS. 연도마다 출처를 적는다.
+
+### 2. 밸류에이션 (목표가 산정)
+
+| 항목 | 값 | 근거 |
+| --- | --- | --- |
+| 기준 지표 | EPS 또는 BPS (연도·출처) | |
+| 적용 배수 | Target PER/PBR | 과거 범위, 업종 비교, 성장률 중 무엇인지 |
+| 목표가 | 기준 지표 × 배수 | |
+| 현재가 / 상승여력 | | |
+
+목표가는 `final-decision`의 `levels.targets`와 같은 값이어야 한다. 다르면 이 표가 틀렸거나
+판단이 틀린 것이니 맞춘다. PER/PBR 밴드 차트는 아직 계산 스크립트가 없어 "데이터 없음"으로 둔다.
+
+### 3. 사업 현황
+
+이 종목의 주가를 움직이는 사업 이슈를 표로 정리한다(수주·증설·신제품·해외법인 등).
+열은 사업마다 다르지만 기본은 `프로젝트/부문 | 규모 | 일정 | 금액 | 출처`다. 근거는 DART 공시
+(단일판매·공급계약, 신규시설투자, 타법인 출자)와 뉴스다. 부문·지역별 매출은 DART API가
+주지 않는다 — 수치를 못 구하면 정성 근거만 쓰고 그렇다고 밝힌다.
+
+### 4. 실적 개요 (분기·연간)
+
+열은 최근 6~8개 분기 + 최근 2~3개 연도, 행은 아래 순서다.
+
+- 매출 / YoY, (부문별 매출 — 있을 때만)
+- 매출총이익 / GPM
+- 영업이익 / YoY / OPM
+- 지배주주순이익 / YoY (부호가 바뀌면 흑전·적전·적지)
+
+분기 단독 값은 `데이터 수집 기준`의 역산 규칙으로 구하고, 4Q는 연간 − 1~3Q 누적이다.
+역산한 값임을 표 아래에 적는다.
+
+### 5. 재무제표 요약
+
+최근 3개 연도 + 최신 보고 기간. 손익은 `financial-major-accounts`, 현금흐름은
+`financial-full-statements`에서 읽는다.
+
+- 손익계산서: 매출, 매출원가, 매출총이익, 판관비, 영업이익, 세전이익, 당기순이익, 지배주주순이익
+- 재무상태표: 유동자산(현금성자산·매출채권·재고), 비유동자산, 자산총계, 유동부채, 비유동부채,
+  차입금, 부채총계, 지배주주지분, 자본총계, 순차입금
+- 현금흐름표: 영업CF, 투자CF(그중 capex), 재무CF(그중 배당), FCF = 영업CF − capex
+- 투자지표: EPS, BPS, DPS, PER, PBR, ROE, ROA, 부채비율, 순부채비율, 이자보상배율
+
+### 6. 기술적 분석
+
+`technical-analysis` 결과. 이동평균 배열, 지표, 지지/저항, 무효화 가격, trend·mean_reversion
+두 계열을 따로 적는다.
+
+### 7. 뉴스·공시·매크로
+
+`news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과. 선택하지 않았으면
+"선택 안 함".
+
+### 8. Bull / Bear / 시나리오 / 포트폴리오 적합성
+
+`bull-analyst`·`bear-analyst` 논거, `scenario-planner` 표(선택 시), `portfolio-fit` 결과.
+
+### 9. 판단 이력
+
+증권사 리포트의 "투자의견 변동 내역" 자리다. `.claude/investments/journal/`에서 같은 종목의
+과거 판단을 날짜·verdict·목표가·결과(`decision-scorecard` 채점)로 나열한다. 없으면
+"이전 판단 없음". 증권사 의견 변동(`kis stock investment-opinion-by-brokerage`)을 함께 둘 수 있다.
+
+### 10. 데이터 출처와 한계
+
+재무 출처(dart-<보고서코드>/kis-annual)와 기간 목록, 데이터별 기준일, `data-sanity-check`
+판정과 경고, 수집에 실패한 항목, 계산값(역산·TTM·FCF)과 원문 값의 구분. 마지막 줄은
+"투자 조언이 아닌 의사결정 보조 리포트"다.
+
+### 부록. final-decision frontmatter
+
+`final-decision`이 낸 YAML을 그대로 붙인다.
 
 ## 데이터 수집 기준
 
