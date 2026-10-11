@@ -48,10 +48,17 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 | 시장 공시 | `uv run cluefin-openapi-cli kis market announcement --stock-code 005930 --json` |
 | DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --stock-code 005930 --json` (필터 없이 부르면 약 12만 건 중 100행에서 잘린다) |
 | DART 개요 | `uv run cluefin-openapi-cli dart company-overview --corp-code <8자리> --json` |
-| DART 공시검색 | `uv run cluefin-openapi-cli dart disclosure-search --corp-code <8자리> --bgn-de ... --end-de ... --json` |
+| DART 공시검색 | `uv run cluefin-openapi-cli dart disclosure-search --corp-code <8자리> --bgn-de ... --end-de ... --json` (아래 공시 규칙) |
 | 최대주주 현황 | `uv run cluefin-openapi-cli dart major-shareholder --corp-code <8자리> --bsns-year ... --reprt-code ... --json` |
 | 증권사 의견·목표가 | `uv run cluefin-openapi-cli kis stock investment-opinion` / `investment-opinion-by-brokerage` (날짜 형식이 특이하다 — `schema`로 먼저 확인) |
 | 컨센서스 추정실적 | `uv run cluefin-openapi-cli kis stock estimated-earnings` (처음 쓰면 `schema`·`--dry-run`) |
+
+### 공시 규칙
+
+`disclosure-search`는 공시 **제목·접수번호·접수일만** 준다. 금액·상대방·합병 대상 같은 본문
+내용은 cluefin으로 알 수 없다. 그러니 기간을 한 번에 넓게(최근 1년) 잡아 **한 번만** 조회하고,
+본문이 필요한 공시는 접수번호와 함께 "금액·상대방 미확인"으로 적는다. 기간이나 `pblntf_ty`를
+바꿔 가며 다시 조회해도 본문은 나오지 않는다.
 
 ### exit code 처리
 
@@ -65,6 +72,11 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 `data-sanity-check`, `portfolio-fit`, `bull-analyst`, `bear-analyst`,
 `fundamental-analysis`, `technical-analysis`, `macro-analysis`, `news-analysis`,
 `scenario-planner`, `risk-position-sizing`, `final-decision`, `investment-journal`.
+
+**스킬은 이름만으로 호출한다(`args` 없이).** 스킬은 이 대화에 이미 있는 수집 결과를 직접
+읽는다. 수집한 숫자를 요약해 `args`로 다시 써 넘기면 스킬마다 같은 데이터를 새로 생성하느라
+시간이 들고(스킬 10개에 1만 자를 쓴 실행이 그것만으로 3분 넘게 늘었다), 옮기다 숫자가 어긋난다.
+`args`는 대화에 없는 지시(예: 사용자가 정한 기간)가 있을 때 한두 줄로만 쓴다.
 
 ## 진행 순서
 
