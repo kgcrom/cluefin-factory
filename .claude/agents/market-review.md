@@ -66,10 +66,18 @@ node scripts/company.mjs collect --symbol 192820
 | **재무 비율·성장률** | `uv run cluefin-openapi-cli dart financial-major-indicators --corp-code <8자리> --bsns-year 2026 --reprt-code 11012 --idx-cl-code M210000 --json` (M210000 수익성/M220000 안정성/M230000 성장성/M240000 활동성) |
 | 주당지표 등 보조 비율 | `uv run cluefin-openapi-cli kis financial {ratio,stability}` — DART 주요지표에 없는 EPS·BPS·SPS·당좌비율·차입금의존도만 |
 | 과거 5개년 실적 | `uv run cluefin-openapi-cli kis financial {income-statement,balance-sheet} --div-cls-code 0` |
-| 시장 공시 | `uv run cluefin-openapi-cli kis market announcement --stock-code 005930 --json` |
+| **뉴스** | `uv run cluefin-openapi-cli kis market announcement --stock-code 005930 --json` — 종목 기사 제목 최근 40건(`data_dt`·`hts_pbnt_titl_cntt`·`dorg`) |
+| **금리** | `uv run cluefin-openapi-cli kis market interest-rate --json` — `domestic`(국고채 1~30년, 회사채, CD·콜)과 `foreign`(미국 10년 T-Note·1년 T-Bill·연방기금금리, 일본 10년), 행마다 `stck_bsop_date` |
 | DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --stock-code 005930 --json` (필터 없이 부르면 약 12만 건 중 100행에서 잘린다) |
 | DART 개요 | `uv run cluefin-openapi-cli dart company-overview --corp-code <8자리> --json` |
 | DART 공시검색 | `uv run cluefin-openapi-cli dart disclosure-search --corp-code <8자리> --bgn-de ... --end-de ... --json` (아래 공시 규칙) |
+
+### 뉴스·금리·환율
+
+뉴스와 금리는 위 두 명령으로 받는다. `search`로 다시 찾지 않고, **웹 검색으로 대신하지 않는다** —
+웹 기사는 발행일이 섞여, 서로 다른 달의 환율 두 개와 확인되지 않은 금리 기사가 매크로 근거로
+들어간 실행이 있었다. **환율 명령은 cluefin에 없다**(`search`로 확인됨). 환율은 "데이터 없음"으로
+두고 매크로 판단에서 불확실로 분류한다.
 
 ### 공시 규칙
 
@@ -104,8 +112,8 @@ node scripts/company.mjs collect --symbol 192820
 1. 시장과 종목을 식별한다.
 2. `scripts/company.mjs collect`로 기본적 분석 데이터를 모은다.
 3. 기술적 분석 데이터를 수집한다.
-4. 최근 뉴스를 수집한다.
-5. 환율, 미국/국내 금리, 채권 데이터를 수집한다.
+4. 최근 뉴스를 수집한다(`kis market announcement`).
+5. 미국/국내 금리, 채권 데이터를 수집한다(`kis market interest-rate`). 환율은 "데이터 없음".
 6. `data-sanity-check` 관점으로 데이터의 기준일, 누락, 충돌, 사용 가능 여부를 점검한다.
 7. **`fundamental-analysis` 관점으로 재무·밸류에이션·성장성·수익성·현금흐름·부채 구조를 분석한다.
    이 섹션은 필수이며, 사용한 재무 출처(dart-<보고서코드> 또는 kis-annual)와 기간 목록을 함께 적는다.**
