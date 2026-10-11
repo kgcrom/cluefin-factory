@@ -48,6 +48,7 @@ KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI
 | `final-decision` | opus | buy/hold/sell/watch, 기준선, 무효화 조건, 추적 지표 |
 | `investment-journal` | sonnet | 투자 판단과 사후 복기를 `investments/journal/`에 기록 |
 | `decision-scorecard` | sonnet | 과거 판단을 기한·무효화 조건 기준으로 채점하고 적중률·초과수익 집계 |
+| `watchlist-groups` | sonnet | 관심종목 1·2·3그룹 판정, 알림·관찰·제외, 알림가·매수 스톱·손절가 ([근거](docs/watchlist-rules.md)) |
 
 ### Market data
 
@@ -111,6 +112,31 @@ claude          # 저장소 안에서 실행
 > market-review 에이전트로 KOSPI 005930 검토해줘
 ```
 
+### 4. 관심종목 그룹 판정
+
+`watchlist-groups` 스킬은 종목 하나가 1그룹(강세선두)·2그룹(추세시작)·3그룹(돌파대기) 중
+어디에 드는지, 알림을 걸지(`alert`)·지켜볼지(`watch`)·제외할지(`exclude`) 판정하고 알림가·매수
+스톱·손절가를 냅니다. 판정은 `scripts/watchlist.mjs`가 하고, 스킬은 결과를 설명합니다.
+
+```text
+> /watchlist-groups 현대해상
+> 080220 관심종목 몇 그룹이야? 돌파 알림 걸 만해?
+```
+
+Claude 없이 스크립트만 실행해도 됩니다. JSON 하나를 출력합니다.
+
+```bash
+node scripts/watchlist.mjs check --name 현대해상
+node scripts/watchlist.mjs check --symbol 001450 --as-of 20261006
+```
+
+- 장중에 실행하면 오늘 봉은 미완성이라 전일 종가로 판정합니다(15:40 KST 이후는 당일).
+- 종목 강도는 자기 시장 지수(코스피 0001, 코스닥 1001) 대비로 잽니다. 수축 모양이 좋아도
+  지수보다 약하면 제외됩니다.
+- 종목 목록(이름·코드·시장)은 그날 처음 실행할 때 받아 `.claude/investments/watchlist/`에
+  캐시합니다.
+- 규칙과 백테스트 근거는 [docs/watchlist-rules.md](docs/watchlist-rules.md)에 있습니다.
+
 ## How It Works
 
 `/market-review`(Pi)와 `market-review` 서브에이전트(Claude Code)는 동일한 순서를 지시합니다.
@@ -155,9 +181,10 @@ claude          # 저장소 안에서 실행
 .claude/
 ├── agents/
 │   └── market-review.md    # market-review 서브에이전트 (오케스트레이터)
-└── skills/                 # 분석 역할 스킬 12개
+└── skills/                 # 분석 역할 스킬 14개
 docs/
 ├── TODO.md                 # 남아 있는 작업 메모
+├── watchlist-rules.md      # 관심종목 그룹 규칙의 백테스트 근거
 └── assets/                 # 파이프라인 다이어그램 등 정적 리소스
 ```
 

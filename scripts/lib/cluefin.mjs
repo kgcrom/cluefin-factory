@@ -36,10 +36,16 @@ export function run(args, { cwd = process.env.CLUEFIN_OPENAPI_CWD || DEFAULT_CWD
 
 const candle = (row) => ({
   date: row.stck_bsop_date,
+  open: Number(row.stck_oprc),
   close: Number(row.stck_clpr),
   high: Number(row.stck_hgpr),
   low: Number(row.stck_lwpr),
+  volume: Number(row.acml_vol),
+  value: Number(row.acml_tr_pbmn), // traded value in won
 });
+
+/** `options.cli` swaps the CLI runner (tests pass a fake); everything else goes to `run`. */
+const runner = (options) => options?.cli ?? run;
 
 const byDate = (a, b) => a.date.localeCompare(b.date);
 
@@ -78,7 +84,7 @@ export function pageBackwards(fetchPage, from, to) {
 }
 
 function candlePage(symbol, start, end, options) {
-  const payload = run(
+  const payload = runner(options)(
     [
       'kis',
       'chart',
@@ -115,7 +121,7 @@ export const SECTOR = { KOSPI: '0001', KOSDAQ: '1001', KOSPI200: '2001' };
  * several calls merged.
  */
 export function sectorDaily(sectorCode, endingOn, options) {
-  const payload = run(
+  const payload = runner(options)(
     ['kis', 'sector', 'daily', '--sector-code', sectorCode, '--start-date', endingOn],
     options,
   );
