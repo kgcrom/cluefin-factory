@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/kgcrom/cluefin-factory/schemas/final-decision.schema.json",
   "title": "final-decision frontmatter",
-  "description": "투자 저널 파일(.claude/investments/journal/YYYY-MM-DD-SYMBOL.md)의 YAML frontmatter. 채점 봇이 이 블록만 읽는다.",
+  "description": "final-decision이 내는 판단의 YAML frontmatter. 리포트 부록에 그대로 붙는다.",
   "type": "object",
   "required": [
     "schema_version",
@@ -20,8 +20,7 @@
     "thesis",
     "biggest_risk",
     "gates",
-    "skills_run",
-    "scoring"
+    "skills_run"
   ],
   "additionalProperties": false,
   "properties": {
@@ -36,14 +35,7 @@
     "decided_at": {
       "type": "string",
       "format": "date-time",
-      "description": "판단 발행 시각(KST, 오프셋 필수). 채점 기준점."
-    },
-    "supersedes": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "이 판단이 뒤집는 이전 decision_id."
+      "description": "판단 발행 시각(KST, 오프셋 필수)."
     },
     "data_as_of": {
       "type": "object",
@@ -124,7 +116,7 @@
     "horizon_days": {
       "type": "integer",
       "minimum": 1,
-      "description": "채점 기한. 단위는 horizon_basis가 정한다(기본 calendar). 이게 없으면 채점 불가 — 필수."
+      "description": "판단 기간. 단위는 horizon_basis가 정한다(기본 calendar). 기한 없는 판단은 검증할 수 없다 — 필수."
     },
     "horizon_basis": {
       "type": "string",
@@ -138,7 +130,7 @@
     "review_due": {
       "type": "string",
       "format": "date",
-      "description": "사후 복기 예정일. horizon_basis가 trading이면 미래 휴장일을 알 수 없어 근사치이며, 기한 도래 판정은 채점 시점에 실제 거래일을 세어 한다."
+      "description": "재점검 예정일. horizon_basis가 trading이면 미래 휴장일을 알 수 없어 근사치다."
     },
     "reference": {
       "type": "object",
@@ -171,7 +163,7 @@
         },
         "adjusted": {
           "type": "boolean",
-          "description": "수정주가 반영 여부. false면 채점 시 액면분할·유증 보정 필요."
+          "description": "수정주가 반영 여부. false면 사후 비교 시 액면분할·유증 보정 필요."
         }
       }
     },
@@ -225,7 +217,7 @@
         },
         "risk_reward": {
           "type": "number",
-          "description": "risk-position-sizing 산출값. 없으면 생략."
+          "description": "(목표가 − 기준가) / (기준가 − 손절가). 없으면 생략."
         }
       }
     },
@@ -248,7 +240,7 @@
     },
     "debate": {
       "type": "object",
-      "description": "bull/bear 스킬 결과. 'bear가 이겼을 때 실제 성과' 같은 집계에 쓴다.",
+      "description": "bull/bear 스킬 결과.",
       "required": [
         "bull_score",
         "bear_score",
@@ -306,7 +298,7 @@
           },
           "metric": {
             "type": "string",
-            "description": "price는 종가, 재무 지표는 scripts/lib/fundamentals.mjs의 FUNDAMENTAL_METRICS(DART 주요지표, % 단위)로 자동 판정한다. 그 밖의 이름은 manual로 넘어간다. 예: price, operating_profit_growth_yoy, debt_to_equity, foreign_net_buy_20d"
+            "description": "price는 종가. 재무 지표는 DART financial-major-indicators 값(% 단위)을 쓴다: revenue_growth_yoy, operating_profit_growth_yoy, net_income_growth_yoy, roe, net_margin, gross_margin, debt_to_equity, current_ratio, equity_ratio. 그 밖의 이름(예: foreign_net_buy_20d)도 쓸 수 있다."
           },
           "op": {
             "type": "string",
@@ -403,201 +395,6 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
-    },
-    "scoring": {
-      "type": "object",
-      "description": "발행 시점에는 status: pending만 둔다. 채점 봇이 나중에 나머지를 채운다. final-decision 스킬은 이 블록을 pending 외의 값으로 쓰지 않는다.",
-      "required": [
-        "status"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": [
-            "pending",
-            "scored",
-            "invalidated",
-            "superseded",
-            "void"
-          ]
-        },
-        "scored_at": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "date-time"
-        },
-        "price_at_review": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "return_pct": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "reference.price 대비 수익률. verdict가 sell이면 부호를 뒤집어 '판단 기준 성과'로 본다."
-        },
-        "benchmark_return_pct": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "같은 기간 KOSPI/KOSDAQ 수익률. 절대수익이 아니라 초과수익으로 채점한다."
-        },
-        "excess_long": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "종목 수익률 − 벤치마크 수익률, 부호 반전 전 원값. 항상 매수 관점으로 계산하고 verdict에 따라 부등호만 뒤집는다(buy/hold는 >0, sell/watch는 <0이 correct). 집계는 return_pct를 다시 빼지 말고 이 값을 읽는다."
-        },
-        "max_drawdown_pct": {
-          "type": [
-            "number",
-            "null"
-          ]
-        },
-        "stop_hit": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "target_hit": {
-          "type": [
-            "boolean",
-            "null"
-          ]
-        },
-        "invalidated_by": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "description": "발동한 invalidation id 목록."
-        },
-        "outcome": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "correct",
-            "incorrect",
-            "inconclusive",
-            null
-          ]
-        },
-        "horizon_basis": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "enum": [
-            "trading",
-            "calendar",
-            null
-          ],
-          "description": "경과를 거래일로 셌는지 달력일로 셌는지."
-        },
-        "elapsed_days": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "horizon_basis 기준 경과. trading이면 거래일 수다."
-        },
-        "elapsed_calendar_days": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "달력 기준 경과."
-        },
-        "elapsed_ratio": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "elapsed_days / horizon_days, 백분율."
-        },
-        "early_exit": {
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "description": "경과율 20% 미만. horizon별 성과 비교에서 제외한다(적중률에는 포함)."
-        },
-        "index_volatility_pct": {
-          "type": [
-            "number",
-            "null"
-          ],
-          "description": "구간 지수 일간 수익률의 표준편차."
-        },
-        "within_noise": {
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "description": "|excess_long| < index_volatility_pct. 초과수익의 크기를 성패로 읽지 않는다."
-        },
-        "coverage_gap": {
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "description": "조회 구간이 기준일까지 닿지 않았다 — 시계열이 잘렸을 수 있다."
-        },
-        "manual_conditions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "스크립트가 판정을 포기한 조건 id. 사용자에게 물어야 한다."
-        },
-        "notes": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      }
-    },
-    "blind": {
-      "type": "object",
-      "description": "블라인드 backward 판단에만 있다. scripts/blind/restore.mjs가 채운다. 이 필드가 있는 판단은 .claude/investments/blind/decisions/에만 두고 forward journal과 집계하지 않는다.",
-      "required": [
-        "case_id",
-        "seal_sha256"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "case_id": {
-          "type": "string",
-          "pattern": "^[a-z]{12}$"
-        },
-        "seal_sha256": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$",
-          "description": "복원에 쓴 봉인 파일의 해시(scripts/blind/case.mjs sealHash)."
-        },
-        "generator_model": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "description": "판단을 낸 모델 ID. 컷오프 전후 비교에 쓴다."
-        }
       }
     }
   },

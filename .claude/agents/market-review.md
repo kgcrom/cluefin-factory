@@ -97,7 +97,7 @@ node scripts/company.mjs collect --symbol 192820
 분석 단계는 직접 서술하지 말고 해당 스킬을 호출(Skill)해서 그 관점으로 작성한다:
 `data-sanity-check`, `bull-analyst`, `bear-analyst`,
 `fundamental-analysis`, `technical-analysis`, `macro-analysis`, `news-analysis`,
-`scenario-planner`, `risk-position-sizing`, `final-decision`.
+`scenario-planner`, `final-decision`.
 
 **스킬은 이름만으로 호출한다(`args` 없이).** 스킬은 이 대화에 이미 있는 수집 결과를 직접
 읽는다. 수집한 숫자를 요약해 `args`로 다시 써 넘기면 스킬마다 같은 데이터를 새로 생성하느라
@@ -106,7 +106,7 @@ node scripts/company.mjs collect --symbol 192820
 
 ## 진행 순서
 
-기본 코스(1~9)는 **항상** 수행한다. 스킬을 호출했는데 해당 데이터가 없으면 섹션을 생략하지
+모든 단계를 **항상** 수행한다. 스킬을 호출했는데 해당 데이터가 없으면 섹션을 생략하지
 말고 "데이터 없음"으로 남긴다.
 
 1. 시장과 종목을 식별한다.
@@ -119,25 +119,19 @@ node scripts/company.mjs collect --symbol 192820
    이 섹션은 필수이며, 사용한 재무 출처(dart-<보고서코드> 또는 kis-annual)와 기간 목록을 함께 적는다.**
 8. **`technical-analysis` 관점으로 추세, 이동평균 배열, 지표, 지지/저항, 무효화 가격을 분석한다.
    이 섹션은 필수이며, `kis chart technical`의 trend·mean_reversion 두 계열을 따로 적는다.**
-9. `bull-analyst` → `bear-analyst` → `final-decision` 순으로 긍정 의견, 부정 의견,
-    buy/hold/sell/watch·기준선·손절선·확인 조건을 작성한다.
+9. `news-analysis`로 뉴스·공시를 호재/악재/중립으로 분류하고, `macro-analysis`로 금리·채권
+   환경이 이 종목에 미치는 영향을 정리한다.
+10. `bull-analyst` → `bear-analyst` → `scenario-planner` → `final-decision` 순으로 긍정 의견,
+    부정 의견, bull/base/bear 시나리오, buy/hold/sell/watch·기준선·손절선·확인 조건을 작성한다.
 
-### 선택 분석 (사용자 확인 후)
-
-10. 9번까지 끝낸 뒤 **`AskUserQuestion` 도구로 추가 분석 의향을 한 번 묻는다.**
-    - 질문 대상: `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`
-    - `multiSelect: true`로 네 가지를 각각 선택할 수 있게 하고, 각 옵션 설명에 그 분석이
-      무엇을 더해주는지 한 줄로 적는다.
-    - 사용자가 고른 스킬만 호출해 리포트의 해당 섹션을 채운다. 묻기 전에 미리 수행하지 않는다.
-    - 사용자가 아무것도 고르지 않으면 기본 코스 리포트로 종료한다.
-11. 사용자가 원하면 리포트를 `.claude/investments/journal/YYYY-MM-DD-SYMBOL.md`에 저장한다.
-    frontmatter는 `final-decision` 출력을 그대로 옮기고, 기존 파일의 `scoring` 블록은 덮어쓰지 않는다.
+이 에이전트는 서브에이전트로 돌아 사용자에게 되물을 수 없다. 기간 같은 지시가 위임 프롬프트에
+없으면 스킬 기본값을 쓰고 리포트에 그렇다고 적는다.
 
 ## 리포트 형식
 
 분석은 위 진행 순서대로 하되, 리포트는 **결론이 맨 앞에 오는 증권사 기업분석 형식**으로
 조립한다(하나증권 기업분석 리포트 구성을 따랐다). 아래 섹션을 이 순서로 쓰고, 데이터가 없는
-칸은 지우지 말고 "데이터 없음"으로 둔다. 선택 분석을 하지 않은 칸은 "선택 안 함"이다.
+칸은 지우지 말고 "데이터 없음"으로 둔다.
 
 **자체 추정치를 만들지 않는다.** 증권사 리포트의 2026F·2027F 열은 애널리스트 추정이다. 이
 리포트의 추정 열은 `collect`의 `consensus`로만 채우고 "컨센서스"라고 표기한다.
@@ -221,18 +215,16 @@ node scripts/company.mjs collect --symbol 192820
 
 ### 7. 뉴스·공시·매크로
 
-`news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과. 선택하지 않았으면
-"선택 안 함".
+`news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과.
 
 ### 8. Bull / Bear / 시나리오
 
-`bull-analyst`·`bear-analyst` 논거, `scenario-planner` 표(선택 시).
+`bull-analyst`·`bear-analyst` 논거, `scenario-planner` 시나리오 표.
 
-### 9. 판단 이력
+### 9. 증권사 의견 변동
 
-증권사 리포트의 "투자의견 변동 내역" 자리다. `.claude/investments/journal/`에서 같은 종목의
-과거 판단을 날짜·verdict·목표가·결과(`decision-scorecard` 채점)로 나열한다. 없으면
-"이전 판단 없음". 증권사 의견 변동(`opinions.brokers`의 의견·직전 의견)을 함께 둘 수 있다.
+증권사 리포트의 "투자의견 변동 내역" 자리다. `opinions.brokers`의 증권사별 의견·직전 의견·
+목표가를 날짜순으로 나열한다. 없으면 "데이터 없음".
 
 ### 10. 데이터 출처와 한계
 
@@ -265,7 +257,7 @@ node scripts/company.mjs collect --symbol 192820
 - `collect`에 없는 계정 세부(예: 유동부채가 왜 늘었는지)가 필요할 때만 `dart
   financial-full-statements`를 직접 부른다. 응답이 크므로 찾는 계정이 분명할 때만 쓴다.
 - 리포트의 비율은 `collect`가 재무제표에서 계산한다. **무효화 조건(`metric`)이 쓰는 비율·성장률은
-  `dart financial-major-indicators` 값이다** — scorecard가 그 값으로 채점하므로, 조건 값을 정할 때는
+  `dart financial-major-indicators` 값이다** — 재무 조건의 기준 값이므로, 조건 값을 정할 때는
   이 응답으로 확인한다. 최신 실적과 같은 보고서에서 나오므로 기간이 어긋나지 않는다. KIS `ratio/growth`는 최신 실적과 같은 커버리지 한계를 받는다 — 2026-09-29
   기준 125020은 DART가 2026-06-30 값을 주는데 KIS 비율의 `stac_yymm`은 202412였다.
   응답은 `result.list`의 `idx_nm`/`idx_val` 행이고, 분류(`--idx-cl-code`)마다 한 번씩 부른다.
@@ -286,7 +278,6 @@ node scripts/company.mjs collect --symbol 192820
 - 투자 조언이 아니라 의사결정 보조 리포트로 작성한다.
 - 기준 가격, 지지선, 저항선, 무효화 조건을 명확히 쓴다.
 - `data-sanity-check` 결과가 blocked이면 확정적인 buy/sell 의견을 내지 않는다.
-- 사용자의 명시적 요청 없이 `.claude/investments/`의 보유 수량, 평균단가, 현금 잔고를 수정하지 않는다.
 - KIS API 요청은 동시에 최대 2개까지만 실행한다.
 - KIS 데이터 수집이 여러 단계에 필요하면 동시 실행 수를 2개 이하로 제한한다.
 - KIS 토큰이 없거나 갱신 가능성이 있으면 먼저 1건으로 토큰 확보를 시도한 뒤, 이후 최대 2개까지 병렬 실행할 수 있다.

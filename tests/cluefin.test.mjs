@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { dailyCandles, previousDay, sectorDailyRange } from '../scripts/lib/cluefin.mjs';
+import { dailyCandles, previousDay } from '../scripts/lib/cluefin.mjs';
 
 /** A fake index that returns at most 100 trading days ending on the given date. */
 function fakeIndex(fromDate, count) {
@@ -33,17 +33,17 @@ describe('dailyCandles', () => {
   });
 });
 
-describe('sectorDailyRange', () => {
+describe('dailyCandles 페이징', () => {
   it('100행 안에 들어오면 한 번만 부른다', () => {
     const fetchPage = vi.fn(fakeIndex('20260101', 120));
-    const rows = sectorDailyRange('2001', '20260201', '20260301', { fetchPage });
+    const rows = dailyCandles('005930', '20260201', '20260301', { fetchPage });
     expect(fetchPage).toHaveBeenCalledTimes(1);
     expect(rows[0].date >= '20260201').toBe(true);
   });
 
   it('100행을 넘는 구간은 나눠 부르고 병합한다', () => {
     const fetchPage = vi.fn(fakeIndex('20250101', 700));
-    const rows = sectorDailyRange('2001', '20250201', '20260901', { fetchPage });
+    const rows = dailyCandles('005930', '20250201', '20260901', { fetchPage });
     expect(fetchPage.mock.calls.length).toBeGreaterThan(1);
     // 병합 결과는 요청 구간을 실제로 덮고, 중복도 역순도 없다
     expect(rows[0].date).toBe('20250203');
@@ -54,14 +54,14 @@ describe('sectorDailyRange', () => {
 
   it('시작일이 데이터보다 앞서도 무한 루프에 빠지지 않는다', () => {
     const fetchPage = vi.fn(fakeIndex('20260101', 120));
-    const rows = sectorDailyRange('2001', '20200101', '20260301', { fetchPage });
+    const rows = dailyCandles('005930', '20200101', '20260301', { fetchPage });
     expect(fetchPage.mock.calls.length).toBeLessThanOrEqual(24);
     expect(rows[0].date).toBe('20260101');
   });
 
   it('빈 응답이면 즉시 멈춘다', () => {
     const fetchPage = vi.fn(() => []);
-    expect(sectorDailyRange('2001', '20250101', '20260301', { fetchPage })).toEqual([]);
+    expect(dailyCandles('005930', '20250101', '20260301', { fetchPage })).toEqual([]);
     expect(fetchPage).toHaveBeenCalledTimes(1);
   });
 });

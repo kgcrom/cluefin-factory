@@ -2,33 +2,25 @@
 
 스키마 정의: [`final-decision.schema.json`](./final-decision.schema.json)
 
-저장 위치는 journal 디렉터리다 —
-`.claude/investments/journal/YYYY-MM-DD-SYMBOL.md`.
-**YAML frontmatter는 기계용(채점 봇이 이것만 읽는다), 본문은 사람용**이다.
-투자 정보는 민감 정보이므로 이 디렉터리는 계속 git-ignore한다.
+판단은 **YAML frontmatter(기계 판독용) + 본문(사람용)** 으로 내고, `market-review` 리포트의
+부록에 그대로 붙는다.
 
 ## 설계 원칙
 
-1. **채점 가능하지 않으면 필드가 아니다.** `horizon_days`가 필수인 이유 — 기한 없는 판단은
-   영원히 "아직 모른다"로 남아 채점이 안 된다.
-2. **기준일을 전부 남긴다.** `data_as_of`는 사후에 "그때 알 수 있었던 정보였나"를 검증하는
+1. **기한 없는 판단은 검증할 수 없다.** 그래서 `horizon_days`가 필수다.
+2. **기준일을 전부 남긴다.** `data_as_of`는 사후에 "그때 알 수 있었던 정보였나"를 확인하는
    유일한 수단이다. 재무 회계기준일과 공시일을 분리한 것도 같은 이유다.
 3. **무효화 조건은 술어(predicate)로 쓴다.** 자연어만 있으면 사람이 매번 해석해야 한다.
-   못 쓰는 조건은 `checkable: false`로 솔직히 표시한다 — 그 비율 자체가 품질 지표다.
-4. **초과수익으로 채점한다.** 지수가 20% 오른 구간의 +15%는 실패다. `benchmark_return_pct`.
-5. **`scoring` 블록에 `status: pending` 외의 값을 final-decision이 쓰지 않는다.**
-   자기 판단을 자기가 채점하면 스코어보드가 무의미해진다.
-6. **`skills_run`을 남긴다.** "macro-analysis를 붙였을 때 성적이 더 좋은가"를
-   나중에 데이터로 답하기 위해서다.
+   못 쓰는 조건은 `checkable: false`로 솔직히 표시한다.
+4. **`skills_run`을 남긴다.** 어떤 분석을 붙여 낸 판단인지 나중에 구분하기 위해서다.
 
-## 예시 (발행 직후)
+## 예시
 
 ```markdown
 ---
 schema_version: 1
 decision_id: 2026-09-16-005930-01
 decided_at: 2026-09-16T16:10:00+09:00
-supersedes: null
 
 data_as_of:
   price: 2026-09-16
@@ -115,9 +107,6 @@ skills_skipped:
   - macro-analysis
   - news-analysis
   - scenario-planner
-
-scoring:
-  status: pending
 ---
 
 # 삼성전자 (005930) — buy
@@ -130,44 +119,4 @@ scoring:
 
 ## bear case
 ...
-
-## 사후 복기 항목
-...
 ```
-
-## 예시 (채점 후 — 채점 봇이 `scoring`만 덮어쓴다)
-
-```yaml
-scoring:
-  status: scored
-  scored_at: 2026-12-15T09:10:00+09:00
-  price_at_review: 78400
-  return_pct: 9.19
-  benchmark_return_pct: 11.40
-  max_drawdown_pct: -7.2
-  stop_hit: false
-  target_hit: false
-  invalidated_by: []
-  outcome: incorrect   # 절대수익은 +지만 벤치마크 하회 → 판단으로서는 실패
-  notes: 방향은 맞았으나 초과수익 실패. bull_score 7이 과했는지 검토.
-```
-
-`status` 값의 뜻:
-
-| 값 | 의미 |
-| --- | --- |
-| `pending` | 발행됨, 아직 기한 미도래 |
-| `scored` | `review_due` 도래 후 정상 채점 |
-| `invalidated` | 기한 전에 `invalidation` 조건 발동 → 그 시점 가격으로 조기 채점 |
-| `superseded` | 기한 전에 같은 종목 새 판단이 나옴 (새 판단의 `supersedes`가 이 id를 가리킴) |
-| `void` | 상장폐지·거래정지·데이터 오류로 채점 불가 |
-
-## 집계 지표 (스코어보드가 계산할 것)
-
-- verdict별 적중률과 평균 초과수익 (buy/sell/hold/watch)
-- `confidence`와 실제 적중률의 상관 — 캘리브레이션이 맞는가
-- `debate.winner`가 bear일 때 vs bull일 때의 성과 차이
-- `invalidation` 발동률과, 발동 후 손실 회피 폭
-- `checkable: false` 조건의 비율 (낮을수록 좋다)
-- `gates.data_sanity`가 `warn`인 판단의 성과 저하 폭
-- `skills_run`에 macro/news 포함 여부에 따른 성과 차이
