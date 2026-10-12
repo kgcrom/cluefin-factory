@@ -131,26 +131,37 @@ describe('peer.mjs pick', () => {
     expect(out.next[0]).toContain('--items II:1A');
   });
 
+  // `sec filings` hint on 2026-10-12: the form list, then a sentence that names 20-F/6-K for everyone.
+  const noFilingCli = (recent) => (args) => {
+    if (args[1] === 'company-lookup') return { data: [{ cik: 1445930, name: 'X' }] };
+    if (args[1] === 'filings') {
+      return {
+        name: 'X',
+        data: [],
+        hint:
+          `No matching filing among the recent ones. Forms this company filed recently: ${recent}.` +
+          ' 20-F/6-K mean a foreign private issuer, whose filings sec filing-items does not read.',
+      };
+    }
+    throw new Error(`fake CLI: ${args.join(' ')}`);
+  };
+
   it('20-F/6-K 제출사는 foreignPrivateIssuer, 고를 것이 없다', () => {
-    const cli = (args) => {
-      if (args[1] === 'company-lookup')
-        return { data: [{ cik: 1445930, name: 'KB Financial Group Inc.' }] };
-      if (args[1] === 'filings') {
-        return {
-          name: 'KB Financial Group Inc.',
-          data: [],
-          hint: 'Forms this company filed recently: 20-F, 6-K.',
-        };
-      }
-      throw new Error(`fake CLI: ${args.join(' ')}`);
-    };
-    const out = pick({ ticker: 'KB' }, deps(cli));
+    const out = pick(
+      { ticker: 'KB' },
+      deps(noFilingCli('20-F, 20-F/A, 424B5, 6-K, 6-K/A, F-3ASR')),
+    );
     expect(out).toMatchObject({
       foreignPrivateIssuer: true,
       periodic: null,
       earnings: null,
       next: [],
     });
+  });
+
+  it('10-K가 아직 없는 미국 회사는 foreignPrivateIssuer가 아니다 — hint 뒷문장의 20-F/6-K는 보지 않는다', () => {
+    const out = pick({ ticker: 'NEWCO' }, deps(noFilingCli('S-1, S-1/A, 424B4, 8-K')));
+    expect(out).toMatchObject({ foreignPrivateIssuer: false, periodic: null });
   });
 
   it('없는 티커는 exit 1, CLI 자격증명 오류(SEC_USER_AGENT 없음)는 exit 3을 그대로', async () => {

@@ -26,6 +26,16 @@ const CLI = 'uv run cluefin-openapi-cli';
 const compact = (isoDate) => String(isoDate ?? '').replaceAll('-', '');
 
 /**
+ * Forms named in the `sec filings` hint ("… filed recently: 20-F, 6-K, F-3. 20-F/6-K mean a
+ * foreign private issuer, …"). Only the list counts: the sentence after it names 20-F/6-K for
+ * every company.
+ */
+function recentForms(hint) {
+  const list = /filed recently: ([^.]*)\./.exec(hint ?? '')?.[1] ?? '';
+  return new Set(list.split(',').map((form) => form.trim()));
+}
+
+/**
  * Newest filing of `forms` filed by `asOf`. Amendments are left out: a 10-K/A is usually
  * Part III only, and an 8-K/A rarely restates the results.
  */
@@ -96,7 +106,8 @@ export function pick(flags, { cli = run, now = new Date() } = {}) {
   const earnings = newest(cli, cik, '8-K', asOf, ['--items', '2.02']);
   const meta = periodic.payload;
   // The CLI names the forms it did find when none match; 20-F/6-K means a foreign private issuer.
-  const foreignPrivateIssuer = !periodic.filing && /20-F|6-K/.test(meta.hint ?? '');
+  const forms = recentForms(meta.hint);
+  const foreignPrivateIssuer = !periodic.filing && (forms.has('20-F') || forms.has('6-K'));
 
   const next = [];
   let periodicOut = null;
