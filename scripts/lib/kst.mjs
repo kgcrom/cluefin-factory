@@ -9,3 +9,13 @@ export function kstClock(now = new Date()) {
     minutes: kst.getUTCHours() * 60 + kst.getUTCMinutes(),
   };
 }
+
+/** The compact date `days` calendar days before `end` (YYYYMMDD) — where a lookback window starts. */
+export function lookbackStart(end, days) {
+  const at = Date.UTC(
+    Number(end.slice(0, 4)),
+    Number(end.slice(4, 6)) - 1,
+    Number(end.slice(6, 8)),
+  );
+  return new Date(at - days * 86_400_000).toISOString().slice(0, 10).replaceAll('-', '');
+}

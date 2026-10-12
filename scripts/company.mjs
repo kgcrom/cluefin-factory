@@ -24,9 +24,8 @@ import {
   quarters,
   trailing,
 } from './company/statements.mjs';
-import { lookbackStart } from './lib/atr.mjs';
 import { CluefinError, dailyCandles, run, SECTOR, sectorDaily } from './lib/cluefin.mjs';
-import { kstClock, SETTLED_MINUTES } from './lib/kst.mjs';
+import { kstClock, lookbackStart, SETTLED_MINUTES } from './lib/kst.mjs';
 
 /** Calendar days of candles: enough for 52 weeks plus the 60-session average. */
 const CANDLE_DAYS = 380;
