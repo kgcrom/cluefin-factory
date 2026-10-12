@@ -27,6 +27,21 @@ effort: high
   계산하면 기준이 다른 값을 빼게 된다.
 - KIS에서 가져온 값(주당지표, DART가 비운 비율)은 최신 실적보다 뒤처진 기간일 수 있으므로
   그 기준 기간을 함께 쓴다.
+- 사업 구조와 부채 구조의 원문 근거는 `collect`의 `filing`이다. 부문별 매출·수주는
+  `salesAndOrders`, 차입금·사채의 만기·이자율과 특수관계자 거래는 `notes.selected`의 표로 본다.
+  표 금액은 표의 `unit` 단위 원문이라 억원으로 바꿔 쓸 때 단위를 적는다. `filing.error`나
+  `truncated`면 그 근거는 "확인 필요 데이터"로 돌린다.
+
+미국 비교 기업:
+- 사업의 개요·뉴스에 미국 상장 고객사·경쟁사(예: 메모리 고객, 장비 경쟁사)가 보이면 티커와 함께
+  꼽는다. 누가 비교 기업인지는 이 스킬의 판단이다 — 없으면 "해당 없음".
+- `scripts/peer.mjs pick` 결과를 읽는 법: `periodic.items`에서 `uncertain: true`이거나 `warnings`가 있는
+  Item은 경계가 틀렸을 수 있어 근거로 쓰지 않는다. `omitted`·`missing` Item은 본문이 없다.
+  `incorporatedByReference`면 다른 문서를 가리키는 문장뿐이다.
+- Item 본문(`sec filing-items --items <키>`)이 `truncated`면 `--offset-chars <next_offset>`으로 이어 읽는다.
+  1A는 10만 자를 넘기도 하니 `--max-chars`로 나눠 읽고, 읽은 범위를 적는다. 금액은 원문 문자열이고 단위는
+  표기 그대로다.
+- 미국 회사 숫자는 그 회사의 회계연도(`fiscalYearEnd`)·통화 기준이다. 이 종목의 분기와 기간을 맞춰 쓰지 않는다.
 
 출력은 다음 순서로 정리한다.
 - 재무 데이터 기준

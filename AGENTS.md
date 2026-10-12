@@ -46,8 +46,10 @@ schemas/                      # final-decision frontmatter JSON Schema
 scripts/                      # deterministic steps lifted out of the skills
 ├── company.mjs               # collect: market-review report data (quarters, statements,
 │                             # consensus, broker targets, Key Data) in one JSON
-├── company/                  # DART statement parsing, consensus/holder/opinion mapping
-└── lib/                      # cluefin CLI wrapper, KST date helpers
+├── peer.mjs                  # pick: a US peer's newest 10-K/10-Q and results 8-K (SEC)
+├── company/                  # DART statement parsing, consensus/holder/opinion mapping,
+│                             # filing-text excerpts (business overview, notes)
+└── lib/                      # cluefin CLI wrapper, KST date helpers, argument parsing
 tests/                        # vitest specs + fixtures
 ```
 
@@ -89,7 +91,11 @@ decorative.
 
 Market data tools shell out to the external **cluefin** CLI (`uv run
 cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
-`DART_AUTH_KEY`, `KIS_APP_KEY`/`KIS_SECRET_KEY`/`KIS_ENV`.
+`DART_AUTH_KEY`, `KIS_APP_KEY`/`KIS_SECRET_KEY`/`KIS_ENV`. US peer filings (`sec` commands,
+`scripts/peer.mjs`) also need `SEC_USER_AGENT="<name> <email>"` — SEC rejects anonymous clients,
+and without it the CLI exits 3. Like every key, it is read from the cluefin directory's `.env`
+(`$CLUEFIN_OPENAPI_CWD`), not this repo's: an empty value here means nothing. Korean ADRs mostly file 20-F/6-K, which `sec filing-items`
+cannot read; a Korean company's own filings are DART.
 
 ## Gotchas
 
@@ -106,6 +112,11 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
   financial-major-indicators`; KIS keeps only EPS/BPS/SPS and the ratios DART leaves null.
   In KIS income statements
   `bsop_prti` is 영업이익 and `op_prfi` is 경상이익 — the name reads the other way.
+- **Segment revenue, order backlog and debt notes come from the filing text**, not the DART
+  JSON APIs (which have none of it). `collect`'s `filing` reads them from the latest periodic
+  report via `dart document-section`/`financial-notes`; which parts and how many characters are
+  fixed in `scripts/company/filing.mjs`. Non-periodic disclosures (supply contracts, investments)
+  still have titles only.
 - **Technical analysis goes through `kis chart technical`**, not raw OHLCV: the CLI pages
   the candles itself and returns indicator readings + rule votes only. Use `chart period`
   (chunked, ~120 days/call) only when the candle rows themselves are the deliverable. How

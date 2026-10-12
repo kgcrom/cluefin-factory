@@ -7,7 +7,9 @@
  *
  * Prints one JSON object: Key Data, consensus, broker targets, single quarters (YTD
  * differences), three fiscal years of statements with ratios, the latest filed period,
- * valuation at the reference close, and a year of disclosure titles. Money is in 억원.
+ * valuation at the reference close, a year of disclosure titles, and excerpts of the latest
+ * report's own text (business overview, sales and orders, debt and contingency notes).
+ * Money is in 억원.
  *
  * The agent used to fetch these piece by piece and re-derive the quarters by hand, which
  * took most of a run and was re-checked afterwards; the same input now gives the same
@@ -15,6 +17,7 @@
  */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { filingText } from './company/filing.mjs';
 import { consensus, holders, opinions, shareCount, tradingAverage } from './company/market.mjs';
 import {
   annual,
@@ -24,6 +27,7 @@ import {
   quarters,
   trailing,
 } from './company/statements.mjs';
+import { parseArgs } from './lib/args.mjs';
 import { CluefinError, dailyCandles, run, SECTOR, sectorDaily } from './lib/cluefin.mjs';
 import { kstClock, lookbackStart, SETTLED_MINUTES } from './lib/kst.mjs';
 
@@ -165,6 +169,16 @@ function keyData({ cli, symbol, corpCode, asOf, today, intraday, market, latestR
   };
 }
 
+/** Excerpts of the latest report. A failure here leaves the rest of the report standing. */
+function filingExcerpt(cli, { corpCode, rceptNo, statementBasis }) {
+  try {
+    return filingText(cli, { corpCode, rceptNo, statementBasis });
+  } catch (cause) {
+    if (!(cause instanceof CluefinError)) throw cause;
+    return { rceptNo, error: { exit_code: cause.code, message: cause.message.slice(0, 300) } };
+  }
+}
+
 function valuation({ close, shares, quarterList, latestFigures, consensusData }) {
   if (!close || !shares?.outstanding) return null;
   const marketCap = close * shares.outstanding;
@@ -291,8 +305,10 @@ export function collect(flags, { cli = run, now = new Date() } = {}) {
         rceptNo: d.rcept_no,
       })),
     },
+    filing: filingExcerpt(cli, { corpCode, rceptNo: latestReport.rceptNo, statementBasis: basis }),
     sources: {
       statements: reports.map((r) => `dart-${r.reprtCode} ${r.year} (${filedOn(r.rceptNo)} 접수)`),
+      filing: `dart document-section·financial-notes, dart-${latestReport.reprtCode} ${latestReport.year} 원문`,
       consensus: 'kis stock estimated-earnings',
       opinions: 'kis stock investment-opinion',
       price: 'kis chart period (수정주가)',
@@ -301,22 +317,11 @@ export function collect(flags, { cli = run, now = new Date() } = {}) {
       '금액 단위는 억원. 분기 Q2~Q4는 누적에서 뺀 값(4Q = 연간 − 9개월 누적)이다.',
       'gpm·opm·debtRatio·netDebtRatio·interestCoverage·roe·roa·freeCashFlow(영업CF − 유형자산 취득)·valuation은 계산값이다.',
       'interestCoverage의 이자비용은 현금흐름표 조정 항목의 이자비용이다.',
-      '공시는 제목·접수번호만 있다. 금액·상대방은 cluefin으로 알 수 없다.',
+      '공시 목록(disclosures)은 제목·접수번호만 있다. 정기보고서가 아닌 공시의 금액·상대방은 cluefin으로 알 수 없다.',
+      'filing은 최신 정기보고서 원문 발췌다. 문자열은 원문 그대로이고, 표 금액은 표의 unit 단위로 환산하지 않았다.',
       '컨센서스 PER·EV/EBITDA는 기준 가격이 불분명해 뺐다. valuation.perByYear가 기준 종가로 다시 계산한 값이다.',
     ],
   });
-}
-
-function parseArgs(argv) {
-  const [command, ...rest] = argv;
-  const flags = {};
-  for (let i = 0; i < rest.length; i += 2) {
-    if (!rest[i].startsWith('--') || rest[i + 1] === undefined) {
-      return { command, error: `알 수 없는 인자 ${rest[i]}` };
-    }
-    flags[rest[i].slice(2)] = rest[i + 1];
-  }
-  return { command, flags };
 }
 
 const USAGE = 'usage: node scripts/company.mjs collect --symbol <6자리> [--as-of YYYYMMDD]';

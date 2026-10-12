@@ -3,6 +3,8 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { collect, main } from '../scripts/company.mjs';
+import { CluefinError } from '../scripts/lib/cluefin.mjs';
+import { fakeFilingCli } from './fixtures/filing-cli.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('..', import.meta.url)));
 /** One real `collect` run for 192820 on 2026-10-12, trimmed to the rows the script reads. */
@@ -36,6 +38,7 @@ function fakeCli(args) {
   if (path === 'kis stock estimated-earnings') return F.estimates;
   if (path === 'kis stock investment-opinion') return { data: F.opinions };
   if (path === 'kis stock current-price') return F.currentPrice;
+  if (args[1] === 'document-section' || args[1] === 'financial-notes') return fakeFilingCli(args);
   throw new Error(`fake CLI: ${args.join(' ')}`);
 }
 
@@ -108,6 +111,10 @@ describe('company.mjs collect', () => {
     const estimate = out.consensus.years.find((y) => y.period === '2026.12E');
     expect(estimate).toMatchObject({ revenue: 29957, netIncomeOwners: 1725, eps: 15207.1 });
     expect(out.disclosures.total).toBe(77);
+    // 원문 발췌는 최신 보고서(2026 반기)의 접수번호로 읽는다
+    const latestH1 = F.statements['2026-11012'][0].rcept_no;
+    expect(out.filing.rceptNo).toBe(latestH1);
+    expect(out.filing.notes.selected.map((n) => n.title)).toEqual(['차입금']);
   });
 
   it('as-of 뒤에 제출된 보고서는 쓰지 않는다', () => {
@@ -116,5 +123,16 @@ describe('company.mjs collect', () => {
     expect(out.quarters.at(-1).period).toBe('2026Q1');
     expect(out.keyData.price.date <= '20260801').toBe(true);
     expect(out.keyData.foreignRatio).toBeNull(); // 오늘이 아니면 현재가 API를 부르지 않는다
+  });
+
+  it('원문 발췌가 실패해도 나머지는 그대로 내고 실패를 적는다', () => {
+    const cli = vi.fn((args) => {
+      if (args[1] === 'document-section')
+        throw new CluefinError(4, '{"error":{"retryable":false}}');
+      return fakeCli(args);
+    });
+    const out = collect({ symbol: '192820', 'as-of': '20261012' }, { cli, now: AFTER_CLOSE });
+    expect(out.filing).toMatchObject({ error: { exit_code: 4 } });
+    expect(out.quarters).toHaveLength(8);
   });
 });

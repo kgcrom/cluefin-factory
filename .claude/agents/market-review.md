@@ -31,11 +31,12 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
   잘린 경우 `_truncated`에 실제 `total`이 오므로 결론 내기 전에 확인한다.
 - KIS가 1순위, Kiwoom은 보조(`kis_alternatives`가 `[]`일 때만), DART는 레퍼런스다.
 - 다단계 작업은 `recipes --json` → `recipe <name> --json`을 참고한다
-  (`stock-research`, `technical-analysis`, `disclosure-monitoring`, `market-scan`, `corporate-actions`).
+  (`stock-research`, `technical-analysis`, `disclosure-monitoring`, `market-scan`, `corporate-actions`,
+  `filing-text`, `us-peer-filings`).
 
 ### 기업 데이터: `scripts/company.mjs collect`
 
-리포트에 들어가는 조회·계산 데이터는 저장소 루트에서 **한 번에** 모은다(약 20회 호출, 10초 남짓).
+리포트에 들어가는 조회·계산 데이터는 저장소 루트에서 **한 번에** 모은다(약 24회 호출, 15초 남짓).
 
 ```bash
 node scripts/company.mjs collect --symbol 192820
@@ -45,7 +46,19 @@ node scripts/company.mjs collect --symbol 192820
 최대주주·외국인 지분율), `consensus`, `opinions`(최근 90일 증권사별 마지막 목표가), `valuation`
 (기준 종가의 시총·TTM PER·PBR·연도별 PER), `quarters`(최근 8개 분기 단독 값과 YoY), `annual`
 (3개 연도 손익·재무상태·현금흐름·비율), `latest`(최신 보고 기간 누적), `disclosures`(1년 공시
-제목), `sources`, `notes`.
+제목), `filing`(최신 정기보고서 원문 발췌), `sources`, `notes`.
+
+`filing`은 최신 정기보고서 원문에서 읽은 것이다: `businessOverview`(사업의 개요),
+`salesAndOrders`(매출 및 수주상황 — 부문별 매출·수주잔고), `notes`(연결/별도는 `statementBasis`를
+따른다. `toc`는 노트 전체 목록, `selected`는 `scripts/company/filing.mjs`의 `NOTE_TERMS`로 고른
+부채·특수관계자·우발 노트 본문). 블록은
+문자열(문단) 또는 `{unit, rows}`(표)이고 표 금액은 그 `unit` 단위 원문 문자열이다.
+
+- `filing.error`가 있으면 원문을 못 읽은 것이다 — 나머지 출력은 정상이니 원문 근거만 "데이터 없음".
+- `truncated: true`면 발췌가 잘렸다. `notes.warnings`(노트 번호가 빠짐·놓쳤을 수 있음)가 있으면
+  노트 목록이 완전하지 않을 수 있다고 10번 섹션에 적는다.
+- `selected`에 없는 노트(유형자산, 리스 등)나 다른 장이 필요하면 아래 표의 원문 명령을 `filing.rceptNo`
+  로 직접 부른다(같은 `--corp-code`). 레시피는 `recipe filing-text --json`.
 
 - 이 출력에 있는 값은 **다시 조회하거나 다시 계산하지 않는다.** 분기 역산, 비율, 컨센서스 필드
   해석은 스크립트가 테스트로 고정해 둔 것이다. 값이 이상해 보이면 직접 고치지 말고 그렇다고
@@ -71,6 +84,12 @@ node scripts/company.mjs collect --symbol 192820
 | DART 기업코드 | `uv run cluefin-openapi-cli dart corp-code-lookup --stock-code 005930 --json` (필터 없이 부르면 약 12만 건 중 100행에서 잘린다) |
 | DART 개요 | `uv run cluefin-openapi-cli dart company-overview --corp-code <8자리> --json` |
 | DART 공시검색 | `uv run cluefin-openapi-cli dart disclosure-search --corp-code <8자리> --bgn-de ... --end-de ... --json` (아래 공시 규칙) |
+| 원문 목차 | `uv run cluefin-openapi-cli dart document-outline --rcept-no <14자리> --corp-code <8자리> --json` — 섹션별 `index`·`chars` |
+| 원문 섹션 | `uv run cluefin-openapi-cli dart document-section --rcept-no ... --corp-code ... --index <outline의 index> --json` (`--section business`·`--title` 도 가능, 기본 2만 자에서 잘림) |
+| 재무제표 주석 | `uv run cluefin-openapi-cli dart financial-notes --rcept-no ... --corp-code ... --notes 12,15 --json` (필터 없이 부르면 목차, `--title-contains 유형자산`) |
+| 미국 비교 기업 공시 고르기 | `node scripts/peer.mjs pick --ticker MU` (저장소 루트) — 최신 10-K/10-Q·실적 8-K와 Item 목차, 읽을 명령 `next` |
+| 미국 공시 Item 읽기 | `uv run cluefin-openapi-cli sec filing-items --cik ... --accession-number ... --items 1A --json` (`--max-chars`·`--offset-chars`) |
+| 미국 실적 보도자료 | `uv run cluefin-openapi-cli sec filing-exhibit --cik ... --accession-number ... --exhibit EX-99.1 --json` |
 
 ### 뉴스·금리·환율
 
@@ -82,9 +101,10 @@ node scripts/company.mjs collect --symbol 192820
 ### 공시 규칙
 
 공시 목록은 `collect` 출력의 `disclosures`(최근 1년)를 쓰고 따로 조회하지 않는다.
-`disclosure-search`는 공시 **제목·접수번호·접수일만** 준다. 금액·상대방·합병 대상 같은 본문
-내용은 cluefin으로 알 수 없으니, 본문이 필요한 공시는 접수번호와 함께 "금액·상대방 미확인"으로
-적는다. 기간이나 `pblntf_ty`를 바꿔 가며 다시 조회해도 본문은 나오지 않는다.
+`disclosure-search`는 공시 **제목·접수번호·접수일만** 준다. 원문을 읽을 수 있는 것은 정기보고서
+(사업·반기·분기)와 감사보고서뿐이다(`filing`, 위 원문 명령). 단일판매·공급계약, 타법인 출자 같은
+주요사항·수시공시의 금액·상대방·합병 대상은 cluefin으로 알 수 없으니 접수번호와 함께 "금액·상대방
+미확인"으로 적는다. 기간이나 `pblntf_ty`를 바꿔 가며 다시 조회해도 본문은 나오지 않는다.
 
 ### exit code 처리
 
@@ -121,6 +141,13 @@ node scripts/company.mjs collect --symbol 192820
    이 섹션은 필수이며, `kis chart technical`의 trend·mean_reversion 두 계열을 따로 적는다.**
 9. `news-analysis`로 뉴스·공시를 호재/악재/중립으로 분류하고, `macro-analysis`로 금리·채권
    환경이 이 종목에 미치는 영향을 정리한다.
+   - **미국 비교 기업(선택).** `fundamental-analysis`·`news-analysis`가 미국 상장 고객사·경쟁사를
+     티커와 함께 꼽았으면 최대 2개사에 대해 `node scripts/peer.mjs pick --ticker <티커>`를 돌리고, 그
+     `next` 명령으로 10-K 1A·7(10-Q면 II:1A·I:2)과 실적 8-K의 EX-99.1을 읽어 수요·가이던스 근거로
+     쓴다. 꼽힌 회사가 없으면 건너뛰고 그렇다고 적는다. 읽는 법은 `fundamental-analysis`에 있다.
+   - `pick`이 exit 3이면 `SEC_USER_AGENT`가 없는 것이다 — CLI는 `$CLUEFIN_OPENAPI_CWD`의 `.env`만 읽으므로
+     이 저장소 `.env`에 값이 없어도 정상이다. `.env` 파일은 열어 보지 않는다. 건너뛰고 10번 섹션에 적는다.
+     `foreignPrivateIssuer: true`(20-F/6-K 제출사, 한국 ADR 대부분)면 SEC Item을 읽을 수 없다.
 10. `bull-analyst` → `bear-analyst` → `scenario-planner` → `final-decision` 순으로 긍정 의견,
     부정 의견, bull/base/bear 시나리오, buy/hold/sell/watch·기준선·손절선·확인 조건을 작성한다.
 
@@ -182,15 +209,16 @@ node scripts/company.mjs collect --symbol 192820
 ### 3. 사업 현황
 
 이 종목의 주가를 움직이는 사업 이슈를 표로 정리한다(수주·증설·신제품·해외법인 등).
-열은 사업마다 다르지만 기본은 `프로젝트/부문 | 규모 | 일정 | 금액 | 출처`다. 근거는 DART 공시
-(단일판매·공급계약, 신규시설투자, 타법인 출자)와 뉴스다. 부문·지역별 매출은 DART API가
-주지 않는다 — 수치를 못 구하면 정성 근거만 쓰고 그렇다고 밝힌다.
+열은 사업마다 다르지만 기본은 `프로젝트/부문 | 규모 | 일정 | 금액 | 출처`다. 근거는 `filing`
+(사업의 개요의 주요 제품·부문, 매출 및 수주상황의 부문별 매출·수주잔고), DART 공시 제목
+(단일판매·공급계약, 신규시설투자, 타법인 출자)과 뉴스다. `filing.salesAndOrders`가 없으면 부문별
+매출은 "데이터 없음"으로 두고 정성 근거만 쓴다.
 
 ### 4. 실적 개요 (분기·연간)
 
 열은 최근 6~8개 분기 + 최근 2~3개 연도, 행은 아래 순서다.
 
-- 매출 / YoY, (부문별 매출 — 있을 때만)
+- 매출 / YoY, (부문별 매출 — `filing.salesAndOrders`에 있을 때만, 그 표의 기간·단위 그대로)
 - 매출총이익 / GPM
 - 영업이익 / YoY / OPM
 - 지배주주순이익 / YoY (부호가 바뀌면 흑전·적전·적지)
@@ -207,6 +235,7 @@ node scripts/company.mjs collect --symbol 192820
   차입금, 부채총계, 지배주주지분, 자본총계, 순차입금
 - 현금흐름표: 영업CF, 투자CF(그중 capex), 재무CF(그중 배당), FCF = 영업CF − capex
 - 투자지표: EPS, BPS, DPS, PER, PBR, ROE, ROA, 부채비율, 순부채비율, 이자보상배율
+- 부채 세부: 차입금·사채의 만기·이자율과 우발부채·소송은 `filing.notes.selected`의 원문 표로 보충한다.
 
 ### 6. 기술적 분석
 
@@ -215,7 +244,8 @@ node scripts/company.mjs collect --symbol 192820
 
 ### 7. 뉴스·공시·매크로
 
-`news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과.
+`news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과. 미국 비교 기업 공시를
+읽었으면 회사·양식·접수일과 함께 수요·가이던스 근거를 여기에 둔다.
 
 ### 8. Bull / Bear / 시나리오
 
@@ -228,7 +258,8 @@ node scripts/company.mjs collect --symbol 192820
 
 ### 10. 데이터 출처와 한계
 
-재무 출처와 기간 목록(`collect`의 `sources`), 데이터별 기준일, `notes`의 계산값 목록, `data-sanity-check`
+재무 출처와 기간 목록(`collect`의 `sources`), 원문 발췌의 접수번호(`filing.rceptNo`)와 잘림·분할 경고,
+데이터별 기준일, `notes`의 계산값 목록, `data-sanity-check`
 판정과 경고, 수집에 실패한 항목, 계산값(역산·TTM·FCF)과 원문 값의 구분. 마지막 줄은
 "투자 조언이 아닌 의사결정 보조 리포트"다.
 
