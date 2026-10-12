@@ -97,7 +97,7 @@ node scripts/company.mjs collect --symbol 192820
 분석 단계는 직접 서술하지 말고 해당 스킬을 호출(Skill)해서 그 관점으로 작성한다:
 `data-sanity-check`, `bull-analyst`, `bear-analyst`,
 `fundamental-analysis`, `technical-analysis`, `macro-analysis`, `news-analysis`,
-`scenario-planner`, `risk-position-sizing`, `final-decision`.
+`scenario-planner`, `final-decision`.
 
 **스킬은 이름만으로 호출한다(`args` 없이).** 스킬은 이 대화에 이미 있는 수집 결과를 직접
 읽는다. 수집한 숫자를 요약해 `args`로 다시 써 넘기면 스킬마다 같은 데이터를 새로 생성하느라
@@ -125,8 +125,8 @@ node scripts/company.mjs collect --symbol 192820
 ### 선택 분석 (사용자 확인 후)
 
 10. 9번까지 끝낸 뒤 **`AskUserQuestion` 도구로 추가 분석 의향을 한 번 묻는다.**
-    - 질문 대상: `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`
-    - `multiSelect: true`로 네 가지를 각각 선택할 수 있게 하고, 각 옵션 설명에 그 분석이
+    - 질문 대상: `macro-analysis`, `news-analysis`, `scenario-planner`
+    - `multiSelect: true`로 세 가지를 각각 선택할 수 있게 하고, 각 옵션 설명에 그 분석이
       무엇을 더해주는지 한 줄로 적는다.
     - 사용자가 고른 스킬만 호출해 리포트의 해당 섹션을 채운다. 묻기 전에 미리 수행하지 않는다.
     - 사용자가 아무것도 고르지 않으면 기본 코스 리포트로 종료한다.

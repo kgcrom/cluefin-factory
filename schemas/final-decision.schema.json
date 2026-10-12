@@ -225,7 +225,7 @@
         },
         "risk_reward": {
           "type": "number",
-          "description": "risk-position-sizing 산출값. 없으면 생략."
+          "description": "(목표가 − 기준가) / (기준가 − 손절가). 없으면 생략."
         }
       }
     },
