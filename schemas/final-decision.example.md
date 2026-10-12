@@ -2,7 +2,7 @@
 
 스키마 정의: [`final-decision.schema.json`](./final-decision.schema.json)
 
-저장 위치는 기존 `investment-journal` 규칙을 그대로 쓴다 —
+저장 위치는 journal 디렉터리다 —
 `.claude/investments/journal/YYYY-MM-DD-SYMBOL.md`.
 **YAML frontmatter는 기계용(채점 봇이 이것만 읽는다), 본문은 사람용**이다.
 투자 정보는 민감 정보이므로 이 디렉터리는 계속 git-ignore한다.
@@ -108,7 +108,6 @@ skills_run:
   - data-sanity-check
   - fundamental-analysis
   - technical-analysis
-  - portfolio-fit
   - bull-analyst
   - bear-analyst
   - final-decision

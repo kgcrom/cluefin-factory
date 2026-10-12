@@ -56,7 +56,7 @@ forward는 "이 에이전트를 믿어도 되는가"에, 블라인드 backward�
 그때의 실제 값과 대조한다. 판단 시점에 결과를 알 수 없었다는 보증이 이 방식의 근거다.
 
 - 스키마: `schemas/final-decision.schema.json` (+ `final-decision.example.md`)
-- 발행: `final-decision` → `investment-journal`이 frontmatter째 journal에 저장
+- 발행: `final-decision` → `market-review`가 frontmatter째 journal에 저장
 - 채점: `scripts/scorecard.mjs`가 산술과 쓰기를 맡고, `decision-scorecard` 스킬은
   실행과 결과 해석만 한다 (`lint` → `score --write` → `aggregate`)
 
@@ -98,7 +98,7 @@ forward 표본은 달력 시간이 지나야 쌓이므로 블라인드 작업과
    `kiwoom analysis institutional-trend`가 과거 구간을 준다(2026-09-29 확인). PIT의 수급
    캐시와 같은 데이터이므로 그쪽 형식이 정해진 뒤 붙이면 한 번에 끝난다.
 3. **복기 흐름.** `review_due`가 오면 `score` 결과와 함께 journal 본문의 사후 복기 항목을
-   채우도록 `investment-journal`·`decision-scorecard`를 잇는다. 감정 기록은 지금처럼 채점
+   채우도록 `decision-scorecard`를 잇는다. 감정 기록은 지금처럼 채점
    대상 밖에 둔다. 스킬 문서 작업이다.
 4. **`aggregate --brief`.** 표본 10건 미만이면 "해석 불가" 한 줄만 내는 요약. 이것을
    bull/bear/final-decision이 읽고 확신도 조정에만 쓰게 하는 연결은 표본이 쌓인 뒤에 한다.

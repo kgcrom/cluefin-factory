@@ -95,9 +95,9 @@ node scripts/company.mjs collect --symbol 192820
 ## 분석가 스킬
 
 분석 단계는 직접 서술하지 말고 해당 스킬을 호출(Skill)해서 그 관점으로 작성한다:
-`data-sanity-check`, `portfolio-fit`, `bull-analyst`, `bear-analyst`,
+`data-sanity-check`, `bull-analyst`, `bear-analyst`,
 `fundamental-analysis`, `technical-analysis`, `macro-analysis`, `news-analysis`,
-`scenario-planner`, `risk-position-sizing`, `final-decision`, `investment-journal`.
+`scenario-planner`, `risk-position-sizing`, `final-decision`.
 
 **스킬은 이름만으로 호출한다(`args` 없이).** 스킬은 이 대화에 이미 있는 수집 결과를 직접
 읽는다. 수집한 숫자를 요약해 `args`로 다시 써 넘기면 스킬마다 같은 데이터를 새로 생성하느라
@@ -106,7 +106,7 @@ node scripts/company.mjs collect --symbol 192820
 
 ## 진행 순서
 
-기본 코스(1~10)는 **항상** 수행한다. 스킬을 호출했는데 해당 데이터가 없으면 섹션을 생략하지
+기본 코스(1~9)는 **항상** 수행한다. 스킬을 호출했는데 해당 데이터가 없으면 섹션을 생략하지
 말고 "데이터 없음"으로 남긴다.
 
 1. 시장과 종목을 식별한다.
@@ -119,19 +119,19 @@ node scripts/company.mjs collect --symbol 192820
    이 섹션은 필수이며, 사용한 재무 출처(dart-<보고서코드> 또는 kis-annual)와 기간 목록을 함께 적는다.**
 8. **`technical-analysis` 관점으로 추세, 이동평균 배열, 지표, 지지/저항, 무효화 가격을 분석한다.
    이 섹션은 필수이며, `kis chart technical`의 trend·mean_reversion 두 계열을 따로 적는다.**
-9. `portfolio-fit` 관점으로 기존 포트폴리오와의 적합성을 확인한다.
-10. `bull-analyst` → `bear-analyst` → `final-decision` 순으로 긍정 의견, 부정 의견,
+9. `bull-analyst` → `bear-analyst` → `final-decision` 순으로 긍정 의견, 부정 의견,
     buy/hold/sell/watch·기준선·손절선·확인 조건을 작성한다.
 
 ### 선택 분석 (사용자 확인 후)
 
-11. 10번까지 끝낸 뒤 **`AskUserQuestion` 도구로 추가 분석 의향을 한 번 묻는다.**
+10. 9번까지 끝낸 뒤 **`AskUserQuestion` 도구로 추가 분석 의향을 한 번 묻는다.**
     - 질문 대상: `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`
     - `multiSelect: true`로 네 가지를 각각 선택할 수 있게 하고, 각 옵션 설명에 그 분석이
       무엇을 더해주는지 한 줄로 적는다.
     - 사용자가 고른 스킬만 호출해 리포트의 해당 섹션을 채운다. 묻기 전에 미리 수행하지 않는다.
     - 사용자가 아무것도 고르지 않으면 기본 코스 리포트로 종료한다.
-12. 사용자가 원하면 `investment-journal` 형식으로 기록할 내용을 제안한다.
+11. 사용자가 원하면 리포트를 `.claude/investments/journal/YYYY-MM-DD-SYMBOL.md`에 저장한다.
+    frontmatter는 `final-decision` 출력을 그대로 옮기고, 기존 파일의 `scoring` 블록은 덮어쓰지 않는다.
 
 ## 리포트 형식
 
@@ -224,9 +224,9 @@ node scripts/company.mjs collect --symbol 192820
 `news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과. 선택하지 않았으면
 "선택 안 함".
 
-### 8. Bull / Bear / 시나리오 / 포트폴리오 적합성
+### 8. Bull / Bear / 시나리오
 
-`bull-analyst`·`bear-analyst` 논거, `scenario-planner` 표(선택 시), `portfolio-fit` 결과.
+`bull-analyst`·`bear-analyst` 논거, `scenario-planner` 표(선택 시).
 
 ### 9. 판단 이력
 

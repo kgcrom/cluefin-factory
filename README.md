@@ -40,13 +40,11 @@ KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI
 | `news-analysis` | opus | 뉴스, 공시, 실적, 산업 이벤트를 호재/악재/중립으로 분류 |
 | `macro-analysis` | opus | 환율, 미국/한국 금리, 미국채/국고채, 유동성 환경 |
 | `data-sanity-check` | sonnet | 기준일, 누락, 충돌, 종목 식별, 가격 조정 여부 점검 |
-| `portfolio-fit` | opus | 기존 포트폴리오와 신규/기존 종목의 적합성 |
 | `scenario-planner` | opus | bull / base / bear 시나리오와 조건, 예상 가격 범위 |
 | `risk-position-sizing` | sonnet | 진입가, 손절가, 목표가, 손익비, 포지션 크기 |
 | `bull-analyst` | opus | 동일 데이터에서 긍정 투자 논리 구성 |
 | `bear-analyst` | opus | 동일 데이터에서 부정 투자 논리 구성 |
 | `final-decision` | opus | buy/hold/sell/watch, 기준선, 무효화 조건, 추적 지표 |
-| `investment-journal` | sonnet | 투자 판단과 사후 복기를 `investments/journal/`에 기록 |
 | `decision-scorecard` | sonnet | 과거 판단을 기한·무효화 조건 기준으로 채점하고 적중률·초과수익 집계 |
 | `watchlist-groups` | sonnet | 관심종목 1·2·3그룹 판정, 알림·관찰·제외, 알림가·매수 스톱·손절가 ([근거](docs/watchlist-rules.md)) |
 
@@ -149,11 +147,10 @@ node scripts/watchlist.mjs check --symbol 001450 --as-of 20261006
 6. `data-sanity-check`로 기준일, 누락, 충돌, 사용 가능 여부 점검
 7. `fundamental-analysis` (필수 섹션)
 8. `technical-analysis` (필수 섹션)
-9. `portfolio-fit`로 기존 포트폴리오 적합성 확인
-10. `bull-analyst` → `bear-analyst` → `final-decision` (buy/hold/sell/watch, 기준선, 손절선, 확인 조건)
-11. `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`는 기본 코스를
+9. `bull-analyst` → `bear-analyst` → `final-decision` (buy/hold/sell/watch, 기준선, 손절선, 확인 조건)
+10. `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`는 기본 코스를
     끝낸 뒤 사용자에게 물어보고(Claude Code는 AskUserQuestion), 선택한 것만 수행
-12. 필요 시 `investment-journal` 형식으로 기록 제안
+11. 필요 시 리포트를 `investments/journal/`에 저장
 
 주요 가드레일:
 
@@ -166,7 +163,7 @@ node scripts/watchlist.mjs check --symbol 001450 --as-of 20261006
 
 ## Investments Data
 
-`portfolio-fit`과 `investment-journal` 스킬은 사용자별 로컬 데이터를 읽고 씁니다.
+`market-review`, `decision-scorecard`, `watchlist-groups`는 사용자별 로컬 데이터를 읽고 씁니다.
 `.claude/investments/`에 저장합니다.
 
 - `portfolio.yaml`, `watchlist.yaml`, `transactions.csv`: 보유/관심 종목과 거래 기록
@@ -181,7 +178,7 @@ node scripts/watchlist.mjs check --symbol 001450 --as-of 20261006
 .claude/
 ├── agents/
 │   └── market-review.md    # market-review 서브에이전트 (오케스트레이터)
-└── skills/                 # 분석 역할 스킬 14개
+└── skills/                 # 분석 역할 스킬 12개
 docs/
 ├── TODO.md                 # 남아 있는 작업 메모
 ├── watchlist-rules.md      # 관심종목 그룹 규칙의 백테스트 근거

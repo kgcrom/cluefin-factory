@@ -95,7 +95,7 @@ frontmatter에 이미 있는 값을 본문에 다시 나열만 하지는 않는�
 - `gates.data_sanity`가 `blocked`이면 `verdict`는 `watch`만 허용한다.
   확정 판단을 내리지 않는다.
 - `skills_run`에는 이번 검토에서 실제로 수행한 **분석** 스킬만 적는다.
-  `investment-journal`·`decision-scorecard` 같은 기록·채점 스킬은 넣지 않는다 —
+  `decision-scorecard` 같은 채점 스킬은 넣지 않는다 —
   "어떤 분석을 붙였을 때 성적이 좋은가"를 보는 필드라, 모든 판단에 공통으로
   붙는 스킬이 섞이면 신호가 희석된다.
 - `scoring`은 `status: pending`만 쓴다. **이 스킬은 자기 판단을 채점하지 않는다.**

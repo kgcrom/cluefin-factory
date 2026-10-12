@@ -36,10 +36,9 @@ directly, with `js-yaml` and `ajv` as its only dependencies.
 .claude/
 ├── agents/market-review.md   # market-review subagent (the orchestrator)
 ├── agents/blind-judge.md     # blind backward judge: Read only, guarded to one case file
-└── skills/                   # 14 analyst skills: bull/bear-analyst, fundamental-,
+└── skills/                   # 12 analyst skills: bull/bear-analyst, fundamental-,
                               # technical-, macro-, news-analysis, scenario-planner,
-                              # final-decision, data-sanity-check, portfolio-fit,
-                              # risk-position-sizing, investment-journal,
+                              # final-decision, data-sanity-check, risk-position-sizing,
                               # decision-scorecard, watchlist-groups
 docs/                         # TODO.md + assets/ (GitHub Pages source),
                               # watchlist-rules.md (evidence for the watchlist rules)
@@ -62,12 +61,12 @@ Investments data is per-user and git-ignored: `.claude/investments/` (the PIT st
 
 Each skill pins a model in its frontmatter: `sonnet` for rule-application, arithmetic
 and recording (data-sanity-check, technical-analysis, risk-position-sizing,
-investment-journal, decision-scorecard, watchlist-groups), `opus` for everything that
-weighs multiple sources or argues a side. Each also pins an `effort`: `low` for recording or
-explaining a script's verdict (investment-journal, watchlist-groups), `medium` for applying
+decision-scorecard, watchlist-groups), `opus` for everything that
+weighs multiple sources or argues a side. Each also pins an `effort`: `low` for
+explaining a script's verdict (watchlist-groups), `medium` for applying
 rules or classifying (the other sonnet skills, news-analysis, market-review's orchestration),
 `high` for building or attacking a thesis (bull/bear, fundamental, macro, scenario,
-portfolio-fit, blind-judge), and `xhigh` only for final-decision, where every other output
+blind-judge), and `xhigh` only for final-decision, where every other output
 is weighed at once.
 
 ## Code vs. skill
