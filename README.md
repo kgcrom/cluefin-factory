@@ -1,16 +1,16 @@
 # Cluefin Factory
 
-![market-review 파이프라인 다이어그램 — KIS·DART 데이터 수집부터 data-sanity-check 게이트, 기본적·기술적 분석, 포트폴리오 적합성, bull/bear 토론, 최종 판단, 종목별 투자 검토 리포트까지](docs/assets/factory_logo.png)
+![market-review 파이프라인 다이어그램 — KIS·DART 데이터 수집부터 data-sanity-check 게이트, 기본적·기술적 분석, bull/bear 토론, 최종 판단, 종목별 투자 검토 리포트까지](docs/assets/factory_logo.png)
 
 Cluefin Factory는 한국 시장 투자 리서치 워크벤치입니다.
-테슬라의 기가팩토리처럼 기업 분석과 종목 추출을 끊임없이 반복해 내놓는 "공장"을 지향합니다.
+테슬라의 기가팩토리처럼 기업 분석을 끊임없이 반복해 내놓는 "공장"을 지향합니다.
+한 기업의 시계열 재무제표, 뉴스, 매크로, 시나리오를 근거로 판단합니다. 포트폴리오 관리와 포지션 사이징은 하지 않습니다.
 별도의 CLI를 만들지 않고, 코딩 에이전트의 project-local resource로 시장 데이터 도구와 분석 워크플로우를 구성합니다.
-시장과 종목을 입력하면 데이터 수집부터 기본적/기술적/뉴스/매크로 분석, 데이터 점검, 포트폴리오 적합성, bull/bear 의견, 최종 판단까지 하나의 진입점에서 실행합니다.
+시장과 종목을 입력하면 데이터 수집부터 기본적/기술적/뉴스/매크로 분석, 데이터 점검, bull/bear 의견, 시나리오, 최종 판단까지 하나의 진입점에서 실행합니다.
 
 위 그림이 `market-review` 서브에이전트의 실행 순서입니다. `data-sanity-check`가 게이트 역할을
 해서 blocked이면 확정 판단을 내리지 않고, `fundamental-analysis`와 `technical-analysis`는 항상
-수행하며, `macro-analysis`·`news-analysis`·`scenario-planner`·`risk-position-sizing`은 사용자가
-요청할 때만 붙습니다.
+수행하며, `news-analysis`·`macro-analysis`·`scenario-planner`도 기본 코스에 들어갑니다.
 
 런타임은 **[Claude Code](https://docs.claude.com/en/docs/claude-code)** 하나이며,
 `.claude/` 리소스로 동작합니다. `market-review` 에이전트가 cluefin CLI를 bash로 직접
@@ -31,7 +31,7 @@ KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI
 
 ### Analysis skills
 
-`.claude/skills/`에 있습니다. 규칙 적용·산술·기록처럼 기계적인 스킬은 sonnet, 다중 근거를 종합하거나 반론을 구성하는 스킬은 opus로 고정했습니다.
+`.claude/skills/`에 있습니다. 규칙 적용·분류처럼 기계적인 스킬은 sonnet, 다중 근거를 종합하거나 반론을 구성하는 스킬은 opus로 고정했습니다.
 
 | Skill | 모델 | 역할 |
 | --- | --- | --- |
@@ -41,12 +41,9 @@ KIS·DART 데이터를 가져오는 도구는 cluefin 프로젝트의 Python CLI
 | `macro-analysis` | opus | 환율, 미국/한국 금리, 미국채/국고채, 유동성 환경 |
 | `data-sanity-check` | sonnet | 기준일, 누락, 충돌, 종목 식별, 가격 조정 여부 점검 |
 | `scenario-planner` | opus | bull / base / bear 시나리오와 조건, 예상 가격 범위 |
-| `risk-position-sizing` | sonnet | 진입가, 손절가, 목표가, 손익비, 포지션 크기 |
 | `bull-analyst` | opus | 동일 데이터에서 긍정 투자 논리 구성 |
 | `bear-analyst` | opus | 동일 데이터에서 부정 투자 논리 구성 |
 | `final-decision` | opus | buy/hold/sell/watch, 기준선, 무효화 조건, 추적 지표 |
-| `decision-scorecard` | sonnet | 과거 판단을 기한·무효화 조건 기준으로 채점하고 적중률·초과수익 집계 |
-| `watchlist-groups` | sonnet | 관심종목 1·2·3그룹 판정, 알림·관찰·제외, 알림가·매수 스톱·손절가 ([근거](docs/watchlist-rules.md)) |
 
 ### Market data
 
@@ -110,47 +107,21 @@ claude          # 저장소 안에서 실행
 > market-review 에이전트로 KOSPI 005930 검토해줘
 ```
 
-### 4. 관심종목 그룹 판정
-
-`watchlist-groups` 스킬은 종목 하나가 1그룹(강세선두)·2그룹(추세시작)·3그룹(돌파대기) 중
-어디에 드는지, 알림을 걸지(`alert`)·지켜볼지(`watch`)·제외할지(`exclude`) 판정하고 알림가·매수
-스톱·손절가를 냅니다. 판정은 `scripts/watchlist.mjs`가 하고, 스킬은 결과를 설명합니다.
-
-```text
-> /watchlist-groups 현대해상
-> 080220 관심종목 몇 그룹이야? 돌파 알림 걸 만해?
-```
-
-Claude 없이 스크립트만 실행해도 됩니다. JSON 하나를 출력합니다.
-
-```bash
-node scripts/watchlist.mjs check --name 현대해상
-node scripts/watchlist.mjs check --symbol 001450 --as-of 20261006
-```
-
-- 장중에 실행하면 오늘 봉은 미완성이라 전일 종가로 판정합니다(15:40 KST 이후는 당일).
-- 종목 강도는 자기 시장 지수(코스피 0001, 코스닥 1001) 대비로 잽니다. 수축 모양이 좋아도
-  지수보다 약하면 제외됩니다.
-- 종목 목록(이름·코드·시장)은 그날 처음 실행할 때 받아 `.claude/investments/watchlist/`에
-  캐시합니다.
-- 규칙과 백테스트 근거는 [docs/watchlist-rules.md](docs/watchlist-rules.md)에 있습니다.
-
 ## How It Works
 
-`/market-review`(Pi)와 `market-review` 서브에이전트(Claude Code)는 동일한 순서를 지시합니다.
+`market-review` 서브에이전트는 아래 순서로 진행합니다.
 
 1. 시장과 종목 식별
-2. 기본적 분석 데이터 수집 (가능하면 최근 5개년 연간, 부족하면 최근 12개 기간)
+2. 기본적 분석 데이터 수집 (`node scripts/company.mjs collect` — 분기·연간 재무, 컨센서스, 증권사 목표가)
 3. 기술적 분석 지표 수집 (`kis chart technical` — CLI가 일봉을 페이징해 지표·신호만 반환, 기본 수정주가)
 4. 최근 뉴스 수집
 5. 환율, 미국/국내 금리, 채권 등 매크로 데이터 수집
 6. `data-sanity-check`로 기준일, 누락, 충돌, 사용 가능 여부 점검
 7. `fundamental-analysis` (필수 섹션)
 8. `technical-analysis` (필수 섹션)
-9. `bull-analyst` → `bear-analyst` → `final-decision` (buy/hold/sell/watch, 기준선, 손절선, 확인 조건)
-10. `macro-analysis`, `news-analysis`, `scenario-planner`, `risk-position-sizing`는 기본 코스를
-    끝낸 뒤 사용자에게 물어보고(Claude Code는 AskUserQuestion), 선택한 것만 수행
-11. 필요 시 리포트를 `investments/journal/`에 저장
+9. `news-analysis`, `macro-analysis`
+10. `bull-analyst` → `bear-analyst` → `scenario-planner` → `final-decision`
+    (buy/hold/sell/watch, 기준선, 손절선, 무효화 조건)
 
 주요 가드레일:
 
@@ -159,18 +130,6 @@ node scripts/watchlist.mjs check --symbol 001450 --as-of 20261006
 - KIS API 요청은 동시에 최대 2개로 제한하고, 토큰/호출 제한 오류(exit 5) 시 확정 판단을 미룹니다.
 - 명령 경로는 `search`, 파라미터는 `schema`로 확인하며 `list` 전체 덤프는 호출하지 않습니다.
 - 기술적 신호는 trend/mean_reversion 두 계열을 따로 읽고 하나의 점수로 합치지 않습니다.
-- 사용자의 명시적 요청 없이 `investments/`의 보유 수량, 평균단가, 현금 잔고를 수정하지 않습니다.
-
-## Investments Data
-
-`market-review`, `decision-scorecard`, `watchlist-groups`는 사용자별 로컬 데이터를 읽고 씁니다.
-`.claude/investments/`에 저장합니다.
-
-- `portfolio.yaml`, `watchlist.yaml`, `transactions.csv`: 보유/관심 종목과 거래 기록
-  (`transactions.csv`의 `decision_id`로 매매를 판단에 연결한다 — `scorecard.mjs execution`)
-- `journal/`: 투자 판단과 사후 복기 기록
-
-이 데이터는 개인 자료이므로 커밋하지 않습니다 (`.gitignore`에서 `.claude/investments/` 제외).
 
 ## Repository Layout
 
@@ -178,25 +137,29 @@ node scripts/watchlist.mjs check --symbol 001450 --as-of 20261006
 .claude/
 ├── agents/
 │   └── market-review.md    # market-review 서브에이전트 (오케스트레이터)
-└── skills/                 # 분석 역할 스킬 12개
+└── skills/                 # 분석 역할 스킬 9개
 docs/
 ├── TODO.md                 # 남아 있는 작업 메모
-├── watchlist-rules.md      # 관심종목 그룹 규칙의 백테스트 근거
 └── assets/                 # 파이프라인 다이어그램 등 정적 리소스
+schemas/                    # final-decision frontmatter JSON Schema
+scripts/
+├── company.mjs             # collect: 리포트용 기업 데이터를 JSON 하나로
+└── company/                # DART 재무제표 파싱, 컨센서스·목표가 매핑
+tests/                      # vitest
 ```
 
 ## Development
 
 작업을 마친 뒤 아래 검증을 실행합니다.
 
-저장소에 소스 코드가 없어 빌드 단계는 없습니다. 남은 npm 스크립트는 형식 검사용입니다.
+빌드 단계는 없습니다. `scripts/`는 Node(ESM)로 바로 실행합니다.
 
 ```bash
 npm run lint   # biome check
 npm run format # biome format --write
-npm test       # vitest (--passWithNoTests, 현재 테스트 없음)
+npm test       # vitest
 ```
 
 ## Related Docs
 
-- [docs/TODO.md](docs/TODO.md): `investment-decision` extension 도입 검토 등 남아 있는 작업 메모
+- [docs/TODO.md](docs/TODO.md): 남아 있는 작업 메모

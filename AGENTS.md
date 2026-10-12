@@ -1,7 +1,10 @@
 # AGENTS.md
 
 Cluefin Factory is an agent configuration for Korean-market investment research —
-a "factory" that keeps turning out company analyses and stock picks.
+a "factory" that keeps turning out company analyses. Scope is one company at a time:
+time-series financials, news, macro and scenarios feed a single judgment. Portfolio
+management, position sizing, watchlists and decision journaling are out of scope;
+backtesting will be rebuilt separately.
 It is mostly Claude Code configuration (Markdown) plus docs. Run `claude` in-repo;
 analyst skills live in `.claude/skills/`, the orchestrator in
 `.claude/agents/market-review.md`. The agent reaches market data by shelling out to
@@ -28,59 +31,49 @@ npm run format        # biome format --write .
 ```
 
 There is nothing to build. npm is the lint/test toolchain; `scripts/` runs on Node
-directly, with `js-yaml` and `ajv` as its only dependencies.
+directly with no runtime dependencies.
 
 ## Layout
 
 ```
 .claude/
 ├── agents/market-review.md   # market-review subagent (the orchestrator)
-├── agents/blind-judge.md     # blind backward judge: Read only, guarded to one case file
-└── skills/                   # 12 analyst skills: bull/bear-analyst, fundamental-,
-                              # technical-, macro-, news-analysis, scenario-planner,
-                              # final-decision, data-sanity-check, risk-position-sizing,
-                              # decision-scorecard, watchlist-groups
-docs/                         # TODO.md + assets/ (GitHub Pages source),
-                              # watchlist-rules.md (evidence for the watchlist rules)
-schemas/                      # final-decision frontmatter + blind case JSON Schemas
+└── skills/                   # 9 analyst skills: data-sanity-check, fundamental-,
+                              # technical-, news-, macro-analysis, bull/bear-analyst,
+                              # scenario-planner, final-decision
+docs/                         # TODO.md + assets/ (GitHub Pages source)
+schemas/                      # final-decision frontmatter JSON Schema
 scripts/                      # deterministic steps lifted out of the skills
-├── scorecard.mjs             # lint / score [--write] / aggregate
-├── blind.mjs                 # blind run: universe / register / build / judge / restore
-├── blind/                    # case masking, seal, sampling, restore, judge read-guard
-├── pit.mjs                   # PIT store: migrate / rebuild / stats / fill
-├── watchlist.mjs             # check: watchlist group 1/2/3 + alert/watch/exclude
 ├── company.mjs               # collect: market-review report data (quarters, statements,
 │                             # consensus, broker targets, Key Data) in one JSON
 ├── company/                  # DART statement parsing, consensus/holder/opinion mapping
-└── pit/                      # node:sqlite store, raw→fact parsers, as-of queries
+└── lib/                      # cluefin CLI wrapper, KST date helpers
 tests/                        # vitest specs + fixtures
 ```
 
-Investments data is per-user and git-ignored: `.claude/investments/` (the PIT store is
-`.claude/investments/pit/pit.sqlite`, blind runs are `.claude/investments/blind/<run>/`).
+Each skill pins a model in its frontmatter: `sonnet` for rule-application and
+classification (data-sanity-check, technical-analysis), `opus` for everything that
+weighs multiple sources or argues a side. Each also pins an `effort`: `medium` for applying
+rules, classifying or reading thin data (data-sanity-check, technical-analysis,
+news-analysis, macro-analysis, market-review's orchestration), `high` for building or
+attacking a thesis (bull/bear, fundamental, scenario), and `xhigh` only for
+final-decision, where every other output is weighed at once.
 
-Each skill pins a model in its frontmatter: `sonnet` for rule-application, arithmetic
-and recording (data-sanity-check, technical-analysis, risk-position-sizing,
-decision-scorecard, watchlist-groups), `opus` for everything that
-weighs multiple sources or argues a side. Each also pins an `effort`: `low` for
-explaining a script's verdict (watchlist-groups), `medium` for applying
-rules or classifying (the other sonnet skills, news-analysis, market-review's orchestration),
-`high` for building or attacking a thesis (bull/bear, fundamental, macro, scenario,
-blind-judge), and `xhigh` only for final-decision, where every other output
-is weighed at once.
+**Skills, not agents.** The analysts stay skills because `market-review` already runs as a
+subagent, and a subagent cannot spawn another; skills also read the collected data
+straight from the conversation instead of having it re-serialised into a prompt. A
+subagent cannot ask the user either (`AskUserQuestion` is unavailable), so every step in
+`market-review` runs by default rather than waiting on a question.
 
 ## Code vs. skill
 
 A step belongs in `scripts/` when the same input must always produce the same output:
-schema validation, date arithmetic, predicate evaluation, return/benchmark/volatility
-maths, aggregation tables, and writing computed fields back into journal frontmatter.
-Writing that logic ad hoc each session costs tokens, drifts between runs, and cannot be
-tested. The `invalidation` predicates (`metric`/`op`/`value`) were designed to be
-machine-read — a skill should not be reading them by eye.
+parsing DART statements, back-deriving quarters, ratio and valuation arithmetic, and
+mapping consensus fields. Writing that logic ad hoc each session costs tokens, drifts
+between runs, and cannot be tested.
 
 A step stays in a skill when it weighs evidence or writes prose: forming a thesis,
-designing invalidation conditions, arguing bull vs. bear, resolving `checkable: false`
-conditions with the user, and interpreting a scorecard. Skills also stay in charge of
+designing invalidation conditions, arguing bull vs. bear, and laying out scenarios. Skills also stay in charge of
 changing the rules themselves.
 
 **Rules live in the code that enforces them.** When a rule moves to `scripts/`, the
@@ -100,14 +93,6 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
 
 ## Gotchas
 
-- **`blind-judge` runs as a separate headless process** (`claude -p --agent blind-judge`,
-  driven by `node scripts/blind.mjs judge`), never as a subagent of a session that has
-  read seals. Agent definitions load at session start, so a new or edited agent file is
-  invisible to the Agent tool until restart — the headless process reads it fresh.
-- **PIT store needs Node ≥ 22.5** for the built-in `node:sqlite` (still experimental —
-  `scripts/pit/db.mjs` is the only module that imports it). A row dated after `as_of`
-  reaching the blind case builder is a bug upstream; the builder throws instead of
-  filtering it.
 - **cluefin path:** the agent runs the CLI from `$CLUEFIN_OPENAPI_CWD`, default
   `~/workspace/cluefin`; credentials come from that directory's `.env`.
 - `.claude/agents/market-review.md` holds the bash recipes for the cluefin CLI
