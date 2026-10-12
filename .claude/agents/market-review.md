@@ -145,7 +145,8 @@ node scripts/company.mjs collect --symbol 192820
      티커와 함께 꼽았으면 최대 2개사에 대해 `node scripts/peer.mjs pick --ticker <티커>`를 돌리고, 그
      `next` 명령으로 10-K 1A·7(10-Q면 II:1A·I:2)과 실적 8-K의 EX-99.1을 읽어 수요·가이던스 근거로
      쓴다. 꼽힌 회사가 없으면 건너뛰고 그렇다고 적는다. 읽는 법은 `fundamental-analysis`에 있다.
-   - `pick`이 exit 3이면 `SEC_USER_AGENT`가 없는 것이다(이 저장소 `.env`, `.env.example` 참고) — 건너뛰고 10번 섹션에 적는다.
+   - `pick`이 exit 3이면 `SEC_USER_AGENT`가 없는 것이다 — CLI는 `$CLUEFIN_OPENAPI_CWD`의 `.env`만 읽으므로
+     이 저장소 `.env`에 값이 없어도 정상이다. `.env` 파일은 열어 보지 않는다. 건너뛰고 10번 섹션에 적는다.
      `foreignPrivateIssuer: true`(20-F/6-K 제출사, 한국 ADR 대부분)면 SEC Item을 읽을 수 없다.
 10. `bull-analyst` → `bear-analyst` → `scenario-planner` → `final-decision` 순으로 긍정 의견,
     부정 의견, bull/base/bear 시나리오, buy/hold/sell/watch·기준선·손절선·확인 조건을 작성한다.

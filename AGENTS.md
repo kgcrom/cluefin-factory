@@ -93,7 +93,8 @@ Market data tools shell out to the external **cluefin** CLI (`uv run
 cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
 `DART_AUTH_KEY`, `KIS_APP_KEY`/`KIS_SECRET_KEY`/`KIS_ENV`. US peer filings (`sec` commands,
 `scripts/peer.mjs`) also need `SEC_USER_AGENT="<name> <email>"` — SEC rejects anonymous clients,
-and without it the CLI exits 3. Korean ADRs mostly file 20-F/6-K, which `sec filing-items`
+and without it the CLI exits 3. Like every key, it is read from the cluefin directory's `.env`
+(`$CLUEFIN_OPENAPI_CWD`), not this repo's: an empty value here means nothing. Korean ADRs mostly file 20-F/6-K, which `sec filing-items`
 cannot read; a Korean company's own filings are DART.
 
 ## Gotchas
