@@ -32,7 +32,7 @@ description: 시장과 기업명/종목코드를 받아 데이터 수집부터 b
 - KIS가 1순위, Kiwoom은 보조(`kis_alternatives`가 `[]`일 때만), DART는 레퍼런스다.
 - 다단계 작업은 `recipes --json` → `recipe <name> --json`을 참고한다
   (`stock-research`, `technical-analysis`, `disclosure-monitoring`, `market-scan`, `corporate-actions`,
-  `filing-text`).
+  `filing-text`, `us-peer-filings`).
 
 ### 기업 데이터: `scripts/company.mjs collect`
 
@@ -87,6 +87,9 @@ node scripts/company.mjs collect --symbol 192820
 | 원문 목차 | `uv run cluefin-openapi-cli dart document-outline --rcept-no <14자리> --corp-code <8자리> --json` — 섹션별 `index`·`chars` |
 | 원문 섹션 | `uv run cluefin-openapi-cli dart document-section --rcept-no ... --corp-code ... --index <outline의 index> --json` (`--section business`·`--title` 도 가능, 기본 2만 자에서 잘림) |
 | 재무제표 주석 | `uv run cluefin-openapi-cli dart financial-notes --rcept-no ... --corp-code ... --notes 12,15 --json` (필터 없이 부르면 목차, `--title-contains 유형자산`) |
+| 미국 비교 기업 공시 고르기 | `node scripts/peer.mjs pick --ticker MU` (저장소 루트) — 최신 10-K/10-Q·실적 8-K와 Item 목차, 읽을 명령 `next` |
+| 미국 공시 Item 읽기 | `uv run cluefin-openapi-cli sec filing-items --cik ... --accession-number ... --items 1A --json` (`--max-chars`·`--offset-chars`) |
+| 미국 실적 보도자료 | `uv run cluefin-openapi-cli sec filing-exhibit --cik ... --accession-number ... --exhibit EX-99.1 --json` |
 
 ### 뉴스·금리·환율
 
@@ -138,6 +141,12 @@ node scripts/company.mjs collect --symbol 192820
    이 섹션은 필수이며, `kis chart technical`의 trend·mean_reversion 두 계열을 따로 적는다.**
 9. `news-analysis`로 뉴스·공시를 호재/악재/중립으로 분류하고, `macro-analysis`로 금리·채권
    환경이 이 종목에 미치는 영향을 정리한다.
+   - **미국 비교 기업(선택).** `fundamental-analysis`·`news-analysis`가 미국 상장 고객사·경쟁사를
+     티커와 함께 꼽았으면 최대 2개사에 대해 `node scripts/peer.mjs pick --ticker <티커>`를 돌리고, 그
+     `next` 명령으로 10-K 1A·7(10-Q면 II:1A·I:2)과 실적 8-K의 EX-99.1을 읽어 수요·가이던스 근거로
+     쓴다. 꼽힌 회사가 없으면 건너뛰고 그렇다고 적는다. 읽는 법은 `fundamental-analysis`에 있다.
+   - `pick`이 exit 3이면 `SEC_USER_AGENT`가 없는 것이다(이 저장소 `.env`, `.env.example` 참고) — 건너뛰고 10번 섹션에 적는다.
+     `foreignPrivateIssuer: true`(20-F/6-K 제출사, 한국 ADR 대부분)면 SEC Item을 읽을 수 없다.
 10. `bull-analyst` → `bear-analyst` → `scenario-planner` → `final-decision` 순으로 긍정 의견,
     부정 의견, bull/base/bear 시나리오, buy/hold/sell/watch·기준선·손절선·확인 조건을 작성한다.
 
@@ -234,7 +243,8 @@ node scripts/company.mjs collect --symbol 192820
 
 ### 7. 뉴스·공시·매크로
 
-`news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과.
+`news-analysis`(호재/악재/중립 분류)와 `macro-analysis`(금리·환율) 결과. 미국 비교 기업 공시를
+읽었으면 회사·양식·접수일과 함께 수요·가이던스 근거를 여기에 둔다.
 
 ### 8. Bull / Bear / 시나리오
 

@@ -46,9 +46,10 @@ schemas/                      # final-decision frontmatter JSON Schema
 scripts/                      # deterministic steps lifted out of the skills
 ├── company.mjs               # collect: market-review report data (quarters, statements,
 │                             # consensus, broker targets, Key Data) in one JSON
+├── peer.mjs                  # pick: a US peer's newest 10-K/10-Q and results 8-K (SEC)
 ├── company/                  # DART statement parsing, consensus/holder/opinion mapping,
 │                             # filing-text excerpts (business overview, notes)
-└── lib/                      # cluefin CLI wrapper, KST date helpers
+└── lib/                      # cluefin CLI wrapper, KST date helpers, argument parsing
 tests/                        # vitest specs + fixtures
 ```
 
@@ -90,7 +91,10 @@ decorative.
 
 Market data tools shell out to the external **cluefin** CLI (`uv run
 cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
-`DART_AUTH_KEY`, `KIS_APP_KEY`/`KIS_SECRET_KEY`/`KIS_ENV`.
+`DART_AUTH_KEY`, `KIS_APP_KEY`/`KIS_SECRET_KEY`/`KIS_ENV`. US peer filings (`sec` commands,
+`scripts/peer.mjs`) also need `SEC_USER_AGENT="<name> <email>"` — SEC rejects anonymous clients,
+and without it the CLI exits 3. Korean ADRs mostly file 20-F/6-K, which `sec filing-items`
+cannot read; a Korean company's own filings are DART.
 
 ## Gotchas
 

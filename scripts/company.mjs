@@ -27,6 +27,7 @@ import {
   quarters,
   trailing,
 } from './company/statements.mjs';
+import { parseArgs } from './lib/args.mjs';
 import { CluefinError, dailyCandles, run, SECTOR, sectorDaily } from './lib/cluefin.mjs';
 import { kstClock, lookbackStart, SETTLED_MINUTES } from './lib/kst.mjs';
 
@@ -321,18 +322,6 @@ export function collect(flags, { cli = run, now = new Date() } = {}) {
       '컨센서스 PER·EV/EBITDA는 기준 가격이 불분명해 뺐다. valuation.perByYear가 기준 종가로 다시 계산한 값이다.',
     ],
   });
-}
-
-function parseArgs(argv) {
-  const [command, ...rest] = argv;
-  const flags = {};
-  for (let i = 0; i < rest.length; i += 2) {
-    if (!rest[i].startsWith('--') || rest[i + 1] === undefined) {
-      return { command, error: `알 수 없는 인자 ${rest[i]}` };
-    }
-    flags[rest[i].slice(2)] = rest[i + 1];
-  }
-  return { command, flags };
 }
 
 const USAGE = 'usage: node scripts/company.mjs collect --symbol <6자리> [--as-of YYYYMMDD]';
