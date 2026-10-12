@@ -46,7 +46,8 @@ schemas/                      # final-decision frontmatter JSON Schema
 scripts/                      # deterministic steps lifted out of the skills
 ├── company.mjs               # collect: market-review report data (quarters, statements,
 │                             # consensus, broker targets, Key Data) in one JSON
-├── company/                  # DART statement parsing, consensus/holder/opinion mapping
+├── company/                  # DART statement parsing, consensus/holder/opinion mapping,
+│                             # filing-text excerpts (business overview, notes)
 └── lib/                      # cluefin CLI wrapper, KST date helpers
 tests/                        # vitest specs + fixtures
 ```
@@ -106,6 +107,11 @@ cluefin-openapi-cli`). Required keys in `.env` (see `.env.example`):
   financial-major-indicators`; KIS keeps only EPS/BPS/SPS and the ratios DART leaves null.
   In KIS income statements
   `bsop_prti` is 영업이익 and `op_prfi` is 경상이익 — the name reads the other way.
+- **Segment revenue, order backlog and debt notes come from the filing text**, not the DART
+  JSON APIs (which have none of it). `collect`'s `filing` reads them from the latest periodic
+  report via `dart document-section`/`financial-notes`; which parts and how many characters are
+  fixed in `scripts/company/filing.mjs`. Non-periodic disclosures (supply contracts, investments)
+  still have titles only.
 - **Technical analysis goes through `kis chart technical`**, not raw OHLCV: the CLI pages
   the candles itself and returns indicator readings + rule votes only. Use `chart period`
   (chunked, ~120 days/call) only when the candle rows themselves are the deliverable. How

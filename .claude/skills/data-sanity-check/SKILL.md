@@ -23,6 +23,7 @@ effort: medium
 - 뉴스 중복 기사나 단순 재배포 기사가 과대표집됐는지
 - 환율, 금리, 채권 데이터의 기준 시간이 주가 데이터와 맞는지
 - 핵심 필드가 비어 있는데 모델이 추정하고 있지 않은지
+- 공시 원문 발췌(`filing`)가 `error`·`truncated`인지, 주석 분할 `warnings`가 있는지, `filing.rceptNo`가 재무 출처의 최신 보고서와 같은지
 
 출력:
 - 사용 가능 여부: usable, usable-with-caution, blocked
