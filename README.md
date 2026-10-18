@@ -1,5 +1,11 @@
 # Cluefin Factory
 
+> **2026-10-18 아카이브.** 이 저장소는 [cluefin](https://github.com/kgcrom/cluefin) 의 `.claude/agents/market-review.md` 하나로 흡수됐다.
+> 스킬 9개로 나눈 분석은 같은 모델이 같은 데이터로 양쪽을 연기하는 구조라 agent 하나와 결과가 다르지 않았고,
+> 실제 가치였던 데이터 정리(`scripts/company.mjs collect` 의 분기 역산·연결/별도·차입금 합산)와 데이터 함정 지식은
+> CLI 쪽에 속하는 것이라 별도 저장소를 유지할 이유가 없었다. 계산 로직은 cluefin-openapi-cli 계산 명령으로 옮기는
+> 중이다(cluefin 로드맵 B-7). 코드는 그대로 두니 참고용으로 읽으면 된다.
+
 ![market-review 파이프라인 다이어그램 — KIS·DART 데이터 수집부터 data-sanity-check 게이트, 기본적·기술적 분석, bull/bear 토론, 최종 판단, 종목별 투자 검토 리포트까지](docs/assets/factory_logo.png)
 
 Cluefin Factory는 한국 시장 투자 리서치 워크벤치입니다.
